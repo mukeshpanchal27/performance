@@ -63,7 +63,7 @@ jobs:
       versions: ${{ steps.set-versions.outputs.versions }}
     steps:
       - id: set-names
-        run: echo "names=$(jq 'keys' plugins.json)" >> $GITHUB_OUTPUT
+        run: echo "names=$(jq 'keys' package.json)" >> $GITHUB_OUTPUT
       - id: set-slugs
         run: echo "slugs=$(jq '.[].slug' plugins.json)" >> $GITHUB_OUTPUT
       - id: set-versions
