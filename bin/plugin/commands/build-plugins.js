@@ -89,6 +89,7 @@ exports.handler = async () => {
 					log( formats.error( `${ error }` ) );
 				}
 			}
+			log( plugins )
 		} catch ( jsonError ) {
 			log(
 				formats.error( `Error parsing JSON string: "${ jsonError }"` )
