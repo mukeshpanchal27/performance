@@ -60,21 +60,8 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - uses: styfle/cancel-workflow-action@0.9.1
-      - uses: actions/checkout@v3
-      - name: Setup Node.js (.nvmrc)
-        uses: actions/setup-node@v3
       - id: set-matrix
-        run: |
-          content=`cat ./plugins.json`
-          # the following lines are only required for multi line json
-          content="${content//'%'/'%25'}"
-          content="${content//$'\n'/'%0A'}"
-          content="${content//$'\r'/'%0D'}"
-          echo "${content}"
-          # end of optional handling for multi line json
-          echo "::set-output name=packageJson::$content"
-          echo "${{fromJson(steps.set-matrix.outputs.packageJson)}}"
+        run: echo "matrix={\"include\":[{\"project\":\"foo\",\"config\":\"Debug\"},{\"project\":\"bar\",\"config\":\"Release\"}]}" >> $GITHUB_OUTPUT
   job2:
     needs: job1
     runs-on: ubuntu-latest
