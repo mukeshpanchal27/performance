@@ -58,14 +58,21 @@ jobs:
   job1:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      names: ${{ steps.set-names.outputs.names }}
+      slugs: ${{ steps.set-slugs.outputs.slugs }}
+      versions: ${{ steps.set-versions.outputs.versions }}
     steps:
-      - id: set-matrix
-        run: echo "matrix={\"include\":[{\"project\":\"foo\",\"config\":\"Debug\"},{\"project\":\"bar\",\"config\":\"Release\"}]}" >> $GITHUB_OUTPUT
+      - id: set-names
+        run: echo "names=$(jq 'keys' /path/to/plugins.json)" >> $GITHUB_OUTPUT
+      - id: set-slugs
+        run: echo "slugs=$(jq '.[].slug' /path/to/plugins.json)" >> $GITHUB_OUTPUT
+      - id: set-versions
+        run: echo "versions=$(jq '.[].version' /path/to/plugins.json)" >> $GITHUB_OUTPUT
   job2:
     needs: job1
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJSON(needs.job1.outputs.matrix) }}
-    steps:
-      - run: build
+      matrix:
+        name: ${{ fromJSON(needs.job1.outputs.names) }}
+        slug: ${{ fromJSON(needs.job1.outputs.slugs) }}
+        version: ${{ fromJSON(needs.job1.outputs.versions) }}
