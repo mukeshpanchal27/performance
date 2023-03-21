@@ -56,5 +56,5 @@ jobs:
         run: npm run build-plugins
       - name: Dump steps context
         env:
-          STEPS_CONTEXT: ${{ toJson(build-plugins) }}
+          STEPS_CONTEXT: ${{ toJson(steps) }}
         run: echo "$STEPS_CONTEXT"
