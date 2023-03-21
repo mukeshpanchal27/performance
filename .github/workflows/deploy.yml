@@ -7,7 +7,7 @@ on:
       - 'release/**'
     # Only run if PHP-related files changed.
     paths:
-      - '.github/workflows/php-test.yml'
+      - '.github/workflows/deploy.yml'
       - '**.php'
       - '.wp-env.json'
       - '**/package.json'
@@ -23,7 +23,7 @@ on:
       - 'feature/**'
     # Only run if PHP-related files changed.
     paths:
-      - '.github/workflows/php-test.yml'
+      - '.github/workflows/deploy.yml'
       - '**.php'
       - '.wp-env.json'
       - '**/package.json'
