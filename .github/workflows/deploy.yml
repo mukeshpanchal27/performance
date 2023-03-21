@@ -76,3 +76,6 @@ jobs:
         name: ${{ fromJSON(needs.job1.outputs.names) }}
         slug: ${{ fromJSON(needs.job1.outputs.slugs) }}
         version: ${{ fromJSON(needs.job1.outputs.versions) }}
+    steps:
+      - run: npm run build-plugins
+      
