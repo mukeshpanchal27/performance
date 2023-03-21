@@ -37,24 +37,35 @@ on:
       - reopened
       - synchronize
 
+#jobs:
+#  release:
+#    name: New Release
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: styfle/cancel-workflow-action@0.9.1
+#      - uses: actions/checkout@v3
+#      - name: Setup Node.js (.nvmrc)
+#        uses: actions/setup-node@v3
+#        with:
+#          node-version-file: '.nvmrc'
+#          cache: npm
+#      - name: npm install
+#        run: npm ci
+#      - name: Building standalone plugins
+#        id: build-plugins
+#        run: npm run build-plugins
 jobs:
-  release:
-    name: New Release
+  job1:
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - uses: styfle/cancel-workflow-action@0.9.1
-      - uses: actions/checkout@v3
-      - name: Setup Node.js (.nvmrc)
-        uses: actions/setup-node@v3
-        with:
-          node-version-file: '.nvmrc'
-          cache: npm
-      - name: npm install
-        run: npm ci
-      - name: Building standalone plugins
-        id: build-plugins
-        run: npm run build-plugins
-      - name: Dump steps context
-        env:
-          STEPS_CONTEXT: ${{ toJson(steps) }}
-        run: echo "$STEPS_CONTEXT"
+      - id: set-matrix
+        run: echo "matrix={\"include\":[{\"project\":\"foo\",\"config\":\"Debug\"},{\"project\":\"bar\",\"config\":\"Release\"}]}" >> $GITHUB_OUTPUT
+  job2:
+    needs: job1
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJSON(needs.job1.outputs.matrix) }}
+    steps:
+      - run: build
