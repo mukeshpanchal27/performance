@@ -52,4 +52,9 @@ jobs:
       - name: npm install
         run: npm ci
       - name: Building standalone plugins
+        id: build-plugins
         run: npm run build-plugins
+      - name: Dump steps context
+        env:
+          STEPS_CONTEXT: ${{ toJson(build-plugins) }}
+        run: echo "$STEPS_CONTEXT"
