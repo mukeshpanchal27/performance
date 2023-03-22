@@ -58,9 +58,7 @@ jobs:
   job1:
     runs-on: ubuntu-latest
     outputs:
-      names: ${{ steps.set-names.outputs.names }}
-      slugs: ${{ steps.set-slugs.outputs.slugs }}
-      versions: ${{ steps.set-versions.outputs.versions }}
+      slugs: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - uses: actions/checkout@v3
       - id: set-matrix
