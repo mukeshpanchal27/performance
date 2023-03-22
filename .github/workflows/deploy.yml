@@ -62,7 +62,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - id: set-matrix
-        run: echo "matrix="$(jq -c '[keys[] as $k | {name:$k,slug:.[$k].slug,version:.[$k].version }]' plugins.json) >> $GITHUB_OUTPUT
+        run: echo "matrix="$(jq -c '{include:[keys[] as $k | {name:$k,slug:.[$k].slug,version:.[$k].version }]}' plugins.json) >> $GITHUB_OUTPUT
   job2:
     needs: job1
     runs-on: ubuntu-latest
