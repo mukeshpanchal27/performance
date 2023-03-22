@@ -66,7 +66,7 @@ jobs:
       - id: set-names
         run: |
           echo "names=$(jq -c 'keys' plugins.json)" >> $GITHUB_OUTPUT
-          echo ${{name}}
+          echo ${{names}}
       - id: set-slugs
         run: |
           echo 'slugs=\"$(jq -c '.[].slug' plugins.json)\"' >> $GITHUB_OUTPUT
