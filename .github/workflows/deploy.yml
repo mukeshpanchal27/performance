@@ -58,7 +58,7 @@ jobs:
   job1:
     runs-on: ubuntu-latest
     outputs:
-      slugs: ${{ steps.set-matrix.outputs.matrix }}
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - uses: actions/checkout@v3
       - id: set-matrix
@@ -67,10 +67,7 @@ jobs:
     needs: job1
     runs-on: ubuntu-latest
     strategy:
-      matrix:
-#        name: ${{ fromJSON(fromJSON(toJSON(needs.job1.outputs.names))) }}
-        slug: ${{ fromJSON(fromJSON(toJSON(needs.job1.outputs.matrix))) }}
-#        version: ${{ fromJSON(fromJSON(toJSON(needs.job1.outputs.versions))) }}
+      matrix: ${{ fromJSON(toJSON(needs.job1.outputs.matrix)) }}
     steps:
       - uses: actions/checkout@v3
       - name: Setup Node.js (.nvmrc)
