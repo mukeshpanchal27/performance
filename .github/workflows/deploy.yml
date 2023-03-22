@@ -82,6 +82,6 @@ jobs:
         env:
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
-          SLUG: ${{ matrix.version }}
-          VERSION: ${{ matrix.slug }}
+          SLUG: ${{ matrix.slug }}
+          VERSION: ${{ matrix.version }}
           BUILD_DIR: ./build/${{ matrix.slug }}
