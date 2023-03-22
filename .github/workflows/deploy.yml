@@ -62,6 +62,7 @@ jobs:
       slugs: ${{ steps.set-slugs.outputs.slugs }}
       versions: ${{ steps.set-versions.outputs.versions }}
     steps:
+      - uses: actions/checkout@v3
       - id: set-names
         run: echo "names=$(jq 'keys' package.json)" >> $GITHUB_OUTPUT
       - id: set-slugs
@@ -77,5 +78,6 @@ jobs:
         slug: ${{ fromJSON(needs.job1.outputs.slugs) }}
         version: ${{ fromJSON(needs.job1.outputs.versions) }}
     steps:
+      - uses: actions/checkout@v3
       - run: npm run build-plugins
       
