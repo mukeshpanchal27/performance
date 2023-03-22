@@ -63,19 +63,15 @@ jobs:
       versions: ${{ steps.set-versions.outputs.versions }}
     steps:
       - uses: actions/checkout@v3
-      - id: set-names
-        run: echo "names="$(jq -c 'keys' plugins.json) >> $GITHUB_OUTPUT
-      - id: set-slugs
-        run: echo "slugs="$(jq -c '[.[].slug]' plugins.json) >> $GITHUB_OUTPUT
-      - id: set-versions
-        run: echo "versions="$(jq -c '[.[].version]' plugins.json) >> $GITHUB_OUTPUT
+      - id: set-matrix
+        run: echo "matrix="$(jq -c '[keys[] as $k | [ .[$k] ]]' plugins.json) >> $GITHUB_OUTPUT
   job2:
     needs: job1
     runs-on: ubuntu-latest
     strategy:
       matrix:
 #        name: ${{ fromJSON(fromJSON(toJSON(needs.job1.outputs.names))) }}
-        slug: ${{ fromJSON(fromJSON(toJSON(needs.job1.outputs.slugs))) }}
+        slug: ${{ fromJSON(fromJSON(toJSON(needs.job1.outputs.matrix))) }}
 #        version: ${{ fromJSON(fromJSON(toJSON(needs.job1.outputs.versions))) }}
     steps:
       - uses: actions/checkout@v3
