@@ -79,5 +79,14 @@ jobs:
         version: ${{ fromJSON(fromJSON(toJSON(needs.job1.outputs.versions))) }}
     steps:
       - uses: actions/checkout@v3
-      - run: npm run build-plugins
+      - name: Setup Node.js (.nvmrc)
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+      - name: npm install
+        run: npm ci
+      - name: Building standalone plugins
+        id: build-plugins
+        run: npm run build-plugins
       
