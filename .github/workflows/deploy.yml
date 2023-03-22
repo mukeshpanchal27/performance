@@ -74,7 +74,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        name: ${{ fromJSON(fromJSON(toJSON(needs.job1.outputs.names))) }}
+#        name: ${{ fromJSON(fromJSON(toJSON(needs.job1.outputs.names))) }}
         slug: ${{ fromJSON(fromJSON(toJSON(needs.job1.outputs.slugs))) }}
         version: ${{ fromJSON(fromJSON(toJSON(needs.job1.outputs.versions))) }}
     steps:
