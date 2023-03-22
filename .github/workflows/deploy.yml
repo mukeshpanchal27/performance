@@ -66,15 +66,15 @@ jobs:
       - id: set-names
         run: |
           echo "names=$(jq -c 'keys' plugins.json)" >> $GITHUB_OUTPUT
-          echo ${{names}}
+          echo $names
       - id: set-slugs
         run: |
           echo 'slugs=\"$(jq -c '.[].slug' plugins.json)\"' >> $GITHUB_OUTPUT
-          echo ${{slugs}}
+          echo $slugs
       - id: set-versions
         run: |
           echo 'versions=\"$(jq -c '.[].version' plugins.json)\"' >> $GITHUB_OUTPUT
-          echo ${{versions}}
+          echo $versions
   job2:
     needs: job1
     runs-on: ubuntu-latest
