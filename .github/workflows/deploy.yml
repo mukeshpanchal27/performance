@@ -74,9 +74,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        name: ${{ fromJSON(toJSON(needs.job1.outputs.names)) }}
-        slug: ${{ fromJSON(toJSON(needs.job1.outputs.slugs)) }}
-        version: ${{ fromJSON(toJSON(needs.job1.outputs.versions)) }}
+        name: ${{ fromJSON(fromJSON(toJSON(needs.job1.outputs.names))) }}
+        slug: ${{ fromJSON(fromJSON(toJSON(needs.job1.outputs.slugs))) }}
+        version: ${{ fromJSON(fromJSON(toJSON(needs.job1.outputs.versions))) }}
     steps:
       - uses: actions/checkout@v3
       - run: npm run build-plugins
