@@ -64,17 +64,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - id: set-names
-        run: |
-          echo "names=$(jq -c 'keys' plugins.json)" >> $GITHUB_OUTPUT
-          echo $names
+        run: echo "names=$(jq -c 'keys' plugins.json | sed 's/"/\\"/g')" >> $GITHUB_OUTPUT
       - id: set-slugs
-        run: |
-          echo 'slugs=\"$(jq -c '.[].slug' plugins.json)\"' >> $GITHUB_OUTPUT
-          echo $slugs
+        run: echo 'slugs=\"$(jq -c '.[].slug' plugins.json | sed 's/"/\\"/g')\"' >> $GITHUB_OUTPUT
       - id: set-versions
-        run: |
-          echo 'versions=\"$(jq -c '.[].version' plugins.json)\"' >> $GITHUB_OUTPUT
-          echo $versions
+        run: echo 'versions=\"$(jq -c '.[].version' plugins.json | sed 's/"/\\"/g')\"' >> $GITHUB_OUTPUT
   job2:
     needs: job1
     runs-on: ubuntu-latest
