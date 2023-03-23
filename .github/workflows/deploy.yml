@@ -57,5 +57,4 @@ jobs:
           SLUG: ${{ matrix.slug }}
           VERSION: ${{ matrix.version }}
           BUILD_DIR: ./build/${{ matrix.slug }}
-        run: ${GITHUB_WORKSPACE}/deploy.sh
-        shell: bash
+        run: bash ./deploy.sh
