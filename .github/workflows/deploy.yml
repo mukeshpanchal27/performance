@@ -48,7 +48,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Deploy Standalone Plugin - ${{ matrix.slug }}
-        uses: 10up/action-wordpress-plugin-deploy@stable
+#        uses: 10up/action-wordpress-plugin-deploy@stable
         env:
           #SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           #SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
@@ -57,3 +57,5 @@ jobs:
           SLUG: ${{ matrix.slug }}
           VERSION: ${{ matrix.version }}
           BUILD_DIR: ./build/${{ matrix.slug }}
+        run: ./deploy.sh
+        shell: bash
