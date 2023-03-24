@@ -61,4 +61,6 @@ jobs:
           SLUG: ${{ matrix.slug }}
           VERSION: ${{ matrix.version }}
           BUILD_DIR: ./build/${{ matrix.slug }}
-        run: bash ./deploy.sh
+        run: |
+          ls -R
+          bash ./deploy.sh
