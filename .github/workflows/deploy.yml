@@ -74,4 +74,4 @@ jobs:
           SVN_USERNAME: SVN_USERNAME
           SLUG: ${{ matrix.slug }}
           VERSION: ${{ matrix.version }}
-          BUILD_DIR: build/${{ matrix.slug }}
+          BUILD_DIR: ${{ github.workspace }}/build/${{ matrix.slug }}
