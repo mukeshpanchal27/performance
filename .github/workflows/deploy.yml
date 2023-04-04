@@ -1,23 +1,32 @@
 name: Deploy standalone plugins to WordPress.org
 
+#on:
+#  push:
+#    branches:
+#      - trunk
+#      - 'release/**'
+#    paths:
+#      - '.github/workflows/deploy.yml'
+#  pull_request:
+#    branches:
+#      - trunk
+#      - 'release/**'
+#      - 'feature/**'
+#    paths:
+#      - '.github/workflows/deploy.yml'
+#    types:
+#      - opened
+#      - reopened
+#      - synchronize
+
 on:
-  push:
-    branches:
-      - trunk
-      - 'release/**'
-    paths:
-      - '.github/workflows/deploy.yml'
-  pull_request:
-    branches:
-      - trunk
-      - 'release/**'
-      - 'feature/**'
-    paths:
-      - '.github/workflows/deploy.yml'
-    types:
-      - opened
-      - reopened
-      - synchronize
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      slug:
+        type: string
+        description: 'The slug of the plugin to deploy'
 
 jobs:
   release:
