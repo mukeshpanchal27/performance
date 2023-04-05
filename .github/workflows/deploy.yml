@@ -37,7 +37,7 @@ jobs:
         # Load the JSON file and parse from "{name: {slug, version}, ...}" to "include: [{ name, slug, version }, ...]"
         # for use in the matrix.
         run: |
-          if [[ github.event_name == 'workflow_dispatch' &&  ]]; then
+          if [[ github.event_name == 'workflow_dispatch' ]]; then
             echo "matrix='[name:inputs.slug,slug:inputs.slug,version:inputs.version]' >> $GITHUB_OUTPUT
           else
             echo "matrix="$(jq -c '{include:[keys[] as $k | {name:$k,slug:.[$k].slug,version:.[$k].version }]}' plugins.json) >> $GITHUB_OUTPUT
