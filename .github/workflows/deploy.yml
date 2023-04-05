@@ -61,7 +61,9 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
       - name: Building standalone plugins
-        run: npm run build-plugins
+        run: |
+          npm run build-plugins
+          echo ${{ matrix }}
       - name: Deploy Standalone Plugin - ${{ matrix.slug }}
         # TODO Once the workflow is tested, we will remove the comment and use the 10up action to deploy the plugin.
         #uses: 10up/action-wordpress-plugin-deploy@stable
