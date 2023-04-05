@@ -38,6 +38,12 @@ jobs:
         # for use in the matrix.
         run: |
           if [[ github.event_name == 'workflow_dispatch' ]]; then
+            echo 'Manual';
+          else
+            echo 'Auto';
+          fi
+
+          if ${{ github.event_name != 'workflow_dispatch' }}; then
             echo $version
             echo "matrix='[name:$slug,slug:$slug,version:$version]'" >> $GITHUB_OUTPUT
           else
