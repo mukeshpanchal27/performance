@@ -34,12 +34,13 @@ jobs:
         uses: actions/checkout@v3
       - name: Set matrix
         id: set-matrix
-        # Load the JSON file and parse from "{name: {slug, version}, ...}" to "include: [{ name, slug, version }, ...]"
-        # for use in the matrix.
         run: |
           if ${{ github.event_name == 'workflow_dispatch' }}; then
+            # Set the matrix based on the input values when the workflow_dispatch event triggers.
             echo "matrix={\"include\":[{\"name\":\"${{ inputs.slug }}\",\"slug\":\"${{ inputs.slug }}\",\"version\":\"${{ inputs.version }}\"}]}" >> $GITHUB_OUTPUT
           else
+            # Load the JSON file and parse from "{name: {slug, version}, ...}" to "include: [{ name, slug, version }, ...]"
+            # for use in the matrix.
             echo "matrix="$(jq -c '{include:[keys[] as $k | {name:$k,slug:.[$k].slug,version:.[$k].version }]}' plugins.json) >> $GITHUB_OUTPUT
           fi
   deploy:
