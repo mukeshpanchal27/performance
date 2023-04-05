@@ -43,6 +43,7 @@ jobs:
           else
             echo 'tests'
             echo "matrix="$(jq -c '{include:[keys[] as $k | {name:$k,slug:.[$k].slug,version:.[$k].version }]}' plugins.json) >> $GITHUB_OUTPUT
+            echo $matrix
           fi
   deploy:
     needs: release
