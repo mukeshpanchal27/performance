@@ -37,7 +37,7 @@ jobs:
         run: |
           if ${{ github.event_name == 'workflow_dispatch' }}; then
             # Set the matrix based on the input values when the workflow_dispatch event triggers.
-            echo "matrix={\"include\":[{\"name\":\"${{ inputs.slug }}\",\"slug\":\"${{ inputs.slug }}\",\"version\":\"${{ inputs.version }}\"}]}" >> $GITHUB_OUTPUT
+            echo "matrix={\"include\":[{\"slug\":\"${{ inputs.slug }}\",\"version\":\"${{ inputs.version }}\"}]}" >> $GITHUB_OUTPUT
           else
             # Load the JSON file and parse from "{name: {slug, version}, ...}" to "include: [{ name, slug, version }, ...]"
             # for use in the matrix.
