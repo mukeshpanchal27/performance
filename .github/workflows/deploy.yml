@@ -39,7 +39,7 @@ jobs:
         run: |
           if ${{ github.event_name == 'workflow_dispatch' }}; then
             echo ${{ inputs.version }}
-            echo "matrix='[{\"name\":\"${{ inputs.slug }}\",\"slug\":\"${{ inputs.slug }}\",\"version\":\"${{ inputs.version }}\"}]'" >> $GITHUB_OUTPUT
+            echo "::set-output name=matrix::{\"include\":[{\"name\":\"${{ inputs.slug }}\",\"slug\":\"${{ inputs.slug }}\",\"version\":\"${{ inputs.version }}\"}]}"
           else
             echo 'tests'
             echo "matrix="$(jq -c '{include:[keys[] as $k | {name:$k,slug:.[$k].slug,version:.[$k].version }]}' plugins.json) >> $GITHUB_OUTPUT
@@ -61,9 +61,7 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
       - name: Building standalone plugins
-        run: |
-          npm run build-plugins
-          echo ${{ matrix }}
+        run: npm run build-plugins
       - name: Deploy Standalone Plugin - ${{ matrix.slug }}
         # TODO Once the workflow is tested, we will remove the comment and use the 10up action to deploy the plugin.
         #uses: 10up/action-wordpress-plugin-deploy@stable
