@@ -38,8 +38,10 @@ jobs:
         # for use in the matrix.
         run: |
           if [[ github.event_name == 'workflow_dispatch' ]]; then
+            echo $version
             echo "matrix='[name:$slug,slug:$slug,version:$version]'" >> $GITHUB_OUTPUT
           else
+            echo 'tests'
             echo "matrix="$(jq -c '{include:[keys[] as $k | {name:$k,slug:.[$k].slug,version:.[$k].version }]}' plugins.json) >> $GITHUB_OUTPUT
           fi
   deploy:
