@@ -38,12 +38,9 @@ jobs:
         # for use in the matrix.
         run: |
           if ${{ github.event_name == 'workflow_dispatch' }}; then
-            echo ${{ inputs.version }}
-            echo "::set-output name=matrix::{\"include\":[{\"name\":\"${{ inputs.slug }}\",\"slug\":\"${{ inputs.slug }}\",\"version\":\"${{ inputs.version }}\"}]}"
+            echo "matrix="'{include:[{slug:${{ inputs.slug }},version:${{ inputs.version }} }]}' >> $GITHUB_OUTPUT
           else
-            echo 'tests'
             echo "matrix="$(jq -c '{include:[keys[] as $k | {name:$k,slug:.[$k].slug,version:.[$k].version }]}' plugins.json) >> $GITHUB_OUTPUT
-            echo $matrix
           fi
   deploy:
     needs: release
