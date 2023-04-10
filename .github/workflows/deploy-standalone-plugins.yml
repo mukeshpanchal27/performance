@@ -45,9 +45,10 @@ jobs:
           script: |
             const fs = require( 'fs' ).promises;
             const path = require( 'path' );
-            
+
             const pluginsFile = path.join( '.', 'plugins.json' );
-            console.log( pluginsFile );
+            const event = JSON.parse(fs.readFileSync(pluginsFile, 'utf8'))
+            console.log( event );
   deploy:
     name: Deploy Plugin
     needs: release
