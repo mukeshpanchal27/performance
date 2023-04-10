@@ -6,11 +6,16 @@ on:
   workflow_dispatch:
     inputs:
       slug:
-        type: string
+        type: choice
+        options:
+        - audit-autoloaded-options
+        - audit-enqueued-assets
+        - dominant-color-images
+        - fetchpriority
+        - sqlite
+        - webp-support
+        - webp-uploads
         description: 'The slug of the plugin to deploy'
-      version:
-        type: string
-        description: 'The version of the plugin to deploy'
 
 jobs:
   release:
