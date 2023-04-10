@@ -28,18 +28,10 @@ jobs:
         uses: actions/checkout@v3
       - name: Set matrix
         id: set-matrix
-        run: |
-          if ${{ github.event_name == 'workflow_dispatch' }}; then
-            const fs = require( 'fs-extra' );
-            const path = require( 'path' );
-            const pluginsFile = path.join( '.', 'plugins.json' );
-            # Set the manual input values in JSON format for use in the matrix.
-            echo "matrix={\"include\":[{\"slug\":\"${{ inputs.slug }}\",\"version\":\"${{ inputs.version }}\"}]}" >> $GITHUB_OUTPUT
-          else
-            # Load the JSON file and parse from "{name: {slug, version}, ...}" to "include: [{ name, slug, version }, ...]"
-            # for use in the matrix.
-            echo "matrix="$(jq -c '{include:[keys[] as $k | {name:$k,slug:.[$k].slug,version:.[$k].version }]}' plugins.json) >> $GITHUB_OUTPUT
-          fi
+        uses: actions/github-script@v6
+        with:
+          script: |
+            console.log( 'Yes' )
   deploy:
     name: Deploy Plugin
     needs: release
