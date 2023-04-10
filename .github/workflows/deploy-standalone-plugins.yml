@@ -34,14 +34,14 @@ jobs:
           script: |
             if ( ${{ github.event_name == 'workflow_dispatch' }} ) {
               const matrix = [{"slug": "${{ inputs.slug }}", "version": "1.2.1"}];
-              return "matrix = [{"slug": "${{ inputs.slug }}", "version": "1.2.1"}]"
+              return matrix
             }
   deploy:
     name: Deploy Plugin
     needs: release
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJSON(needs.release.outputs.matrix) }}
+      matrix: ${{ fromJSON(needs.release.outputs) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
