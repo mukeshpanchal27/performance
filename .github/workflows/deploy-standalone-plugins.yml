@@ -70,6 +70,8 @@ jobs:
                   console.log( pluginVersion );
                   console.log( pluginSlug );
                 }
+              } catch ( jsonError ) {
+                console.log( `Error parsing JSON string: "${ jsonError }"` );
               }
             });
 
