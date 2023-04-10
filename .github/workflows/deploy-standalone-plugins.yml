@@ -43,7 +43,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const fs = require( 'fs-extra' );
+            const fs = require( 'fs' ).promises;
             const path = require( 'path' );
             
             const pluginsFile = path.join( '.', 'plugins.json' );
