@@ -43,7 +43,11 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            console.log( 'Yes' )
+            const fs = require( 'fs-extra' );
+            const path = require( 'path' );
+            
+            const pluginsFile = path.join( '.', 'plugins.json' );
+            console.log( pluginsFile );
   deploy:
     name: Deploy Plugin
     needs: release
