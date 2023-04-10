@@ -32,7 +32,7 @@ jobs:
         with:
           script: |
             if ( ${{ github.event_name == 'workflow_dispatch' }} ) {
-              return "matrix=''"
+              return "matrix={\"include\":[{\"slug\":\"${{ inputs.slug }}\",\"version\":\"1.1.2\"}]}"
             } else {
               console.log( "dev" )
             }
