@@ -32,10 +32,11 @@ jobs:
         with:
           script: |
             if ( ${{ github.event_name == 'workflow_dispatch' }} ) {
-              return "matrix={"include":[{"slug":"${{ inputs.slug }}","version":"1.1.2"}]}"
+              const matrix = "{"include":[{"slug":"${{ inputs.slug }}","version":"1.1.2"}]}"
             } else {
-              console.log( "dev" )
+              console.log( matrix )
             }
+            console.log( "dev" )
   deploy:
     name: Deploy Plugin
     needs: release
