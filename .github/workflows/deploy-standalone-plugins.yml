@@ -42,7 +42,7 @@ jobs:
     needs: release
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJSON(needs.release.outputs) }}
+      matrix: ${{ fromJSON(needs.release.outputs.matrix) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
