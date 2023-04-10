@@ -69,9 +69,7 @@ jobs:
                     process.exit( 1 );
                   }
                   if ( ${{ github.event_name == 'workflow_dispatch' }} ) {
-                    if ( ${{ inputs.slug == ${pluginSlug} }} ) {
-                      console.log( "test" );
-                    }
+
                     if ( ${{ inputs.slug }} == ${pluginSlug} ) {
                       console.log( "dev" );
                     }
