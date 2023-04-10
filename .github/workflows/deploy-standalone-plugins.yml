@@ -32,14 +32,6 @@ jobs:
         with:
           script: |
             console.log( github.event_name );
-            if ( github.event_name == 'workflow_dispatch' ) {
-              // # Set the manual input values in JSON format for use in the matrix.
-              return "matrix={\"include\":[{\"slug\":\"${{ inputs.slug }}\",\"version\":\"${{ inputs.version }}\"}]}"
-            } else {
-              // # Load the JSON file and parse from "{name: {slug, version}, ...}" to "include: [{ name, slug, version }, ...]"
-              // # for use in the matrix.
-              return "matrix="$(jq -c '{include:[keys[] as $k | {name:$k,slug:.[$k].slug,version:.[$k].version }]}' plugins.json)
-            }
   deploy:
     name: Deploy Plugin
     needs: release
