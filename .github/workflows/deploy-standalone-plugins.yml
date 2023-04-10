@@ -74,9 +74,7 @@ jobs:
                       pluginsFileVersion = pluginVersion;
                     }
                   }
-                  console.log( pluginsFileVersion );
-                  console.log( pluginVersion );
-                  console.log( pluginSlug );
+                  return pluginsFileVersion;
                 }
               } catch ( jsonError ) {
                 console.log( `Error parsing JSON string: "${ jsonError }"` );
