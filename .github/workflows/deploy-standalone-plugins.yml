@@ -33,11 +33,9 @@ jobs:
           debug: true
           script: |
             if ( ${{ github.event_name == 'workflow_dispatch' }} ) {
-              const matrix = [
-                {"slug": "Rahul", "version": 89},
-              ];
-                          console.log( matrix )
-            return matrix
+              const matrix = [{"slug": "${{ inputs.slug }}", "version": "1.2.1"}];
+              console.log( matrix )
+              return matrix
             }
   deploy:
     name: Deploy Plugin
