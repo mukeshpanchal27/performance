@@ -31,7 +31,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            if ${{ github.event_name == 'workflow_dispatch' }} {
+            if ( ${{ github.event_name == 'workflow_dispatch' }} ) {
               console.log( "matrix=["1"]" )
             } else {
               console.log( "matrix=["2"]" )
