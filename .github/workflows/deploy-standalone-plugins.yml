@@ -70,7 +70,7 @@ jobs:
                   }
                   if ( ${{ github.event_name == 'workflow_dispatch' }} ) {
 
-                    if ( ${{ inputs.slug }} == pluginSlug ) {
+                    if ( "${{ inputs.slug }}" == pluginSlug ) {
                       console.log( "dev" );
                     }
                     console.log( ${{ inputs.slug }} );
