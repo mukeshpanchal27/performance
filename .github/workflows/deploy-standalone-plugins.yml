@@ -68,7 +68,7 @@ jobs:
                     );
                     process.exit( 1 );
                   }
-                  if ( ${{ github.event_name == 'workflow_dispatch' }} && ${{ inputs.version }} == pluginSlug ) {
+                  if ( ${{ github.event_name == 'workflow_dispatch' }} && ${{ inputs.version == pluginSlug }} ) {
                     pluginsFileVersion = pluginVersion;
                   }
                   console.log( pluginsFileVersion );
