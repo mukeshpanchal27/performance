@@ -36,9 +36,9 @@ jobs:
               const matrix = [
                 {"slug": "Rahul", "version": 89},
               ];
-            }
-            console.log( matrix )
+                          console.log( matrix )
             return matrix
+            }
   deploy:
     name: Deploy Plugin
     needs: release
