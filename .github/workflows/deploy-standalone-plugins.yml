@@ -69,6 +69,12 @@ jobs:
                     process.exit( 1 );
                   }
                   if ( ${{ github.event_name == 'workflow_dispatch' }} ) {
+                    if ( ${{ inputs.slug == pluginSlug }} ) {
+                      console.log( "test" );
+                    }
+                    if ( ${{ inputs.slug }} == pluginSlug ) {
+                      console.log( "dev" );
+                    }
                     console.log( ${{ inputs.slug }} );
                     console.log( pluginSlug );
                     pluginsFileVersion = pluginVersion;
@@ -77,7 +83,6 @@ jobs:
                   console.log( pluginVersion );
                   console.log( pluginSlug );
                 }
-                console.log( "matrix="$(jq -c '{include:[keys[] as $k | {name:$k,slug:.[$k].slug,version:.[$k].version }]}' plugins.json) );
               } catch ( jsonError ) {
                 console.log( `Error parsing JSON string: "${ jsonError }"` );
               }
