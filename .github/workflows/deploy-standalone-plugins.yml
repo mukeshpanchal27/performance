@@ -31,7 +31,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            console.log( $github.event_name );
+            console.log( ${{ github.event_name }} );
   deploy:
     name: Deploy Plugin
     needs: release
