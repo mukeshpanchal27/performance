@@ -32,9 +32,9 @@ jobs:
         with:
           script: |
             if ( ${{ github.event_name }} == 'workflow_dispatch' ) {
-              console.log( "matrix=["1"]" )
+              console.log( "test" )
             } else {
-              console.log( "matrix=["2"]" )
+              console.log( "dev" )
             }
   deploy:
     name: Deploy Plugin
