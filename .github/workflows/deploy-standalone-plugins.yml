@@ -71,11 +71,8 @@ jobs:
                   if ( ${{ github.event_name == 'workflow_dispatch' }} ) {
 
                     if ( "${{ inputs.slug }}" == pluginSlug ) {
-                      console.log( "dev" );
+                      pluginsFileVersion = pluginVersion;
                     }
-                    console.log( ${{ inputs.slug }} );
-                    console.log( pluginSlug );
-                    pluginsFileVersion = pluginVersion;
                   }
                   console.log( pluginsFileVersion );
                   console.log( pluginVersion );
