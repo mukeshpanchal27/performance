@@ -48,6 +48,7 @@ jobs:
             const fs = require( 'fs' );
             const path = require( 'path' );
 
+            let pluginsFileVersion = '';
             const pluginsFile = path.join( '.', 'plugins.json' );
             fs.readFile( pluginsFile, 'utf8', ( err, jsonString ) => {
               if ( err ) {
@@ -67,9 +68,14 @@ jobs:
                     );
                     process.exit( 1 );
                   }
+                  if ( ${{ github.event_name == 'workflow_dispatch' }} && ${{ inputs.version }} == pluginSlug ) {
+                    pluginsFileVersion = pluginVersion;
+                  }
+                  console.log( pluginsFileVersion );
                   console.log( pluginVersion );
                   console.log( pluginSlug );
                 }
+                console.log( echo "matrix="$(jq -c '{include:[keys[] as $k | {name:$k,slug:.[$k].slug,version:.[$k].version }]}' plugins.json) )
               } catch ( jsonError ) {
                 console.log( `Error parsing JSON string: "${ jsonError }"` );
               }
