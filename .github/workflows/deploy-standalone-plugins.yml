@@ -49,8 +49,30 @@ jobs:
             const path = require( 'path' );
 
             const pluginsFile = path.join( '.', 'plugins.json' );
-            const event = JSON.parse(fs.readFileSync(pluginsFile, 'utf8'))
-            console.log( event );
+            fs.readFile( pluginsFile, 'utf8', ( err, jsonString ) => {
+              if ( err ) {
+                console.log( `Error reading file from disk: "${ err }"` ) );
+                process.exit( 1 );
+              }
+
+              try {
+                const plugins = JSON.parse( jsonString );
+                for ( const moduleDir in plugins ) {
+                  const pluginVersion = plugins[ moduleDir ]?.version;
+                  const pluginSlug = plugins[ moduleDir ]?.slug;
+
+                  if ( ! pluginVersion || ! pluginSlug ) {
+                    console.log(
+                        'The given module configuration is invalid, the module JSON object is missing the "version" and/or "slug" properties, or they are misspelled.'
+                    );
+                    process.exit( 1 );
+                  }
+                  console.log( pluginVersion );
+                  console.log( pluginSlug );
+                }
+              }
+            });
+
   deploy:
     name: Deploy Plugin
     needs: release
