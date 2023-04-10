@@ -32,7 +32,7 @@ jobs:
         with:
           script: |
             if ( ${{ github.event_name == 'workflow_dispatch' }} ) {
-              console.log( "test" )
+              return matrix="["1","2"]"
             } else {
               console.log( "dev" )
             }
