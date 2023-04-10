@@ -51,7 +51,7 @@ jobs:
             const pluginsFile = path.join( '.', 'plugins.json' );
             fs.readFile( pluginsFile, 'utf8', ( err, jsonString ) => {
               if ( err ) {
-                console.log( `Error reading file from disk: "${ err }"` ) );
+                console.log( `Error reading file from disk: "${ err }"` );
                 process.exit( 1 );
               }
 
