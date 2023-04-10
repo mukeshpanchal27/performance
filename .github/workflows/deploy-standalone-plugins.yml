@@ -30,6 +30,9 @@ jobs:
         id: set-matrix
         run: |
           if ${{ github.event_name == 'workflow_dispatch' }}; then
+            const fs = require( 'fs-extra' );
+            const path = require( 'path' );
+            const pluginsFile = path.join( '.', 'plugins.json' );
             # Set the manual input values in JSON format for use in the matrix.
             echo "matrix={\"include\":[{\"slug\":\"${{ inputs.slug }}\",\"version\":\"${{ inputs.version }}\"}]}" >> $GITHUB_OUTPUT
           else
