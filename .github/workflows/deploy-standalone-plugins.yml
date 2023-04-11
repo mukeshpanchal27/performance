@@ -53,7 +53,7 @@ jobs:
             const fs = require( 'fs' );
             const path = require( 'path' );
 
-            const setMenualPluginVersion = '';
+            let setMenualPluginVersion = '';
             const pluginsFile = path.join( '.', 'plugins.json' );
             fs.readFile( pluginsFile, 'utf8', ( err, jsonString ) => {
               if ( err ) {
