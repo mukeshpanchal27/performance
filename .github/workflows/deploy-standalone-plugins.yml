@@ -74,7 +74,10 @@ jobs:
                   }
                   console.log(pluginSlug);
                   if ( "${{ inputs.slug }}" == "${ pluginSlug }" ) {
+                    console.log(pluginVersion);
                     return pluginVersion;
+                  } else {
+                    console.log( "NOOO" );
                   }
                 }
               } catch ( jsonError ) {
