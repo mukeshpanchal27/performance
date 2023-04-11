@@ -72,9 +72,9 @@ jobs:
                     );
                     process.exit( 1 );
                   }
-                  console.log(pluginSlug);
+                  //console.log(pluginSlug);
                   if ( "${{ inputs.slug }}" == pluginSlug ) {
-                    console.log(pluginVersion);
+                    //console.log(pluginVersion);
                     return pluginVersion;
                   } else {
                     console.log( "NOOO" );
