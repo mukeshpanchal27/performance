@@ -39,6 +39,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Install npm dependencies
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         run: npm ci
       - name: Get plugin version
         id: get-version
@@ -72,7 +73,7 @@ jobs:
                     process.exit( 1 );
                   }
                   console.log(pluginSlug);
-                  if ( "${{ inputs.slug }}" == ${ pluginSlug } ) {
+                  if ( "${{ inputs.slug }}" == pluginSlug ) {
                     return pluginVersion;
                   }
                 }
