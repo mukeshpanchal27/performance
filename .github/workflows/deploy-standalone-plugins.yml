@@ -85,7 +85,7 @@ jobs:
         run: |
           echo ${{ steps.get-version.outputs.result }}
 
-          if ${{ steps.get-version.outputs.result == 'auto' }}; then
+          if [[ ${{ steps.get-version.outputs.result }} == 'auto' ]]; then
             echo "Auto";
           else
             echo "Manual";
