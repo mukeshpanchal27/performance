@@ -53,6 +53,7 @@ jobs:
             const fs = require( 'fs' );
             const path = require( 'path' );
 
+            const setMenualPluginVersion = '';
             const pluginsFile = path.join( '.', 'plugins.json' );
             fs.readFile( pluginsFile, 'utf8', ( err, jsonString ) => {
               if ( err ) {
@@ -76,7 +77,7 @@ jobs:
                   if ( "${{ inputs.slug }}" == pluginSlug ) {
                     //console.log(pluginVersion);
                     console.log( "Yesss" );
-                    return "1.0.0";
+                    setMenualPluginVersion = pluginVersion;
                   } else {
                     console.log( "NOOO" );
                   }
@@ -84,6 +85,8 @@ jobs:
               } catch ( jsonError ) {
                 console.log( `Error parsing JSON string: "${ jsonError }"` );
               }
+              console.log( 'aaa' + setMenualPluginVersion );
+              return setMenualPluginVersion;
             });
       - name: Set matrix
         id: set-matrix
