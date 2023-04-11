@@ -46,7 +46,7 @@ jobs:
         with:
           script: |
             if ( ${{ github.event_name != 'workflow_dispatch' }} ) {
-              return "n.e.x.t";
+              return "auto";
             }
 
             const fs = require( 'fs' );
@@ -71,6 +71,7 @@ jobs:
                     );
                     process.exit( 1 );
                   }
+                  console.log(pluginSlug);
                   if ( "${{ inputs.slug }}" == pluginSlug ) {
                     return pluginVersion;
                   }
@@ -84,7 +85,7 @@ jobs:
         run: |
           echo ${{ steps.get-version.outputs.result }}
 
-          if ${{ steps.get-version.outputs.result == 'n.e.x.t' }}; then
+          if ${{ steps.get-version.outputs.result == 'auto' }}; then
             echo "Auto";
           else
             echo "Manual";
