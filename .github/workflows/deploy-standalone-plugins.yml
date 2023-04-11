@@ -48,10 +48,10 @@ jobs:
             if ( ${{ github.event_name != 'workflow_dispatch' }} ) {
               return "n.e.x.t";
             }
+
             const fs = require( 'fs' );
             const path = require( 'path' );
 
-            let pluginsFileVersion = '';
             const pluginsFile = path.join( '.', 'plugins.json' );
             fs.readFile( pluginsFile, 'utf8', ( err, jsonString ) => {
               if ( err ) {
@@ -72,7 +72,7 @@ jobs:
                     process.exit( 1 );
                   }
                   if ( "${{ inputs.slug }}" == pluginSlug ) {
-                    pluginsFileVersion = pluginVersion;
+                    return pluginVersion;
                   }
                 }
               } catch ( jsonError ) {
@@ -83,6 +83,13 @@ jobs:
         id: set-matrix
         run: |
           echo ${{ steps.get-version.outputs.result }}
+
+          if ${{ steps.get-version.outputs.result == 'n.e.x.t' }}; then
+            echo "Auto";
+          else
+            echo "Manual";
+          fi
+          
           if ${{ github.event_name == 'workflow_dispatch' }}; then
             # Set the manual input values in JSON format for use in the matrix.
             echo "matrix={\"include\":[{\"slug\":\"${{ inputs.slug }}\",\"version\":\"${{ inputs.version }}\"}]}" >> $GITHUB_OUTPUT
