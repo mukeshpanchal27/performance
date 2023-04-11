@@ -75,7 +75,7 @@ jobs:
                   console.log(pluginSlug);
                   if ( "${{ inputs.slug }}" == pluginSlug ) {
                     console.log(pluginVersion);
-                    return pluginVersion;
+                    return "${ pluginVersion }";
                   } else {
                     console.log( "NOOO" );
                   }
