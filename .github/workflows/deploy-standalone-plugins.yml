@@ -40,8 +40,8 @@ jobs:
         uses: actions/checkout@v3
       - name: Install npm dependencies
         run: npm ci
-      - name: Set matrix
-        id: set-matrix
+      - name: Get plugin version
+        id: get-version
         uses: actions/github-script@v6
         with:
           script: |
@@ -74,12 +74,23 @@ jobs:
                       pluginsFileVersion = pluginVersion;
                     }
                   }
-                  return pluginsFileVersion;
+                  console.log(`::set-output name=version::${pluginsFileVersion}`);
                 }
               } catch ( jsonError ) {
                 console.log( `Error parsing JSON string: "${ jsonError }"` );
               }
             });
+      - name: Set matrix
+        id: set-matrix
+        run: |
+          if ${{ github.event_name == 'workflow_dispatch' }}; then
+            # Set the manual input values in JSON format for use in the matrix.
+            echo "matrix={\"include\":[{\"slug\":\"${{ inputs.slug }}\",\"version\":\"${{ inputs.version }}\"}]}" >> $GITHUB_OUTPUT
+          else
+            # Load the JSON file and parse from "{name: {slug, version}, ...}" to "include: [{ name, slug, version }, ...]"
+            # for use in the matrix.
+            echo "matrix="$(jq -c '{include:[keys[] as $k | {name:$k,slug:.[$k].slug,version:.[$k].version }]}' plugins.json) >> $GITHUB_OUTPUT
+          fi
 
   deploy:
     name: Deploy Plugin
