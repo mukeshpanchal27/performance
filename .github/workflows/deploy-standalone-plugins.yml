@@ -45,6 +45,10 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
+            if ( ${{ github.event_name != 'workflow_dispatch' }} ) {
+              console.log(`::set-output name=version::n.e.x.t`);
+              return;
+            }
             const fs = require( 'fs' );
             const path = require( 'path' );
 
@@ -68,13 +72,9 @@ jobs:
                     );
                     process.exit( 1 );
                   }
-                  if ( ${{ github.event_name == 'workflow_dispatch' }} ) {
-
-                    if ( "${{ inputs.slug }}" == pluginSlug ) {
-                      pluginsFileVersion = pluginVersion;
-                    }
+                  if ( "${{ inputs.slug }}" == pluginSlug ) {
+                    pluginsFileVersion = pluginVersion;
                   }
-                  console.log(`::set-output name=version::${pluginsFileVersion}`);
                 }
               } catch ( jsonError ) {
                 console.log( `Error parsing JSON string: "${ jsonError }"` );
@@ -83,6 +83,7 @@ jobs:
       - name: Set matrix
         id: set-matrix
         run: |
+          echo ${{ steps.get-version.outputs.version }}
           if ${{ github.event_name == 'workflow_dispatch' }}; then
             # Set the manual input values in JSON format for use in the matrix.
             echo "matrix={\"include\":[{\"slug\":\"${{ inputs.slug }}\",\"version\":\"${{ inputs.version }}\"}]}" >> $GITHUB_OUTPUT
