@@ -72,7 +72,7 @@ jobs:
                     process.exit( 1 );
                   }
                   console.log(pluginSlug);
-                  if ( "${{ inputs.slug }}" == pluginSlug ) {
+                  if ( "${{ inputs.slug }}" == ${ pluginSlug } ) {
                     return pluginVersion;
                   }
                 }
