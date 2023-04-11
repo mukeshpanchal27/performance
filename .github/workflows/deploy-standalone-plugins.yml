@@ -76,16 +76,16 @@ jobs:
                   //console.log(pluginSlug);
                   if ( "${{ inputs.slug }}" == pluginSlug ) {
                     //console.log(pluginVersion);
-                    console.log( "Yesss" );
+                    //console.log( "Yesss" );
                     setMenualPluginVersion = pluginVersion;
                   } else {
-                    console.log( "NOOO" );
+                    //console.log( "NOOO" );
                   }
                 }
               } catch ( jsonError ) {
                 console.log( `Error parsing JSON string: "${ jsonError }"` );
               }
-              console.log( 'aaa' + setMenualPluginVersion );
+              //console.log( 'aaa' + setMenualPluginVersion );
               return setMenualPluginVersion;
             });
       - name: Set matrix
