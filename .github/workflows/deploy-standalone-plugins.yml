@@ -78,7 +78,7 @@ jobs:
                     //console.log(pluginVersion);
                     //console.log( "Yesss" );
                     console.log(pluginVersion);
-                    return;
+                    return pluginVersion;
                     setMenualPluginVersion = pluginVersion;
                   } else {
                     //console.log( "NOOO" );
