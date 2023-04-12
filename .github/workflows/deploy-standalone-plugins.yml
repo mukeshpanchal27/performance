@@ -53,6 +53,11 @@ jobs:
             const fs = require( 'fs' );
             const path = require( 'path' );
 
+            /**
+             * Internal dependencies
+             */
+            const { log, formats } = require( '../lib/logger' );
+
             let setMenualPluginVersion = '';
             const pluginsFile = path.join( '.', 'plugins.json' );
             let pluginsFileContent = '';
@@ -90,7 +95,7 @@ jobs:
               }
             }
 
-            console.log( 'The given "${{ inputs.slug }}" module slug is missing in the file "${ pluginsFile }".' );
+            log( formats.error( `The given "${{ inputs.slug }}" module slug is missing in the file "${ pluginsFile }".` );
             
             // Return with exit code 1 to trigger a failure in the deploy standalone workflow pipeline.
             process.exit( 1 );
