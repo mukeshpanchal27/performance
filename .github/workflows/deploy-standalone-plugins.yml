@@ -77,6 +77,8 @@ jobs:
                   if ( "${{ inputs.slug }}" == pluginSlug ) {
                     //console.log(pluginVersion);
                     //console.log( "Yesss" );
+                    console.log(pluginVersion);
+                    return;
                     setMenualPluginVersion = pluginVersion;
                   } else {
                     //console.log( "NOOO" );
