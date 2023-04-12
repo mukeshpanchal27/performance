@@ -85,9 +85,9 @@ jobs:
               } catch ( jsonError ) {
                 console.log( `Error parsing JSON string: "${ jsonError }"` );
               }
+            });
               console.log( 'aaa' + setMenualPluginVersion );
               return setMenualPluginVersion;
-            });
       - name: Set matrix
         id: set-matrix
         run: |
