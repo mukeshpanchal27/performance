@@ -82,14 +82,8 @@ jobs:
                 );
                 process.exit( 1 );
               }
-              //console.log(pluginSlug);
               if ( "${{ inputs.slug }}" == pluginSlug ) {
-                console.log(pluginVersion);
                 return pluginVersion;
-                //console.log( "Yesss" );
-                setMenualPluginVersion = pluginVersion;
-              } else {
-                //console.log( "NOOO" );
               }
             }
       - name: Set matrix
@@ -105,7 +99,7 @@ jobs:
           
           if ${{ github.event_name == 'workflow_dispatch' }}; then
             # Set the manual input values in JSON format for use in the matrix.
-            echo "matrix={\"include\":[{\"slug\":\"${{ inputs.slug }}\",\"version\":\"${{ inputs.version }}\"}]}" >> $GITHUB_OUTPUT
+            echo "matrix={\"include\":[{\"slug\":\"${{ inputs.slug }}\",\"version\":\"${{ steps.get-version.outputs.result }}\"}]}" >> $GITHUB_OUTPUT
           else
             # Load the JSON file and parse from "{name: {slug, version}, ...}" to "include: [{ name, slug, version }, ...]"
             # for use in the matrix.
