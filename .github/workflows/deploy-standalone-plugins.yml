@@ -66,14 +66,15 @@ jobs:
               );
             }
             console.log( pluginsFileContent );
+            
             if ( pluginsFileContent === '' ) {
               console.log( `Error reading the file "${ pluginsFile }"` );
               return false;
             }
-
-            for ( const moduleDir in pluginsFileContent ) {
-              const pluginVersion = pluginsFileContent[ moduleDir ]?.version;
-              const pluginSlug = pluginsFileContent[ moduleDir ]?.slug;
+            const plugins = JSON.parse( pluginsFileContent );
+            for ( const moduleDir in plugins ) {
+              const pluginVersion = plugins[ moduleDir ]?.version;
+              const pluginSlug = plugins[ moduleDir ]?.slug;
 
               if ( ! pluginVersion || ! pluginSlug ) {
                 console.log(
