@@ -19,6 +19,7 @@ on:
     inputs:
       slug:
         type: choice
+        default: 'webp-uploads'
         options:
         - audit-autoloaded-options
         - audit-enqueued-assets
@@ -27,7 +28,7 @@ on:
         - sqlite
         - webp-support
         - webp-uploads
-        description: 'The slug of the plugin to deploy'
+        description: 'Select a slug of the plugin to deploy'
 
 jobs:
   release:
