@@ -38,9 +38,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Install npm dependencies
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: npm ci
       - name: Get plugin version
         id: get-version
         uses: actions/github-script@v6
@@ -53,44 +50,35 @@ jobs:
             const fs = require( 'fs' );
             const path = require( 'path' );
 
-            let setMenualPluginVersion = '';
             const pluginsFile = path.join( '.', 'plugins.json' );
             let pluginsFileContent = '';
             try {
               pluginsFileContent = fs.readFileSync( pluginsFile, 'utf-8' );
             } catch ( err ) {
-              log(
-                formats.error(
-                  `Error reading the file "${ pluginsFile }": "${ err }"`
-                )
-              );
+              console.log( `Error reading the file "${ pluginsFile }": "${ err }"` );
 
               // Return with exit code 1 to trigger a failure in the deploy standalone workflow pipeline.
               process.exit( 1 );
             }
-            console.log( pluginsFileContent );
             
             if ( pluginsFileContent === '' ) {
               console.log( `Error reading the file "${ pluginsFile }"` );
-              return false;
+
+              // Return with exit code 1 to trigger a failure in the deploy standalone workflow pipeline.
+              process.exit( 1 );
             }
+
             const plugins = JSON.parse( pluginsFileContent );
             for ( const moduleDir in plugins ) {
               const pluginVersion = plugins[ moduleDir ]?.version;
               const pluginSlug = plugins[ moduleDir ]?.slug;
 
-              if ( ! pluginVersion || ! pluginSlug ) {
-                console.log(
-                    'The given module configuration is invalid, the module JSON object is missing the "version" and/or "slug" properties, or they are misspelled.'
-                );
-                process.exit( 1 );
-              }
-              if ( "${{ inputs.slug }}" == pluginSlug ) {
+              if ( pluginVersion && pluginSlug && ( "${{ inputs.slug }}" == pluginSlug ) ) {
                 return pluginVersion;
               }
             }
 
-            console.log( `The given "${{ inputs.slug }}" module slug is missing in the file "${ pluginsFile }".` );
+            console.log( `The "${{ inputs.slug }}" module slug is missing in the file "${ pluginsFile }".` );
             
             // Return with exit code 1 to trigger a failure in the deploy standalone workflow pipeline.
             process.exit( 1 );
