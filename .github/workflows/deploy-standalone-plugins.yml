@@ -65,7 +65,7 @@ jobs:
                 )
               );
             }
-
+            console.log( pluginsFileContent );
             if ( pluginsFileContent === '' ) {
               console.log( `Error reading the file "${ pluginsFile }"` );
               return false;
