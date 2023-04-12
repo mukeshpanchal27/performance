@@ -85,7 +85,7 @@ jobs:
               } catch ( jsonError ) {
                 console.log( `Error parsing JSON string: "${ jsonError }"` );
               }
-              //console.log( 'aaa' + setMenualPluginVersion );
+              console.log( 'aaa' + setMenualPluginVersion );
               return setMenualPluginVersion;
             });
       - name: Set matrix
