@@ -55,6 +55,7 @@ jobs:
 
             let setMenualPluginVersion = '';
             const pluginsFile = path.join( '.', 'plugins.json' );
+            return "Manual";
             fs.readFile( pluginsFile, 'utf8', ( err, jsonString ) => {
               if ( err ) {
                 console.log( `Error reading file from disk: "${ err }"` );
