@@ -61,9 +61,12 @@ jobs:
             } catch ( err ) {
               log(
                 formats.error(
-                  `Error reading the file "${ buildLoadFile }": "${ err }"`
+                  `Error reading the file "${ pluginsFile }": "${ err }"`
                 )
               );
+
+              // Return with exit code 1 to trigger a failure in the deploy standalone workflow pipeline.
+              process.exit( 1 );
             }
             console.log( pluginsFileContent );
             
@@ -86,6 +89,11 @@ jobs:
                 return pluginVersion;
               }
             }
+
+            console.log( 'The given "${{ inputs.slug }}" module slug is missing in the file "${ pluginsFile }".' );
+            
+            // Return with exit code 1 to trigger a failure in the deploy standalone workflow pipeline.
+            process.exit( 1 );
       - name: Set matrix
         id: set-matrix
         run: |
