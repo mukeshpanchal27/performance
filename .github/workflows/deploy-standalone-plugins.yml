@@ -55,42 +55,42 @@ jobs:
 
             let setMenualPluginVersion = '';
             const pluginsFile = path.join( '.', 'plugins.json' );
+            let pluginsFileContent = '';
+            try {
+              pluginsFileContent = fs.readFileSync( pluginsFile, 'utf-8' );
+            } catch ( err ) {
+              log(
+                formats.error(
+                  `Error reading the file "${ buildLoadFile }": "${ err }"`
+                )
+              );
+            }
 
-            const contents = fs.readFile( pluginsFile, 'utf8', ( err, jsonString ) => {
-              if ( err ) {
-                console.log( `Error reading file from disk: "${ err }"` );
+            if ( pluginsFileContent === '' ) {
+              console.log( `Error reading the file "${ pluginsFile }"` );
+              return false;
+            }
+
+            for ( const moduleDir in pluginsFileContent ) {
+              const pluginVersion = pluginsFileContent[ moduleDir ]?.version;
+              const pluginSlug = pluginsFileContent[ moduleDir ]?.slug;
+
+              if ( ! pluginVersion || ! pluginSlug ) {
+                console.log(
+                    'The given module configuration is invalid, the module JSON object is missing the "version" and/or "slug" properties, or they are misspelled.'
+                );
                 process.exit( 1 );
               }
-
-              try {
-                const plugins = JSON.parse( jsonString );
-                for ( const moduleDir in plugins ) {
-                  const pluginVersion = plugins[ moduleDir ]?.version;
-                  const pluginSlug = plugins[ moduleDir ]?.slug;
-
-                  if ( ! pluginVersion || ! pluginSlug ) {
-                    console.log(
-                        'The given module configuration is invalid, the module JSON object is missing the "version" and/or "slug" properties, or they are misspelled.'
-                    );
-                    process.exit( 1 );
-                  }
-                  //console.log(pluginSlug);
-                  if ( "${{ inputs.slug }}" == pluginSlug ) {
-                    //console.log(pluginVersion);
-                    //console.log( "Yesss" );
-                    console.log(pluginVersion);
-                    return pluginVersion;
-                    setMenualPluginVersion = pluginVersion;
-                  } else {
-                    //console.log( "NOOO" );
-                  }
-                }
-              } catch ( jsonError ) {
-                console.log( `Error parsing JSON string: "${ jsonError }"` );
+              //console.log(pluginSlug);
+              if ( "${{ inputs.slug }}" == pluginSlug ) {
+                console.log(pluginVersion);
+                return pluginVersion;
+                //console.log( "Yesss" );
+                setMenualPluginVersion = pluginVersion;
+              } else {
+                //console.log( "NOOO" );
               }
-            });
-              console.log( contents );
-              return setMenualPluginVersion;
+            }
       - name: Set matrix
         id: set-matrix
         run: |
