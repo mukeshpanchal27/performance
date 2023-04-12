@@ -56,7 +56,7 @@ jobs:
             let setMenualPluginVersion = '';
             const pluginsFile = path.join( '.', 'plugins.json' );
 
-            fs.readFile( pluginsFile, 'utf8', ( err, jsonString ) => {
+            const contents = fs.readFile( pluginsFile, 'utf8', ( err, jsonString ) => {
               if ( err ) {
                 console.log( `Error reading file from disk: "${ err }"` );
                 process.exit( 1 );
@@ -89,7 +89,7 @@ jobs:
                 console.log( `Error parsing JSON string: "${ jsonError }"` );
               }
             });
-              console.log( 'aaa' + setMenualPluginVersion );
+              console.log( contents );
               return setMenualPluginVersion;
       - name: Set matrix
         id: set-matrix
