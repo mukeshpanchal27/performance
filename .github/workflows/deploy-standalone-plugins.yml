@@ -95,7 +95,7 @@ jobs:
               }
             }
 
-            log( formats.error( `The given "${{ inputs.slug }}" module slug is missing in the file "${ pluginsFile }".` );
+            log( formats.error( `The given "${{ inputs.slug }}" module slug is missing in the file "${ pluginsFile }".` ) );
             
             // Return with exit code 1 to trigger a failure in the deploy standalone workflow pipeline.
             process.exit( 1 );
