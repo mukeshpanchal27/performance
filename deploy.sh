@@ -161,11 +161,6 @@ svn update
 
 svn status
 
-# Allow some ENV variables to be customized
-if [[ -z "$DRY_RUN" ]]; then
-	DRY_RUN=false;
-fi
-
 if [[ "$DRY_RUN" == true ]]; then
   echo "➤ Debug mode: Files not committed."
 else
