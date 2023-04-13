@@ -152,7 +152,7 @@ svn update
 
 svn status
 
-if [[ "$DRY_RUN" != false ]]; then
+if [[ -n "$DRY_RUN" ]]
   echo "➤ Debug mode: Files not committed."
 else
   echo "➤ Committing files..."
