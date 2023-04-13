@@ -70,4 +70,5 @@ jobs:
           VERSION: ${{ matrix.version }}
           BUILD_DIR: ./build/${{ matrix.slug }}
           ASSETS_DIR: ./build/${{ matrix.slug }}/.wordpress-org
+          DRY_RUN: false
         run: bash ./deploy.sh
