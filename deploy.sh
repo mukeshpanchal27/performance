@@ -157,7 +157,7 @@ if [[ -z "$DRY_RUN" ]]; then
 	DRY_RUN=false;
 fi
 
-if [[ "$DRY_RUN" != false ]]; then
+if [[ -n "$DRY_RUN" ]]; then
   echo "➤ Debug mode: Files not committed."
 else
   echo "➤ Committing files..."
