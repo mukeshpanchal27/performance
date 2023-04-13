@@ -153,10 +153,10 @@ svn update
 svn status
 
 if [[ "$DRY_RUN" != false ]]; then
+  echo "➤ Debug mode: Files not committed."
+else
   echo "➤ Committing files..."
   svn commit -m "Update to version $VERSION from GitHub" --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
-else
-  echo "➤ Debug mode: Files not committed."
 fi
 
 if $INPUT_GENERATE_ZIP; then
