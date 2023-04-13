@@ -1,6 +1,17 @@
 name: Deploy standalone plugins to WordPress.org
 
 on:
+  pull_request:
+    branches:
+      - trunk
+      - 'release/**'
+      - 'feature/**'
+    paths:
+      - '.github/workflows/deploy-standalone-plugins.yml'
+    types:
+      - opened
+      - reopened
+      - synchronize
   release:
     types: [published]
   workflow_dispatch:
@@ -51,7 +62,7 @@ jobs:
       - name: Building standalone plugins
         run: npm run build-plugins
       - name: Deploy Standalone Plugin - ${{ matrix.slug }}
-        uses: 10up/action-wordpress-plugin-deploy@stable
+        # uses: 10up/action-wordpress-plugin-deploy@stable
         env:
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
@@ -59,3 +70,4 @@ jobs:
           VERSION: ${{ matrix.version }}
           BUILD_DIR: ./build/${{ matrix.slug }}
           ASSETS_DIR: ./build/${{ matrix.slug }}/.wordpress-org
+        run: bash ./deploy.sh
