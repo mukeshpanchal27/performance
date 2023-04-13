@@ -20,6 +20,15 @@ if [[ -z "$SVN_PASSWORD" ]]; then
 	exit 1
 fi
 
+# Check if the DRY_RUN ENV variable is set, otherwise set it to false.
+if [[ -z "$DRY_RUN" ]]; then
+	DRY_RUN=false;
+fi
+
+if [[ "$DRY_RUN" == true ]]; then
+	echo "ℹ︎ DRY_RUN is true"
+fi
+
 # Allow some ENV variables to be customized
 if [[ -z "$SLUG" ]]; then
 	SLUG=${GITHUB_REPOSITORY#*/}
