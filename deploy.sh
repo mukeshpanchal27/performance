@@ -68,7 +68,7 @@ svn update --set-depth infinity trunk
 svn update --set-depth infinity tags
 
 echo "SVN INFO"
-cvn info tags
+svn info tags
 
 #svn info "https://plugins.svn.wordpress.org/${SLUG}/tags/$VERSION"
 #content=$(svn info "https://plugins.svn.wordpress.org/${SLUG}/tags/$VERSION")
