@@ -66,14 +66,8 @@ cd "$SVN_DIR"
 svn update --set-depth infinity assets
 svn update --set-depth infinity trunk
 
-echo "$SVN_URLtags/$VERSION"
-echo "$SVN_DIR/tags/$VERSION"
-
-echo "Check ls"
-svn ls tags
-echo "Check ls tag"
-svn ls tags/"$VERSION"
-
+echo "SVN INFO"
+svn info "$SVN_URL"
 content=$(svn info)
 
 if [[ -z $content ]]; then
