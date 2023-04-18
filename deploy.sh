@@ -65,9 +65,10 @@ svn checkout --depth immediates "$SVN_URL" "$SVN_DIR"
 cd "$SVN_DIR"
 svn update --set-depth infinity assets
 svn update --set-depth infinity trunk
+svn update --set-depth infinity tags
 
 echo "SVN INFO"
-
+cvn info tags
 
 #svn info "https://plugins.svn.wordpress.org/${SLUG}/tags/$VERSION"
 #content=$(svn info "https://plugins.svn.wordpress.org/${SLUG}/tags/$VERSION")
