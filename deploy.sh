@@ -67,23 +67,9 @@ svn update --set-depth infinity assets
 svn update --set-depth infinity trunk
 svn update --set-depth infinity tags
 
-echo "SVN INFO"
-
-#rev=$(svn info tags/$VERSION | awk '/Revision:/{print $2}')
-#echo "$rev"
-
-
-#svn info "https://plugins.svn.wordpress.org/${SLUG}/tags/$VERSION"
-#content=$(svn info "https://plugins.svn.wordpress.org/${SLUG}/tags/$VERSION")
-
-#content = $(svn info "https://plugins.svn.wordpress.org/${SLUG}/tags/$VERSION")
-
-#echo "$content"
-
 if [[ -d "tags/$VERSION" ]]; then
-    echo "The SVN URL doesn't exist";
-else
-    echo "ℹ︎ Tag not exist"
+    echo "Version $VERSION of plugin $SLUG was already published";
+	exit 1
 fi
 
 if [[ "$BUILD_DIR" = false ]]; then
