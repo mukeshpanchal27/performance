@@ -68,9 +68,9 @@ svn update --set-depth infinity trunk
 
 echo "SVN INFO"
 #svn info "https://plugins.svn.wordpress.org/${SLUG}/tags/$VERSION"
-content=$(svn info "https://plugins.svn.wordpress.org/${SLUG}/tags/$VERSION")
+#content=$(svn info "https://plugins.svn.wordpress.org/${SLUG}/tags/$VERSION")
 
-if [[ -z $content ]]; then
+if test -d "https://plugins.svn.wordpress.org/${SLUG}/tags/$VERSION"; then
     echo "The SVN URL doesn't exist"; exit
 else
     echo "ℹ︎ Tag not exist"
