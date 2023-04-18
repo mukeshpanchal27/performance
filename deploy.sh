@@ -76,6 +76,16 @@ else
     echo "ℹ︎ Tag not exist"
 fi
 
+content=$(svn info "$SVN_URL/tags/$VERSION")
+
+if [[ -z $content ]]; then
+    echo "The SVN URL doesn't exist"; exit
+else
+    echo "ℹ︎ Tag not exist"
+fi
+
+svn info "tags/$VERSION"
+
 if [[ "$BUILD_DIR" = false ]]; then
 	echo "➤ Copying files..."
 	if [[ -e "$GITHUB_WORKSPACE/.distignore" ]]; then
