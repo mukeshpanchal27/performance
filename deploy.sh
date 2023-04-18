@@ -66,11 +66,11 @@ cd "$SVN_DIR"
 svn update --set-depth infinity assets
 svn update --set-depth infinity trunk
 
-echo "$SVN_URL/tags/$VERSION"
+echo "$SVN_URL" . "tags/$VERSION"
 echo "$SVN_DIR/tags/$VERSION"
 
 svn info "tags/$VERSION"
-if test -d "$SVN_URL/tags/$VERSION"; then
+if test -d "$SVN_URL" . "tags/$VERSION"; then
     echo "ℹ︎ Tag exist"
 else
     echo "ℹ︎ Tag not exist"
