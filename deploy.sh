@@ -68,7 +68,10 @@ svn update --set-depth infinity trunk
 svn update --set-depth infinity tags
 
 echo "SVN INFO"
-svn info tags
+
+rev=$(svn info tags/$VERSION | awk '/Revision:/{print $2}')
+echo "$rev"
+
 
 #svn info "https://plugins.svn.wordpress.org/${SLUG}/tags/$VERSION"
 #content=$(svn info "https://plugins.svn.wordpress.org/${SLUG}/tags/$VERSION")
