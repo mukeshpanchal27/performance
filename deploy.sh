@@ -72,6 +72,12 @@ svn update --set-depth infinity assets
 svn update --set-depth infinity trunk
 
 
+if test -d "$SVN_DIR/tags/$VERSION"; then
+    echo "ℹ︎ Tag exist"
+else
+    echo "ℹ︎ Tag not exist"
+fi
+
 if [[ "$BUILD_DIR" = false ]]; then
 	echo "➤ Copying files..."
 	if [[ -e "$GITHUB_WORKSPACE/.distignore" ]]; then
