@@ -66,6 +66,7 @@ cd "$SVN_DIR"
 svn update --set-depth infinity assets
 svn update --set-depth infinity trunk
 
+echo "$SVN_DIR/tags/$VERSION"
 if test -d "$SVN_DIR/tags/$VERSION"; then
     echo "ℹ︎ Tag exist"
 else
