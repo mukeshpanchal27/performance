@@ -69,7 +69,7 @@ svn update --set-depth infinity tags
 
 echo "SVN INFO"
 
-rev=$(svn info tags/$VERSION | awk '/Revision:/{print $2}')
+#rev=$(svn info tags/$VERSION | awk '/Revision:/{print $2}')
 #echo "$rev"
 
 
@@ -80,8 +80,8 @@ rev=$(svn info tags/$VERSION | awk '/Revision:/{print $2}')
 
 #echo "$content"
 
-if [[ -z "$rev" ]]; then
-    echo "The SVN URL doesn't exist"; exit
+if [[ -d "tags/$VERSION" ]]; then
+    echo "The SVN URL doesn't exist";
 else
     echo "ℹ︎ Tag not exist"
 fi
