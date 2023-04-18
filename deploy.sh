@@ -69,7 +69,7 @@ svn update --set-depth infinity tags
 
 if [[ -d "tags/$VERSION" ]]; then
     echo "Version $VERSION of plugin $SLUG was already published";
-	exit 1
+	exit
 fi
 
 if [[ "$BUILD_DIR" = false ]]; then
