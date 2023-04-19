@@ -53,7 +53,7 @@ jobs:
           script: |
             // Bail early if it is a normal workflow.
             if ( ${{ github.event_name == 'workflow_dispatch' }} ) {
-              const execSync = require( 'child_process' );
+              const { execSync } = require( 'child_process' );
               
               execSync( `npm run get-plugin-version -- --slug=${{ inputs.slug }}`, ( err, output ) => {
                 // once the command has completed, the callback function is called.
