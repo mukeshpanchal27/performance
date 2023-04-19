@@ -9,12 +9,6 @@ const path = require( 'path' );
  */
 const { log, formats } = require( '../lib/logger' );
 
-/**
- * @typedef WPTestPluginsCommandOptions
- *
- * @property {string=} slug Plugin slug.
- */
-
 exports.options = [
 	{
 		argname: '-s, --slug <slug>',
@@ -25,7 +19,7 @@ exports.options = [
 /**
  * Command to get the plugin version based on the slug.
  *
- * @param {WPTestPluginsCommandOptions} opt Command options.
+ * @param opt Command options.
  */
 exports.handler = async ( opt ) => {
 	doRunGetPluginVersion( {
@@ -37,10 +31,9 @@ exports.handler = async ( opt ) => {
 /**
  * Returns the match plugin version from plugins.json file.
  *
- * @param {WPDoReplaceWpEnvContent} settings Plugin settings.
+ * @param settings Plugin settings.
  */
 function doRunGetPluginVersion( settings ) {
-
 	if ( settings.slug === undefined ) {
 		log(
 			formats.error(
@@ -101,8 +94,7 @@ function doRunGetPluginVersion( settings ) {
 	for ( const moduleDir in plugins ) {
 		const pluginVersion = plugins[ moduleDir ]?.version;
 		const pluginSlug = plugins[ moduleDir ]?.slug;
-		if ( pluginVersion && pluginSlug && ( settings.slug == pluginSlug ) ) {
-			console.log( pluginVersion );
+		if ( pluginVersion && pluginSlug && ( settings.slug === pluginSlug ) ) {
 			return pluginVersion;
 		}
 	}
