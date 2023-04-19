@@ -39,53 +39,34 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      - name: Install npm dependencies
+        run: npm ci
       - name: Get plugin version
         id: get-version
         uses: actions/github-script@v6
         with:
           script: |
             // Bail early if it is a normal workflow.
-            if ( ${{ github.event_name != 'workflow_dispatch' }} ) {
-              return "auto";
+            if ( ${{ github.event_name == 'workflow_dispatch' }} ) {
+              const execSync = require( 'child_process' );
+              
+              execSync( `npm run get-plugin-version -- --slug=${{ inputs.slug }}`, ( err, output ) => {
+                // once the command has completed, the callback function is called.
+                if ( err ) {
+                  log( formats.error( `${ err }` ) );
+
+                  // Return with exit code 1 to trigger a failure in the test pipeline.
+                  process.exit( 1 );
+                }
+
+                // log the output received from the command.
+                log( output );
+              } );
             }
-
-            const fs = require( 'fs' );
-            const path = require( 'path' );
-
-            const pluginsFile = path.join( '.', 'plugins.json' );
-            let pluginsFileContent = '';
-            try {
-              pluginsFileContent = fs.readFileSync( pluginsFile, 'utf-8' );
-            } catch ( err ) {
-              console.log( `Error reading the file "${ pluginsFile }": "${ err }"` );
-
-              // Return with exit code 1 to trigger a failure in the deploy standalone workflow pipeline.
-              process.exit( 1 );
-            }
-            
-            if ( pluginsFileContent === '' ) {
-              console.log( `Error reading the file "${ pluginsFile }"` );
-
-              // Return with exit code 1 to trigger a failure in the deploy standalone workflow pipeline.
-              process.exit( 1 );
-            }
-
-            const plugins = JSON.parse( pluginsFileContent );
-            for ( const moduleDir in plugins ) {
-              const pluginVersion = plugins[ moduleDir ]?.version;
-              const pluginSlug = plugins[ moduleDir ]?.slug;
-
-              if ( pluginVersion && pluginSlug && ( "${{ inputs.slug }}" == pluginSlug ) ) {
-                return pluginVersion;
-              }
-            }
-
-            console.log( `The "${{ inputs.slug }}" module slug is missing in the file "${ pluginsFile }".` );
-            
-            // Return with exit code 1 to trigger a failure in the deploy standalone workflow pipeline.
-            process.exit( 1 );
+            return "auto";
       - name: Manual workflow
         if: ${{ github.event_name == 'workflow_dispatch' }}
+        id: get-version-manual-workflow
         run: |
           npm ci
           npm run get-plugin-version -- --slug=${{ inputs.slug }}
