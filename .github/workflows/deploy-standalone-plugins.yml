@@ -55,7 +55,7 @@ jobs:
         run: |
           if ${{ github.event_name == 'workflow_dispatch' }}; then
             echo "Manual"
-            echo "${{ toJson( steps.get-version.outputs ) }}"
+            echo "${{ toJson( steps.get-version.outputs.result ) }}"
             # Set the manual input values in JSON format for use in the matrix.
             echo "matrix={\"include\":[{\"slug\":\"${{ inputs.slug }}\",\"version\":\"${{ steps.get-version.outputs.result }}\"}]}" >> $GITHUB_OUTPUT
           else
