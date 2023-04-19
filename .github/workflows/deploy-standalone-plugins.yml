@@ -87,6 +87,9 @@ jobs:
             
             // Return with exit code 1 to trigger a failure in the deploy standalone workflow pipeline.
             process.exit( 1 );
+      - name: Manual workflow
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: npm run get-plugin-version
       - name: Set matrix
         id: set-matrix
         run: |
