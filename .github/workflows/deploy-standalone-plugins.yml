@@ -40,6 +40,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Get plugin version
+        run: |
+          
+      - name: Get plugin version
         id: get-version
         uses: actions/github-script@v6
         with:
@@ -87,6 +90,10 @@ jobs:
       - name: Set matrix
         id: set-matrix
         run: |
+          if ${{ github.event_name == 'workflow_dispatch' }}; then
+            npm run get-plugin-version -- --slug inputs.slug 
+          fi
+
           if [[ ${{ steps.get-version.outputs.result }} && ${{ steps.get-version.outputs.result }} == 'auto' ]]; then
             # Load the JSON file and parse from "{name: {slug, version}, ...}" to "include: [{ name, slug, version }, ...]"
             # for use in the matrix.
