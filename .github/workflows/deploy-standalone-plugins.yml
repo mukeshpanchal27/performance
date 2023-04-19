@@ -48,37 +48,12 @@ jobs:
         run: npm ci
       - name: Get plugin version
         id: get-version
-        uses: actions/github-script@v6
-        with:
-          script: |
-            // Bail early if it is a normal workflow.
-            if ( ${{ github.event_name == 'workflow_dispatch' }} ) {
-              const { execSync } = require( 'child_process' );
-              
-              execSync( `npm run get-plugin-version -- --slug=${{ inputs.slug }}`, ( err, output ) => {
-                // once the command has completed, the callback function is called.
-                if ( err ) {
-                  log( formats.error( `${ err }` ) );
-
-                  // Return with exit code 1 to trigger a failure in the test pipeline.
-                  process.exit( 1 );
-                }
-
-                // log the output received from the command.
-                console.log( output );
-              } );
-            }
-            return "auto";
-      - name: Manual workflow
         if: ${{ github.event_name == 'workflow_dispatch' }}
-        id: get-version-manual-workflow
-        run: |
-          npm run get-plugin-version -- --slug=${{ inputs.slug }}
+        run: npm run get-plugin-version -- --slug=${{ inputs.slug }}
       - name: Set matrix
         id: set-matrix
         run: |
-          echo "${{ steps.get-version-manual-workflow.outputs.result }}"
-          if [[ ${{ steps.get-version.outputs.result }} && ${{ steps.get-version.outputs.result }} == 'auto' ]]; then
+          if [[ ${{ github.event_name != 'workflow_dispatch' }} ]]; then
             # Load the JSON file and parse from "{name: {slug, version}, ...}" to "include: [{ name, slug, version }, ...]"
             # for use in the matrix.
             echo "matrix="$(jq -c '{include:[keys[] as $k | {name:$k,slug:.[$k].slug,version:.[$k].version }]}' plugins.json) >> $GITHUB_OUTPUT
