@@ -2,13 +2,5 @@
   "images/dominant-color-images": {
     "slug": "dominant-color-images",
     "version": "1.0.0"
-  },
-  "images/fetchpriority": {
-    "slug": "fetchpriority",
-    "version": "2.0.0"
-  },
-  "images/webp-uploads": {
-    "slug": "webp-uploads",
-    "version": "3.0.0"
   }
 }
