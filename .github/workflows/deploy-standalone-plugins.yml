@@ -78,6 +78,7 @@ jobs:
       - name: Set matrix
         id: set-matrix
         run: |
+          echo "${{ steps.get-version-manual-workflow.outputs.result }}"
           if [[ ${{ steps.get-version.outputs.result }} && ${{ steps.get-version.outputs.result }} == 'auto' ]]; then
             # Load the JSON file and parse from "{name: {slug, version}, ...}" to "include: [{ name, slug, version }, ...]"
             # for use in the matrix.
