@@ -65,7 +65,7 @@ jobs:
                 }
 
                 // log the output received from the command.
-                log( output );
+                console.log( output );
               } );
             }
             return "auto";
