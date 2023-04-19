@@ -19,7 +19,7 @@ exports.options = [
 /**
  * Command to get the plugin version based on the slug.
  *
- * @param opt Command options.
+ * @param {Object} opt Command options.
  */
 exports.handler = async ( opt ) => {
 	doRunGetPluginVersion( {
@@ -31,7 +31,7 @@ exports.handler = async ( opt ) => {
 /**
  * Returns the match plugin version from plugins.json file.
  *
- * @param settings Plugin settings.
+ * @param {Object} settings Plugin settings.
  */
 function doRunGetPluginVersion( settings ) {
 	if ( settings.slug === undefined ) {
