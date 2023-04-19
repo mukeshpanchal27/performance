@@ -73,7 +73,6 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' }}
         id: get-version-manual-workflow
         run: |
-          npm ci
           npm run get-plugin-version -- --slug=${{ inputs.slug }}
       - name: Set matrix
         id: set-matrix
