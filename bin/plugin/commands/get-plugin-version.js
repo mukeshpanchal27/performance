@@ -49,7 +49,7 @@ function doRunGetPluginVersion( settings ) {
 		);
 		return;
 	}
-return "mukesh";
+
 	const pluginsFile = path.join( '.', settings.pluginsJsonFile );
 
 	// Buffer contents of plugins JSON file.
