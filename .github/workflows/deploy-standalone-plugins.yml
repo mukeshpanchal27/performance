@@ -39,9 +39,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Get plugin version
-        run: |
-          
+      - name: Setup Node.js (.nvmrc)
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+      - name: Install npm dependencies
+        run: npm ci
       - name: Get plugin version
         id: get-version
         uses: actions/github-script@v6
