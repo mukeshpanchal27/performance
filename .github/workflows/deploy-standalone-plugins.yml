@@ -53,13 +53,15 @@ jobs:
       - name: Set matrix
         id: set-matrix
         run: |
-          if [[ ${{ github.event_name != 'workflow_dispatch' }} ]]; then
+          if [[ ${{ github.event_name == 'workflow_dispatch' }} ]]; then
+            echo "Manual"
+            # Set the manual input values in JSON format for use in the matrix.
+            echo "matrix={\"include\":[{\"slug\":\"${{ inputs.slug }}\",\"version\":\"${{ steps.get-version.outputs.result }}\"}]}" >> $GITHUB_OUTPUT
+          else
+            echo "Auto"
             # Load the JSON file and parse from "{name: {slug, version}, ...}" to "include: [{ name, slug, version }, ...]"
             # for use in the matrix.
             echo "matrix="$(jq -c '{include:[keys[] as $k | {name:$k,slug:.[$k].slug,version:.[$k].version }]}' plugins.json) >> $GITHUB_OUTPUT
-          else
-            # Set the manual input values in JSON format for use in the matrix.
-            echo "matrix={\"include\":[{\"slug\":\"${{ inputs.slug }}\",\"version\":\"${{ steps.get-version.outputs.result }}\"}]}" >> $GITHUB_OUTPUT            
           fi
   deploy:
     name: Deploy Plugin
