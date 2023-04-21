@@ -50,7 +50,7 @@ jobs:
         id: get-version
         if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
-          echo "version=$(node ./bin/plugin/cli.js get-plugin-version --slug=${{ inputs.slug }})" >> $GITHUB_OUTPUT
+          echo "$(node ./bin/plugin/cli.js get-plugin-version --slug=${{ inputs.slug }})"
       - name: Set matrix
         id: set-matrix
         run: |
