@@ -49,7 +49,9 @@ jobs:
       - name: Get plugin version
         id: get-version
         if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: echo "VERSION=$(npm run get-plugin-version -- --slug=${{ inputs.slug }})" >> ${GITHUB_ENV}
+        run: |
+          export VERSION=$(npm run get-plugin-version -- --slug=${{ inputs.slug }})
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
       - name: Set matrix
         id: set-matrix
         run: |
