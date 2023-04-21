@@ -65,7 +65,7 @@ svn checkout --depth immediates "$SVN_URL" "$SVN_DIR"
 cd "$SVN_DIR"
 svn update --set-depth infinity assets
 svn update --set-depth infinity trunk
-svn update --set-depth infinity tags
+svn update --set-depth immediates tags
 
 if [[ -d "tags/$VERSION" ]]; then
     echo "Version $VERSION of plugin $SLUG was already published";
