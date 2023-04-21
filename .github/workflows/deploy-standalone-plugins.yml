@@ -58,7 +58,7 @@ jobs:
             echo "Manual"
             echo "${{ steps.get-version.outputs.version }}"
             # Set the manual input values in JSON format for use in the matrix.
-            echo "matrix={\"include\":[{\"slug\":\"${{ inputs.slug }}\",\"version\":\"${{ steps.get-version.outputs.result }}\"}]}" >> $GITHUB_OUTPUT
+            echo "matrix={\"include\":[{\"slug\":\"${{ inputs.slug }}\",\"version\":\"${{ steps.get-version.outputs.version }}\"}]}" >> $GITHUB_OUTPUT
           else
             echo "Auto"
             # Load the JSON file and parse from "{name: {slug, version}, ...}" to "include: [{ name, slug, version }, ...]"
