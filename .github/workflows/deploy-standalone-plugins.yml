@@ -49,13 +49,13 @@ jobs:
       - name: Get plugin version
         id: get-version
         if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: npm run get-plugin-version -- --slug=${{ inputs.slug }}
+        run: echo "$(npm run get-plugin-version -- --slug=${{ inputs.slug }})" >> $GITHUB_OUTPUT
       - name: Set matrix
         id: set-matrix
         run: |
           if ${{ github.event_name == 'workflow_dispatch' }}; then
             echo "Manual"
-            echo "${{ toJson( steps.get-version.outputs.result ) }}"
+            echo "${{ steps.get-version.outputs.* }}"
             # Set the manual input values in JSON format for use in the matrix.
             echo "matrix={\"include\":[{\"slug\":\"${{ inputs.slug }}\",\"version\":\"${{ steps.get-version.outputs.result }}\"}]}" >> $GITHUB_OUTPUT
           else
