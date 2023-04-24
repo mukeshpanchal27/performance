@@ -35,6 +35,80 @@ exports.handler = async ( opt ) => {
  */
 function doRunGetPluginVersion( settings ) {
 	if ( settings.slug === undefined ) {
+		throw Error(
+			log(
+				formats.error(
+					'A slug must be provided via the --slug (-s) argument.'
+				)
+			)
+		);
+	}
+
+	const pluginsFile = path.join( '.', settings.pluginsJsonFile );
+
+	// Buffer contents of plugins JSON file.
+	let pluginsFileContent = '';
+
+	try {
+		pluginsFileContent = fs.readFileSync( pluginsFile, 'utf-8' );
+	} catch ( e ) {
+		throw Error(
+			log(
+				formats.error(
+					`Error reading file at "${ pluginsFile }": ${ e }`
+				)
+			)
+		);
+	}
+
+	// Validate that the plugins JSON file contains content before proceeding.
+	if (
+		'' === pluginsFileContent ||
+		! pluginsFileContent
+	) {
+		throw Error(
+			log(
+				formats.error(
+					`Contents of file at "${ pluginsFile }" could not be read, or are empty.`
+				)
+			)
+		);
+	}
+
+	const plugins = JSON.parse( pluginsFileContent );
+
+	// Check for valid and not empty object resulting from plugins JSON file parse.
+	if (
+		'object' !== typeof plugins ||
+		0 === Object.keys( plugins ).length
+	) {
+		throw Error(
+			log(
+				formats.error(
+					`File at "${ pluginsFile }" parsed, but detected empty/non valid JSON object.`
+				)
+			)
+		);
+	}
+
+	for ( const moduleDir in plugins ) {
+		const pluginVersion = plugins[ moduleDir ]?.version;
+		const pluginSlug = plugins[ moduleDir ]?.slug;
+		if ( pluginVersion && pluginSlug && ( settings.slug === pluginSlug ) ) {
+			return log( pluginVersion );
+		}
+	}
+
+	throw Error(
+		log(
+			formats.error(
+				`The "${ settings.slug }" module slug is missing in the file "${ pluginsFile }".`
+			)
+		)
+	);
+}
+
+	if ( settings.slug === undefined ) {
 		log(
 			formats.error(
 				'A slug must be provided via the --slug (-s) argument.'
