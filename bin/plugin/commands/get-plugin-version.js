@@ -66,7 +66,8 @@ function doRunGetPluginVersion( settings ) {
 		const pluginVersion = plugins[ moduleDir ]?.version;
 		const pluginSlug = plugins[ moduleDir ]?.slug;
 		if ( pluginVersion && pluginSlug && ( settings.slug === pluginSlug ) ) {
-			return console.log( pluginVersion );
+			console.log( pluginVersion );
+			return;
 		}
 	}
 
