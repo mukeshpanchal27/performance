@@ -48,12 +48,12 @@ jobs:
         run: npm ci
       - name: Run conditional step
         run: echo "Conditional step executed."
-        if: ${{ startsWith(steps.checkRegex.outputs.result, 'Matched') }}
+        if: ${{ steps.checkRegex.outputs.result == 'Matched' }}
 
       - name: Check regex pattern
         id: checkRegex
         run: |
-          result=$(echo "1.0.0" | grep -E '^\*|\d+(\.\d+){0,2}(-[a-zA-Z0-9\.]+)?$')
+          result=$(echo "1.0.0" | grep -E '^(\*|\d+(\.\d+){0,2}(-[a-zA-Z0-9\.]+)?)$')
           if [[ -n "$result" ]]; then
             echo "::set-output name=result::Matched"
           else
