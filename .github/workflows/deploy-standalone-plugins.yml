@@ -58,19 +58,11 @@ jobs:
             echo "Manual"
             result=$(echo "${{ steps.get-version.outputs.version }}" | grep -E '^\*|\d+(\.\d+){0,2}(-[a-zA-Z0-9\.]+)?$')
             if [[ -n "$result" ]]; then
-              echo "The ${{ inputs.slug }} module slug is in the file plugins.json."
-              exit 1
-            else
-              echo "The ${{ inputs.slug }} module slug is missing in the file plugins.json."
-              exit 1
-            fi
-            echo "${{ steps.get-version.outputs.version }}"
-            if ${{ steps.get-version.outputs.version == '' }}; then
-              echo "The ${{ inputs.slug }} module slug is missing in the file plugins.json."
-              exit 1
-            else
               # Set the manual input values in JSON format for use in the matrix.
               echo "matrix={\"include\":[{\"slug\":\"${{ inputs.slug }}\",\"version\":\"${{ steps.get-version.outputs.version }}\"}]}" >> $GITHUB_OUTPUT
+            else
+              echo "The ${{ inputs.slug }} module slug is missing in the file plugins.json."
+              exit 1
             fi
           else
             echo "Auto"
