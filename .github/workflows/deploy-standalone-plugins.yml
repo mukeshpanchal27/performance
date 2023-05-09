@@ -58,14 +58,6 @@ jobs:
             echo "Manual"
             result=$(echo "${{ steps.get-version.outputs.version }}" | grep -E '^\*|\d+(\.\d+){0,2}(-[a-zA-Z0-9\.]+)?$')
             if [[ -n "$result" ]]; then
-              echo "YESSS"
-            else
-              echo "Nooo"
-            fi
-            exit 1
-
-            echo ${{ steps.get-version.outputs.version }}
-            if [[ "${{ steps.get-version.outputs.version }}" =~ ^(\*|\d+(\.\d+){0,2}(-[a-zA-Z0-9\.]+)?)$ ]]; then
               echo "The ${{ inputs.slug }} module slug is in the file plugins.json."
               exit 1
             else
