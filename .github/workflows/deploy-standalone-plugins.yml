@@ -46,14 +46,17 @@ jobs:
           cache: npm
       - name: Install npm dependencies
         run: npm ci
-      - name: Run conditional step
-        run: echo "Conditional step executed."
-        if: ${{ steps.checkRegex.outputs.result == 'Matched' }}
-
       - name: Check regex pattern
-        id: checkRegex
         run: |
-          result=$(echo "1.0.0" | awk '/^(\*|[0-9]+(\.[0-9]+){0,2}(-[a-zA-Z0-9.]+)?)$/ {print "Matched"}')
+          result=$(echo "1.0.0" | awk '/^(\*|[0-9]+(\.[0-9]+){0,2}(-[a-zA-Z0-9.]+)?)$/)
+          if [[ -n "$result" ]]; then
+            echo "Yesss"
+          else
+            echo "Noooo"
+          fi
+      - name: Check regex pattern 2
+        run: |
+          result=$(echo "" | awk '/^(\*|[0-9]+(\.[0-9]+){0,2}(-[a-zA-Z0-9.]+)?)$/)
           if [[ -n "$result" ]]; then
             echo "Yesss"
           else
