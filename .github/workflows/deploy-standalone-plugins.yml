@@ -48,7 +48,7 @@ jobs:
         run: npm ci
       - name: Check regex pattern
         run: |
-          result=$(echo "1.0.0" | awk '/^(\*|[0-9]+(\.[0-9]+){0,2}(-[a-zA-Z0-9.]+)?)$/)
+          result=$(echo "1.0.0" | awk '/^(\*|[0-9]+(\.[0-9]+){0,2}(-[a-zA-Z0-9.]+)?)$/ {print "Matched"}')
           if [[ -n "$result" ]]; then
             echo "Yesss"
           else
@@ -56,7 +56,7 @@ jobs:
           fi
       - name: Check regex pattern 2
         run: |
-          result=$(echo "" | awk '/^(\*|[0-9]+(\.[0-9]+){0,2}(-[a-zA-Z0-9.]+)?)$/)
+          result=$(echo "" | awk '/^(\*|[0-9]+(\.[0-9]+){0,2}(-[a-zA-Z0-9.]+)?)$/ {print "Matched"}')
           if [[ -n "$result" ]]; then
             echo "Yesss"
           else
