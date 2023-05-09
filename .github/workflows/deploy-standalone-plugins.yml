@@ -57,7 +57,7 @@ jobs:
           if ${{ github.event_name == 'workflow_dispatch' }}; then
             echo "Manual"
             echo ${{ steps.get-version.outputs.version }}
-            if [[ ${{ steps.get-version.outputs.version }} && ${{ steps.get-version.outputs.version }} =~ ^(\*|\d+(\.\d+){0,2}(-[a-zA-Z0-9\.]+)?)$ ]]; then
+            if [[ ${{ steps.get-version.outputs.version }} ]] && [[ ${{ steps.get-version.outputs.version }} =~ ^(\*|\d+(\.\d+){0,2}(-[a-zA-Z0-9\.]+)?)$ ]]; then
               echo "The ${{ inputs.slug }} module slug is in the file plugins.json."
               exit 1
             else
