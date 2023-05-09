@@ -53,7 +53,7 @@ jobs:
       - name: Check regex pattern
         id: checkRegex
         run: |
-          result=$(echo "1.0.0" | grep -E '^(\*|\d+(\.\d+){0,2}(-[a-zA-Z0-9\.]+)?)$')
+          result=$(echo "1.0.0" | awk '/^(\*|[0-9]+(\.[0-9]+){0,2}(-[a-zA-Z0-9.]+)?)$/ {print "Matched"}')
           if [[ -n "$result" ]]; then
             echo "::set-output name=result::Matched"
           else
