@@ -58,8 +58,10 @@ jobs:
             result=$(echo ${{ steps.get-version.outputs.version }} | grep -E '^\*|\d+(\.\d+){0,2}(-[a-zA-Z0-9\.]+)?$')
             if [[ -n "$result" ]]; then
               echo "YESSS"
+              exit 1
             else
               echo "Nooo"
+              exit 1
             fi
             echo "Manual"
             echo ${{ steps.get-version.outputs.version }}
