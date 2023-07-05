@@ -72,7 +72,6 @@ jobs:
       WP_ENV_PHP_VERSION: ${{ matrix.php }}
       WP_ENV_CORE: ${{ matrix.wordpress == 'trunk' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', matrix.wordpress ) }}
     steps:
-      - uses: styfle/cancel-workflow-action@0.9.1
       - uses: actions/checkout@v3
       - uses: shivammathur/setup-php@v2
         with:
