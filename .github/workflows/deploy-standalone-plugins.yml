@@ -59,7 +59,7 @@ jobs:
           else
             # Load the JSON file and parse from "{name: {slug, version}, ...}" to "include: [{ name, slug, version }, ...]"
             # for use in the matrix.
-            echo "matrix="$(jq -c '{include:[keys[] as $k | {name:$k,slug:.[$k].slug,version:.[$k].version }]}' plugins.json) >> $GITHUB_OUTPUT
+            echo "matrix="$(jq -c '{include:[keys[] as $k | {name:$k,slug:.[$k].slug,version:.[$k].version,dry-run:false}]}' plugins.json) >> $GITHUB_OUTPUT
           fi
   deploy:
     name: Deploy Plugin
@@ -90,4 +90,3 @@ jobs:
           VERSION: ${{ matrix.version }}
           BUILD_DIR: ./build/${{ matrix.slug }}
           ASSETS_DIR: ./build/${{ matrix.slug }}/.wordpress-org
-          INPUT_DRY_RUN: ${{ matrix.dry-run }}
