@@ -8,6 +8,9 @@ on:
       slug:
         type: string
         description: 'The slug of the plugin to deploy'
+      dry-run:
+        type: boolean
+        description: 'True to set debug mode'
 jobs:
   release:
     name: Prepare Deployment
@@ -36,7 +39,7 @@ jobs:
             result=$(echo "${{ steps.get-version.outputs.version }}" | awk '/^(\*|[0-9]+(\.[0-9]+){0,2}(-[a-zA-Z0-9.]+)?)$/ {print "Matched"}')
             if [[ -n "$result" ]]; then
               # Set the manual input values in JSON format for use in the matrix.
-              echo "matrix={\"include\":[{\"slug\":\"${{ inputs.slug }}\",\"version\":\"${{ steps.get-version.outputs.version }}\"}]}" >> $GITHUB_OUTPUT
+              echo "matrix={\"include\":[{\"slug\":\"${{ inputs.slug }}\",\"version\":\"${{ steps.get-version.outputs.version }}\",\"dry-run\":\"${{ inputs.dry-run }}\"}]}" >> $GITHUB_OUTPUT
             else
               echo "The ${{ inputs.slug }} module slug is missing in the file plugins.json."
               exit 1
@@ -73,3 +76,4 @@ jobs:
           VERSION: ${{ matrix.version }}
           BUILD_DIR: ./build/${{ matrix.slug }}
           ASSETS_DIR: ./build/${{ matrix.slug }}/.wordpress-org
+          DRY_RUN: ${{ matrix.dry-run && true || false }}
