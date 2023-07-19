@@ -22,7 +22,8 @@ on:
         description: 'The slug of the plugin to deploy'
       dry-run:
         type: boolean
-        description: 'True to set debug mode'
+        description: 'Debug mode (run without publishing).'
+        default: false
 jobs:
   release:
     name: Prepare Deployment
