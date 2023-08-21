@@ -27,8 +27,8 @@
     "slevomat/coding-standard": "^8.0"
   },
   "require": {
-    "composer/installers": "~1.0",
-    "php": ">=5.6|^7|^8"
+    "composer/installers": "^v1.12.0 || ^2.2",
+    "php": ">=5.6"
   },
   "scripts": {
     "phpstan": "phpstan analyze --ansi --memory-limit=2048M",
