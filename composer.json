@@ -13,7 +13,7 @@
   },
   "require-dev": {
     "phpcompatibility/php-compatibility": "^9.3",
-    "phpstan/extension-installer": "^1.3.0",
+    "phpstan/extension-installer": "^1.0",
     "phpstan/phpstan": "^1.10",
     "szepeviktor/phpstan-wordpress": "^1.3.0",
     "wp-phpunit/wp-phpunit": "^6.1",
