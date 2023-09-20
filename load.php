@@ -16,7 +16,7 @@
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
+	exit;
 }
 
 define( 'PERFLAB_VERSION', '2.6.1' );
