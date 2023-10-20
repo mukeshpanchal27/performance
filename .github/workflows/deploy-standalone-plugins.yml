@@ -86,6 +86,6 @@ jobs:
         id: upload
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.repository.name }}
-          path: ${{ github.event.repository.name }}
+          name: webp-uploads
+          path: webp-uploads
           retention-days: 2
