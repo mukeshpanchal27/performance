@@ -87,5 +87,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: webp-uploads
-          path: webp-uploads
+          path: ${{github.workspace}}/build/webp-uploads
           retention-days: 2
