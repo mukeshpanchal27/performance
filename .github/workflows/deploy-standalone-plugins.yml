@@ -86,6 +86,6 @@ jobs:
         id: upload
         uses: actions/upload-artifact@v3
         with:
-          name: webp-uploads
-          path: ${{github.workspace}}/build/webp-uploads
+          name: ${{ matrix.slug }}
+          path: ${{github.workspace}}/build/${{ matrix.slug }}
           retention-days: 2
