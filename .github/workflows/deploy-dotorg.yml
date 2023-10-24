@@ -38,7 +38,7 @@ on:
       dry-run:
         type: boolean
         description: 'Debug mode (run without publishing).'
-        default: false
+        default: true
 
 jobs:
   release:
