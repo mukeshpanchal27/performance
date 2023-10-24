@@ -1,0 +1,33 @@
+name: Deploy to WordPress.org
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        type: boolean
+        description: 'Debug mode (run without publishing).'
+        default: false
+
+jobs:
+  release:
+    name: New Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: WordPress plugin deploy
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        with:
+          dry-run: ${{ inputs.dry-run }}
+          generate-zip: true
+        env:
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SLUG: performance-lab
+      - name: Upload the archive as an artifact
+        id: upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.event.repository.name }}
+          path: ${{github.workspace}}/${{ github.event.repository.name }}
+          retention-days: 2
