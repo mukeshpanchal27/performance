@@ -62,5 +62,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: performance-lab
-          path: ${{github.workspace}}/build/performance-lab
+          path: ${{github.workspace}}/performance-lab
           retention-days: 2
