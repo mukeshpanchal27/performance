@@ -61,5 +61,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.repository.name }}
-          path: ${{github.workspace}}/${{ github.event.repository.name }}
+          path: ${{github.workspace}}/build/${{ github.event.repository.name }}
           retention-days: 2
