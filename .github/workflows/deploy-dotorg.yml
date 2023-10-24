@@ -1,9 +1,44 @@
 name: Deploy to WordPress.org
 
 on:
-  release:
+  push:
+    branches:
+      - trunk
+    # Only run if JS/JSON/Lint/NVM files changed.
+    paths:
+      - '.github/workflows/deploy-dotorg.yml'
+      - '**.js'
+      - '**.json'
+      - '.eslint*'
+      - '.nvmrc'
+      - '.wp-env.json'
+      - '**/package.json'
+      - 'package-lock.json'
+  pull_request:
+    branches:
+      - trunk
+      - 'release/**'
+      - 'feature/**'
+    # Only run if JS/JSON/Lint/NVM files changed.
+    paths:
+      - '.github/workflows/deploy-dotorg.yml'
+      - '**.js'
+      - '**.json'
+      - '.eslint*'
+      - '.nvmrc'
+      - '.wp-env.json'
+      - '**/package.json'
+      - 'package-lock.json'
     types:
-      - published
+      - opened
+      - reopened
+      - synchronize
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        type: boolean
+        description: 'Debug mode (run without publishing).'
+        default: true
 
 jobs:
   release:
@@ -14,12 +49,18 @@ jobs:
         uses: actions/checkout@v3
       - name: WordPress plugin deploy
         uses: 10up/action-wordpress-plugin-deploy@stable
+        with:
+          dry-run: ${{ inputs.dry-run }}
+          generate-zip: true
         env:
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           SLUG: performance-lab
-      - name: Upload release assets
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
+          VERSION: 10.11
+      - name: Upload the archive as an artifact
+        id: upload
+        uses: actions/upload-artifact@v3
         with:
-          files: ${{github.workspace}}/${{ github.event.repository.name }}.zip
+          name: performance-lab
+          path: ${{github.workspace}}
+          retention-days: 2
