@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - trunk
-      - 'release/**'
     # Only run if JS/JSON/Lint/NVM files changed.
     paths:
       - '.github/workflows/deploy-dotorg.yml'
