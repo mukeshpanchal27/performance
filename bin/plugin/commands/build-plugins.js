@@ -25,7 +25,7 @@ exports.handler = async () => {
 
 		try {
 			const pluginsConfig = JSON.parse( jsonString );
-			const plugins       = pluginsConfig.modules;
+			const plugins = pluginsConfig.modules;
 			if ( ! plugins ) {
 				log(
 					formats.error(
