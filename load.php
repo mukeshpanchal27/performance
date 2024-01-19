@@ -426,7 +426,7 @@ function perflab_maybe_remove_object_cache_dropin() {
 		$dropin_path        = WP_CONTENT_DIR . '/object-cache.php';
 		$dropin_backup_path = WP_CONTENT_DIR . '/object-cache-plst-orig.php';
 
-		/**
+		/*
 		 * If there is an object-cache-plst-orig.php file, restore it and
 		 * override the Performance Lab file. This is only relevant for
 		 * backward-compatibility with previous Performance Lab versions
