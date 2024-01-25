@@ -341,7 +341,7 @@ function doRunUnitTests( settings ) {
 				{ shell: true, encoding: 'utf8' }
 			);
 		}
-
+		log( command );
 		log( command.stdout.replace( '\n', '' ) );
 
 		if ( 1 === command.status ) {
