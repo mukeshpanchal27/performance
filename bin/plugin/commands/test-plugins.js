@@ -325,8 +325,8 @@ function doRunUnitTests( settings ) {
 				'wp-env',
 				[
 					'run',
-					'phpunit',
-					`'WP_MULTISITE=1 phpunit -c /var/www/html/wp-content/plugins/${ plugin }/multisite.xml --verbose --testdox'`,
+					'tests-cli',
+					`--env-cwd=/var/www/html/wp-content/plugins/${ plugin } vendor/bin/phpunit -c multisite.xml --verbose --testdox`,
 				],
 				{ shell: true, encoding: 'utf8' }
 			);
@@ -335,8 +335,8 @@ function doRunUnitTests( settings ) {
 				'wp-env',
 				[
 					'run',
-					'phpunit',
-					`'phpunit -c /var/www/html/wp-content/plugins/${ plugin }/phpunit.xml --verbose --testdox'`,
+					'tests-cli',
+					`--env-cwd=/var/www/html/wp-content/plugins/${ plugin } vendor/bin/phpunit -c phpunit.xml --verbose --testdox`,
 				],
 				{ shell: true, encoding: 'utf8' }
 			);
