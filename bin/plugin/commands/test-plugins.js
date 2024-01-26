@@ -327,7 +327,7 @@ function doRunUnitTests( settings ) {
 				log( output );
 			}
 		);
-		
+
 		// Define multi site flag based on single vs multi sitetype arg.
 		const isMultiSite = 'multi' === settings.siteType;
 		let command = '';
@@ -497,7 +497,17 @@ function doRunStandalonePluginTests( settings ) {
 			process.exit( 1 );
 		}
 		log( `PHP Version: ` );
-		execSync( `php -v` );
+		execSync(
+			`php -v`,
+			( err, output ) => {
+				if ( err ) {
+					log( formats.error( `${ err }` ) );
+					process.exit( 1 );
+				}
+				// log the output received from the command
+				log( output );
+			}
+		);
 		// Execute composer install within built plugin following copy.
 		execSync(
 			`composer install --working-dir=${ settings.builtPluginsDir }${ plugin } --no-interaction`,
