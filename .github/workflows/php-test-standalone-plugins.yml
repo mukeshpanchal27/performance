@@ -63,6 +63,8 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           cache: npm
+      - name: Output PHP Version
+        run: php -v
       - name: npm install
         run: npm ci
       - name: Building standalone plugins
