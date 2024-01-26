@@ -316,6 +316,18 @@ function doRunUnitTests( settings ) {
 			)
 		);
 
+		execSync(
+			`composer install --working-dir=${ settings.builtPluginsDir }${ plugin } --no-interaction`,
+			( err, output ) => {
+				if ( err ) {
+					log( formats.error( `${ err }` ) );
+					process.exit( 1 );
+				}
+				// log the output received from the command
+				log( output );
+			}
+		);
+		
 		// Define multi site flag based on single vs multi sitetype arg.
 		const isMultiSite = 'multi' === settings.siteType;
 		let command = '';
@@ -341,10 +353,13 @@ function doRunUnitTests( settings ) {
 				{ shell: true, encoding: 'utf8' }
 			);
 		}
-		log( command );
+
 		log( command.stdout.replace( '\n', '' ) );
 
 		if ( 1 === command.status ) {
+			// Log error.
+			log( formats.error( command.stderr.replace( '\n', '' ) ) );
+
 			log(
 				formats.error(
 					`One or more tests failed for plugin ${ plugin }`
