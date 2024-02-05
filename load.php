@@ -30,8 +30,8 @@ if ( ! defined( 'PERFLAB_OBJECT_CACHE_DROPIN_VERSION' ) ) {
 	define( 'PERFLAB_OBJECT_CACHE_DROPIN_VERSION', false );
 }
 
-require_once PERFLAB_PLUGIN_DIR_PATH . 'server-timing/class-perflab-server-timing-metric.php';
 require_once PERFLAB_PLUGIN_DIR_PATH . 'server-timing/class-perflab-server-timing.php';
+require_once PERFLAB_PLUGIN_DIR_PATH . 'server-timing/class-perflab-server-timing-metric.php';
 require_once PERFLAB_PLUGIN_DIR_PATH . 'server-timing/load.php';
 require_once PERFLAB_PLUGIN_DIR_PATH . 'server-timing/defaults.php';
 
@@ -90,7 +90,7 @@ function perflab_get_modules_setting_default() {
  * @return array Sanitized modules setting value.
  */
 function perflab_sanitize_modules_setting( $value ) {
-	if ( ! is_array( $value ) ) {
+	if ( ! is_array( $value ) || empty( $value ) ) {
 		return array();
 	}
 
