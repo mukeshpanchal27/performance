@@ -90,7 +90,7 @@ function perflab_get_modules_setting_default() {
  * @return array Sanitized modules setting value.
  */
 function perflab_sanitize_modules_setting( $value ) {
-	if ( ! is_array( $value ) ) {
+	if ( ! is_array( $value ) || empty( $value ) {
 		return array();
 	}
 
