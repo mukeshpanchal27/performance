@@ -46,7 +46,7 @@ jobs:
           echo "directory=$(node ./bin/plugin/cli.js get-plugin-dir --slug=${{ inputs.slug }})" >> $GITHUB_OUTPUT
       - name: Get plugin version
         id: get-version
-        if: ${{ github.event_name == 'workflow_dispatch' && steps.get-plugin-dir.outputs.directory == 'build' }}
+        if: ${{ github.event_name == 'workflow_dispatch' && steps.get-plugin-directory.outputs.directory == 'build' }}
         run: |
           if [[ ${{ steps.get-type.outputs.type }} == 'module' ]]; then
             echo "version=$(node ./bin/plugin/cli.js get-plugin-version --slug=${{ inputs.slug }})" >> $GITHUB_OUTPUT
@@ -68,7 +68,7 @@ jobs:
             # for use in the matrix.
             # The "dry-run" parameter is included here to set the deployment mode.
             # When running the manual (workflow_dispatch) workflow, this value will be set from manual input type.
-            echo "matrix=$(jq -c '{include: ([.modules | to_entries[] | {name:.key,slug:.value.slug,version:.value.version,directory:"${{ steps.get-plugin-dir.outputs.directory }}","dry-run":false }] + [.plugins[] | {slug:. , directory:"${{ steps.get-plugin-dir.outputs.directory }}", "dry-run":false}])}' plugins.json)" >> $GITHUB_OUTPUT
+            echo "matrix=$(jq -c '{include: ([.modules | to_entries[] | {name:.key,slug:.value.slug,version:.value.version,directory:"${{ steps.get-plugin-directory.outputs.directory }}","dry-run":false }] + [.plugins[] | {slug:. , directory:"${{ steps.get-plugin-directory.outputs.directory }}", "dry-run":false}])}' plugins.json)" >> $GITHUB_OUTPUT
           fi
   deploy:
     name: Deploy Plugin
