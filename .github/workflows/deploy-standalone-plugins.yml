@@ -29,6 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+      directory: ${{ steps.get-plugin-directory.outputs.directory }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -68,7 +69,7 @@ jobs:
             # for use in the matrix.
             # The "dry-run" parameter is included here to set the deployment mode.
             # When running the manual (workflow_dispatch) workflow, this value will be set from manual input type.
-            echo "matrix=$(jq -c '{include: ([.modules | to_entries[] | {name:.key,slug:.value.slug,version:.value.version,directory:"${{ steps.get-plugin-directory.outputs.directory }}","dry-run":false }] + [.plugins[] | {slug:. , directory:"plugins/${{ steps.get-plugin-directory.outputs.directory }}", "dry-run":false}])}' plugins.json)" >> $GITHUB_OUTPUT
+            echo "matrix=$(jq -c '{include: ([.modules | to_entries[] | {name:.key,slug:.value.slug,version:.value.version,directory:"${{ steps.get-plugin-directory.outputs.directory }}","dry-run":false }] + [.plugins[] | {slug:. , directory:"${{ steps.get-plugin-directory.outputs.directory }}", "dry-run":false}])}' plugins.json)" >> $GITHUB_OUTPUT
           fi
   deploy:
     name: Deploy Plugin
@@ -97,6 +98,5 @@ jobs:
           #SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           SLUG: ${{ matrix.slug }}
           VERSION: ${{ matrix.version }}
-          DIR: ${{ matrix.directory }},
           BUILD_DIR: ./${{ matrix.directory }}/${{ matrix.slug }}
           ASSETS_DIR: ./${{ matrix.directory }}/${{ matrix.slug }}/.wordpress-org
