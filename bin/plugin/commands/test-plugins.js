@@ -491,11 +491,7 @@ function doRunStandalonePluginTests( settings ) {
 						overwrite: true,
 					}
 				);
-				log(
-					formats.success(
-						`Copied plugin "${ plugin }".\n`
-					)
-				);
+				log( formats.success( `Copied plugin "${ plugin }".\n` ) );
 				builtPlugins = builtPlugins.concat( plugin );
 			} catch ( e ) {
 				log(
