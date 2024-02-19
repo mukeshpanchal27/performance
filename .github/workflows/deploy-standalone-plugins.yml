@@ -48,9 +48,7 @@ jobs:
         id: get-version
         if: ${{ github.event_name == 'workflow_dispatch' && steps.get-plugin-directory.outputs.directory == 'build' }}
         run: |
-          if [[ ${{ steps.get-type.outputs.type }} == 'module' ]]; then
-            echo "version=$(node ./bin/plugin/cli.js get-plugin-version --slug=${{ inputs.slug }})" >> $GITHUB_OUTPUT
-          fi
+          echo "version=$(node ./bin/plugin/cli.js get-plugin-version --slug=${{ inputs.slug }})" >> $GITHUB_OUTPUT
       - name: Set matrix
         id: set-matrix
         run: |
