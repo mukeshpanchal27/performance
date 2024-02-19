@@ -57,7 +57,7 @@ jobs:
             if ${{ steps.get-plugin-directory.outputs.directory == 'plugins' }}; then
               # Set the manual input values in JSON format for use in the matrix.
               echo "matrix={\"include\":[{\"slug\":\"${{ inputs.slug }}\",\"directory\":\"${{ steps.get-plugin-directory.outputs.directory }}\",\"dry-run\":\"${{ inputs.dry-run }}\"}]}" >> $GITHUB_OUTPUT
-            elif [[ -n "$result" && steps.get-plugin-directory.outputs.directory == 'build' ]]; then
+            elif [[ -n "$result" ]]; then
               # Set the manual input values in JSON format for use in the matrix.
               echo "matrix={\"include\":[{\"slug\":\"${{ inputs.slug }}\",\"version\":\"${{ steps.get-version.outputs.version }}\",\"directory\":\"${{ steps.get-plugin-directory.outputs.directory }}\",\"dry-run\":\"${{ inputs.dry-run }}\"}]}" >> $GITHUB_OUTPUT
             else
