@@ -55,8 +55,7 @@ jobs:
             wp: 'trunk'
     env:
       WP_ENV_PHP_VERSION: ${{ matrix.php }}
-      WP_ENV_CORE: ${{ matrix.wp == 'trunk' ? 'WordPress/WordPress' : format( 'https://wordpress.org/wordpress-{0}.zip', matrix.wp ) }}
-
+      WP_ENV_CORE: ${{ matrix.wp == 'trunk' ? 'WordPress/WordPress' : 'https://wordpress.org/wordpress-' + matrix.wp + '.zip' }}
     steps:
       - uses: styfle/cancel-workflow-action@0.11.0
       - uses: actions/checkout@v3
