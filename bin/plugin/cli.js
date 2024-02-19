@@ -106,10 +106,7 @@ withOptions(
 	.description( 'Get standalone plugin version' )
 	.action( catchException( getPluginVersionHandler ) );
 
-withOptions(
-	program.command( 'get-plugin-dir' ),
-	getPluginDirOptions
-)
+withOptions( program.command( 'get-plugin-dir' ), getPluginDirOptions )
 	.alias( 'get-plugin-directory' )
 	.description( 'Get plugin directory' )
 	.action( catchException( getPluginDirHandler ) );
