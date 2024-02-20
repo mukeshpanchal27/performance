@@ -47,7 +47,7 @@ jobs:
           echo "directory=$(node ./bin/plugin/cli.js get-plugin-dir --slug=${{ inputs.slug }})" >> $GITHUB_OUTPUT
       - name: Get plugin version
         id: get-version
-        if: ${{ github.event_name == 'workflow_dispatch' && steps.get-plugin-directory.outputs.directory == 'build' }}
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
           echo "version=$(node ./bin/plugin/cli.js get-plugin-version --slug=${{ inputs.slug }})" >> $GITHUB_OUTPUT
       - name: Set matrix
@@ -55,11 +55,8 @@ jobs:
         run: |
           if ${{ github.event_name == 'workflow_dispatch' }}; then
             result=$(echo "${{ steps.get-version.outputs.version }}" | awk '/^(\*|[0-9]+(\.[0-9]+){0,2}(-[a-zA-Z0-9.]+)?)$/ {print "Matched"}')
-            if ${{ steps.get-plugin-directory.outputs.directory == 'plugins' }}; then
-              # Set the manual input values in JSON format for use in the matrix for plugins.
-              echo "matrix={\"include\":[{\"slug\":\"${{ inputs.slug }}\",\"directory\":\"${{ steps.get-plugin-directory.outputs.directory }}\",\"dry-run\":\"true\"}]}" >> $GITHUB_OUTPUT
-            elif [[ -n "$result" ]]; then
-              # Set the manual input values in JSON format for use in the matrix for modules.
+            if [[ -n "$result" ]]; then
+              # Set the manual input values in JSON format for use in the matrix.
               echo "matrix={\"include\":[{\"slug\":\"${{ inputs.slug }}\",\"version\":\"${{ steps.get-version.outputs.version }}\",\"directory\":\"${{ steps.get-plugin-directory.outputs.directory }}\",\"dry-run\":\"true\"}]}" >> $GITHUB_OUTPUT
             else
               echo "The ${{ inputs.slug }} module slug is missing in the file plugins.json."
