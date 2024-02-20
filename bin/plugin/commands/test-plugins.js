@@ -492,23 +492,35 @@ function doRunStandalonePluginTests( settings ) {
 	}
 
 	// Create an array of plugins from entries in plugins JSON file.
-	builtPlugins = builtPlugins.concat( Object.keys( plugins )
-		.filter( ( item ) => {
-			if (
-				! fs.pathExistsSync(
-					`${ settings.builtPluginsDir }${ plugins[ item ].slug }`
-				)
-			) {
-				log(
-					formats.error(
-						`Built plugin path "${ settings.builtPluginsDir }${ plugins[ item ].slug }" not found, skipping and removing from plugin list`
-					)
-				);
-				return false;
-			}
-			return true;
-		} )
-		.map( ( item ) => plugins[ item ].slug ));
+	builtPlugins = builtPlugins.concat(
+		Object.keys( plugins )
+			.filter( ( item ) => {
+				try {
+					fs.copySync(
+						`${ settings.pluginsDir }${ plugins[ item ].slug }/`,
+						`${ settings.builtPluginsDir }${ plugins[ item ].slug }/`,
+						{
+							overwrite: true,
+						}
+					);
+					log(
+						formats.success(
+							`Copied plugin "${ plugins[ item ].slug }".\n`
+						)
+					);
+					return true;
+				} catch ( e ) {
+					// Handle the error appropriately
+					log(
+						formats.error(
+							`Error copying plugin "${ plugins[ item ].slug }": ${ e.message }`
+						)
+					);
+					return false;
+				}
+			} )
+			.map( ( item ) => plugins[ item ].slug )
+	);
 
 	// For each built plugin, copy the test assets.
 	builtPlugins.forEach( ( plugin ) => {
