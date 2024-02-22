@@ -55,17 +55,16 @@ function doRunGetPluginDir( settings ) {
 					return;
 				}
 			}
-		} else if ( plugins && Object.keys( plugins ).length !== 0 ) {
+		}
+
+		// Validate that the plugins object is not empty.
+		if ( plugins && Object.keys( plugins ).length !== 0 ) {
 			for ( const plugin of Object.values( plugins ) ) {
 				if ( plugin.version && settings.slug === plugin.slug ) {
 					log( 'plugins' );
 					return;
 				}
 			}
-		} else {
-			throw Error(
-				`The given "${ pluginsFile }" configuration is invalid, the modules or plugins are missing, or they are misspelled.`
-			);
 		}
 	} catch ( error ) {
 		throw Error( `Error reading file at "${ pluginsFile }": ${ error }` );
