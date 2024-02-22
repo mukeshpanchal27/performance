@@ -50,31 +50,22 @@ function doRunGetPluginDir( settings ) {
 		// Validate that the modules object is not empty.
 		if ( modules && Object.keys( modules ).length !== 0 ) {
 			for ( const module of Object.values( modules ) ) {
-				if (
-					module.version &&
-					settings.slug === module.slug
-				) {
+				if ( module.version && settings.slug === module.slug ) {
 					log( 'build' );
 					return;
 				}
 			}
 		} else if ( plugins && Object.keys( plugins ).length !== 0 ) {
 			for ( const plugin of Object.values( plugins ) ) {
-				if (
-					plugin.version &&
-					settings.slug === plugin.slug
-				) {
+				if ( plugin.version && settings.slug === plugin.slug ) {
 					log( 'plugins' );
 					return;
 				}
 			}
 		} else {
-			log(
-				formats.error(
-					`The given "${ pluginsFile }" configuration is invalid, the modules or plugins are missing, or they are misspelled.`
-				)
+			throw Error(
+				`The given "${ pluginsFile }" configuration is invalid, the modules or plugins are missing, or they are misspelled.`
 			);
-			return;
 		}
 	} catch ( error ) {
 		throw Error( `Error reading file at "${ pluginsFile }": ${ error }` );
