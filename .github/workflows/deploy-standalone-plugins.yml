@@ -92,9 +92,9 @@ jobs:
         id: set_version
         run: |
           if [ -z "${{ matrix.version }}" ]; then
-            echo "version=$(node ./bin/plugin/cli.js get-plugin-version --slug=${{ matrix.slug }})" >> $GITHUB_OUTPUT
+            echo "::set-output name=version::$(node ./bin/plugin/cli.js get-plugin-version --slug=${{ matrix.slug }})"
           else
-            echo "version=${{ matrix.slug }})" >> $GITHUB_OUTPUT
+            echo "::set-output name=version::${{ matrix.version }}"
           fi
       - name: Deploy Standalone Plugin - ${{ matrix.slug }}
         uses: 10up/action-wordpress-plugin-deploy@stable
