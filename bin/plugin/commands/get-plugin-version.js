@@ -62,7 +62,6 @@ function doRunGetPluginVersion( settings ) {
 					'../../../plugins/' + plugin + '/readme.txt'
 				);
 
-				log( readmeFile );
 				let fileContent = '';
 				try {
 					fileContent = fs.readFileSync( readmeFile, 'utf-8' );
