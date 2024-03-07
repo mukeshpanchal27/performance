@@ -2,9 +2,6 @@ name: Code Linting
 
 on:
   push:
-    branches:
-      - trunk
-      - 'release/**'
     # Only run if PHP-related files changed.
     paths:
       - '.github/workflows/php-lint.yml'
@@ -14,10 +11,6 @@ on:
       - 'composer.json'
       - 'composer.lock'
   pull_request:
-    branches:
-      - trunk
-      - 'release/**'
-      - 'feature/**'
     # Only run if PHP-related files changed.
     paths:
       - '.github/workflows/php-lint.yml'
