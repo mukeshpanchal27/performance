@@ -2,9 +2,6 @@ name: Integration Tests for Standalone Plugins
 
 on:
   push:
-    branches:
-      - trunk
-      - 'release/**'
     # Only run if PHP-related files changed.
     paths:
       - '.github/workflows/php-test-standalone-plugins.yml'
@@ -17,10 +14,6 @@ on:
       - 'composer.json'
       - 'composer.lock'
   pull_request:
-    branches:
-      - trunk
-      - 'release/**'
-      - 'feature/**'
     # Only run if PHP-related files changed.
     paths:
       - '.github/workflows/php-test-standalone-plugins.yml'
