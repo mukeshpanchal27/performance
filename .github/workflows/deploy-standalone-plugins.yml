@@ -64,7 +64,7 @@ jobs:
 
             # The "dry-run" parameter is included here to set the deployment mode.
             # When running the manual (workflow_dispatch) workflow, this value will be set from manual input type.
-            echo "matrix=$(jq -c '{include: ([.plugins[] | {name:. , slug:. , "dry-run": true}])}' plugins.json)" >> $GITHUB_OUTPUT
+            echo "matrix=$(jq -c '{include: ([.plugins[] | {slug:. , "dry-run": true}])}' plugins.json)" >> $GITHUB_OUTPUT
           fi
   deploy:
     name: Deploy Plugin
