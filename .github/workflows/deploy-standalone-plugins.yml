@@ -2,6 +2,7 @@
 name: Deploy Standalone Plugin(s) to WordPress.org
 
 on:
+  # TODO The pull_request will be removed once the workflow is tested.
   release:
     types:
       - published
