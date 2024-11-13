@@ -85,6 +85,8 @@ jobs:
           else
             npm run test-php-multisite
           fi
+      - name: List coverage files
+        run: ls -la
       - name: Upload single site coverage reports to Codecov
         if: ${{ matrix.coverage == true }}
         uses: codecov/codecov-action@v4
