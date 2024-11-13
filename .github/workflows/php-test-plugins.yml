@@ -74,14 +74,14 @@ jobs:
       - name: Running single site unit tests
         run: |
           if [ "${{ matrix.coverage }}" == "true" ]; then
-            npm run test-php -- --coverage-clover=coverage-${{ github.sha }}.xml
+            npm run test-php -- -- --coverage-clover=coverage-${{ github.sha }}.xml
           else
             npm run test-php
           fi
       - name: Running multisite unit tests
         run: |
           if [ "${{ matrix.coverage }}" == "true" ]; then
-            npm run test-php-multisite -- --coverage-clover=coverage-multisite-${{ github.sha }}.xml
+            npm run test-php-multisite -- -- --coverage-clover=coverage-multisite-${{ github.sha }}.xml
           else
             npm run test-php-multisite
           fi
