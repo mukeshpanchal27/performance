@@ -92,7 +92,7 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: coverage-${{ github.sha }}.xml
+          file: ./coverage-${{ github.sha }}.xml
           flags: single
           name: ${{ matrix.php }}-single-site-coverage
           fail_ci_if_error: true
@@ -101,7 +101,7 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: coverage-multisite-${{ github.sha }}.xml
+          files: ./coverage-multisite-${{ github.sha }}.xml
           flags: multisite
           name: ${{ matrix.php }}-multisite-coverage
           fail_ci_if_error: true
