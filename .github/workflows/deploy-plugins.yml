@@ -82,19 +82,24 @@ jobs:
         run: |
           echo "deploy=true" >> $GITHUB_OUTPUT
 
+      - name: Fail early if deployment check is false
+        id: exit-check
+        run: |
+          if [[ "${{ steps.check-deployment.outputs.deploy }}" != "true" ]]; then
+            echo "Deployment condition not met. Exiting."
+            exit 1
+          fi
+
       - name: Check plugin version integrity
-        if: steps.check-deployment.outputs.deploy == 'true'
         run: npm run versions -- --plugin=${{ matrix.plugin }}
 
       - name: Create zip file
-        if: steps.check-deployment.outputs.deploy == 'true'
         run: |
           mkdir -p ./build/dist
           cd ./build/${{ matrix.plugin }}
           zip -r ../dist/${{ matrix.plugin }}.zip .
 
       - name: Generate checksum
-        if: steps.check-deployment.outputs.deploy == 'true'
         working-directory: ./build/dist
         run: |
           mkdir -p $RUNNER_TEMP/plugin-checksums
@@ -103,14 +108,12 @@ jobs:
           cat $RUNNER_TEMP/plugin-checksums/checksums.txt | while read sum file; do echo "$sum $file" > ${file#\*}.sha256; done
 
       - name: Upload artifact
-        if: steps.check-deployment.outputs.deploy == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.plugin }}
           path: ./build/dist
 
       - name: Start deployment
-        if: steps.check-deployment.outputs.deploy == 'true'
         uses: bobheadxi/deployments@v1
         id: wporg-deployment
         with:
@@ -119,7 +122,6 @@ jobs:
           env: "wp.org plugin: ${{ matrix.plugin }}"
 
       - name: Deploy Plugin - ${{ matrix.plugin }}
-        if: steps.check-deployment.outputs.deploy == 'true'
         uses: 10up/action-wordpress-plugin-deploy@stable
         with:
           dry-run: ${{ github.event_name == 'workflow_dispatch' && inputs.dry-run || false }}
