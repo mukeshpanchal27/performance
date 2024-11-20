@@ -80,7 +80,7 @@ jobs:
       - name: Check if deployment is needed
         id: check-deployment
         run: |
-          echo "deploy=true" >> $GITHUB_OUTPUT
+          echo "deploy=false" >> $GITHUB_OUTPUT
 
       - name: Fail early if deployment check is false
         id: exit-check
