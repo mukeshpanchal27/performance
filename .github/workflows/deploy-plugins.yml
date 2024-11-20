@@ -83,12 +83,10 @@ jobs:
           echo "deploy=false" >> $GITHUB_OUTPUT
 
       - name: Fail early if deployment check is false
-        id: exit-check
+        if: steps.check-deployment.outputs.deploy != 'true'
         run: |
-          if [[ "${{ steps.check-deployment.outputs.deploy }}" != "true" ]]; then
-            echo "Deployment condition not met. Exiting."
-            exit 1
-          fi
+          echo "Deployment condition not met. Exiting."
+          exit 1
 
       - name: Check plugin version integrity
         run: npm run versions -- --plugin=${{ matrix.plugin }}
