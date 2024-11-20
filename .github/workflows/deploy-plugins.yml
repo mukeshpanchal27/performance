@@ -80,22 +80,6 @@ jobs:
       - name: Check if deployment is needed
         id: check-deployment
         run: |
-          PLUGIN_VERSION_WPORG=$(curl -sSL https://api.wordpress.org/plugins/info/1.0/${{ matrix.plugin }}.json --retry 3 --retry-delay 5 --retry-all-errors --fail | jq -r '.version')
-
-          echo "::debug::The ${{ matrix.plugin }} plugin is currently at version $PLUGIN_VERSION_WPORG on WordPress.org."
-
-          # Bail if the plugin version is not found.
-          if [ -z "$PLUGIN_VERSION_WPORG" ]; then
-            echo "::error::Could not retrieve ${{ matrix.plugin }} information from WordPress.org. The plugin may not exist or the API may be down."
-            exit 1
-          fi
-
-          # Bail if the plugin is already up to date.
-          if [ "$PLUGIN_VERSION_WPORG" = "$PLUGIN_VERSION" ]; then
-            echo "::notice::The ${{ matrix.plugin }} plugin is already up to date on WordPress.org. Halting deployment."
-            exit 0
-          fi
-
           echo "deploy=true" >> $GITHUB_OUTPUT
 
       - name: Check plugin version integrity
