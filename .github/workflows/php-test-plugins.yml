@@ -76,7 +76,7 @@ jobs:
       - name: Update Composer Dependencies
         run: npm run wp-env run tests-cli -- --env-cwd="wp-content/plugins/$(basename $(pwd))" composer update --with-all-dependencies --no-interaction --no-progress
       - name: Install PHPUnit
-        run: composer require --dev phpunit/phpunit:${{ matrix.phpunit }}
+        run: npm run wp-env run tests-cli -- --env-cwd="wp-content/plugins/$(basename $(pwd))" composer require --dev phpunit/phpunit:${{ matrix.phpunit }}
         if: matrix.phpunit != ''
       - name: Running single site unit tests
         run: |
