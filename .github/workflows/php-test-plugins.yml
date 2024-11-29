@@ -49,7 +49,9 @@ jobs:
             wp: '6.5'
           - php: '8.3'
             wp: 'trunk'
+            phpunit: '9.6'
           - php: '8.2'
+            phpunit: '9.6'
             wp: 'latest'
             coverage: true
     env:
@@ -74,25 +76,48 @@ jobs:
       - name: Running single site unit tests
         run: |
           if [ "${{ matrix.coverage }}" == "true" ]; then
-            npm run test-php -- -- -- --coverage-clover=coverage-${{ github.sha }}.xml
+            npm run test-php:performance-lab -- -- -- --coverage-clover=coverage-performance-lab-${{ github.sha }}.xml
+            npm run test-php:auto-sizes -- -- -- --coverage-clover=coverage-auto-sizes-${{ github.sha }}.xml
+            npm run test-php:dominant-color-images -- -- -- --coverage-clover=coverage-dominant-color-images-${{ github.sha }}.xml
+            npm run test-php:embed-optimizer -- -- -- --coverage-clover=coverage-embed-optimizer-${{ github.sha }}.xml
+            npm run test-php:image-prioritizer -- -- -- --coverage-clover=coverage-image-prioritizer-${{ github.sha }}.xml
+            npm run test-php:optimization-detective -- -- -- --coverage-clover=coverage-optimization-detective-${{ github.sha }}.xml
+            npm run test-php:speculation-rules -- -- -- --coverage-clover=coverage-speculation-rules-${{ github.sha }}.xml
+            npm run test-php:web-worker-offloading -- -- -- --coverage-clover=coverage-web-worker-offloading-${{ github.sha }}.xml
+            npm run test-php:webp-uploads -- -- -- --coverage-clover=coverage-webp-uploads-${{ github.sha }}.xml
           else
             npm run test-php
           fi
       - name: Running multisite unit tests
         run: |
           if [ "${{ matrix.coverage }}" == "true" ]; then
-            npm run test-php-multisite -- -- --coverage-clover=coverage-multisite-${{ github.sha }}.xml
+            npm run test-php-multisite:performance-lab -- -- -- --coverage-clover=coverage-multisite-performance-lab-${{ github.sha }}.xml
+            npm run test-php-multisite:auto-sizes -- -- -- --coverage-clover=coverage-multisite-auto-sizes-${{ github.sha }}.xml
+            npm run test-php-multisite:dominant-color-images -- -- -- --coverage-clover=coverage-multisite-dominant-color-images-${{ github.sha }}.xml
+            npm run test-php-multisite:embed-optimizer -- -- -- --coverage-clover=coverage-multisite-embed-optimizer-${{ github.sha }}.xml
+            npm run test-php-multisite:image-prioritizer -- -- -- --coverage-clover=coverage-multisite-image-prioritizer-${{ github.sha }}.xml
+            npm run test-php-multisite:optimization-detective -- -- -- --coverage-clover=coverage-multisite-optimization-detective-${{ github.sha }}.xml
+            npm run test-php-multisite:speculation-rules -- -- -- --coverage-clover=coverage-multisite-speculation-rules-${{ github.sha }}.xml
+            npm run test-php-multisite:web-worker-offloading -- -- -- --coverage-clover=coverage-multisite-web-worker-offloading-${{ github.sha }}.xml
+            npm run test-php-multisite:webp-uploads -- -- -- --coverage-clover=coverage-multisite-webp-uploads-${{ github.sha }}.xml
           else
             npm run test-php-multisite
           fi
-      - name: List coverage files
-        run: ls -la
       - name: Upload single site coverage reports to Codecov
         if: ${{ matrix.coverage == true }}
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage-${{ github.sha }}.xml
+          files: |
+            coverage-performance-lab-${{ github.sha }}.xml
+            coverage-auto-sizes-${{ github.sha }}.xml
+            coverage-dominant-color-images-${{ github.sha }}.xml
+            coverage-embed-optimizer-${{ github.sha }}.xml
+            coverage-image-prioritizer-${{ github.sha }}.xml
+            coverage-optimization-detective-${{ github.sha }}.xml
+            coverage-speculation-rules-${{ github.sha }}.xml
+            coverage-web-worker-offloading-${{ github.sha }}.xml
+            coverage-webp-uploads-${{ github.sha }}.xml
           flags: single
           name: ${{ matrix.php }}-single-site-coverage
           fail_ci_if_error: true
@@ -101,7 +126,16 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage-multisite-${{ github.sha }}.xml
+          files: |
+            coverage-multisite-performance-lab-${{ github.sha }}.xml
+            coverage-multisite-auto-sizes-${{ github.sha }}.xml
+            coverage-multisite-dominant-color-images-${{ github.sha }}.xml
+            coverage-multisite-embed-optimizer-${{ github.sha }}.xml
+            coverage-multisite-image-prioritizer-${{ github.sha }}.xml
+            coverage-multisite-optimization-detective-${{ github.sha }}.xml
+            coverage-multisite-speculation-rules-${{ github.sha }}.xml
+            coverage-multisite-web-worker-offloading-${{ github.sha }}.xml
+            coverage-multisite-webp-uploads-${{ github.sha }}.xml
           flags: multisite
           name: ${{ matrix.php }}-multisite-coverage
           fail_ci_if_error: true
