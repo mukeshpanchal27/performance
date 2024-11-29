@@ -47,7 +47,7 @@ jobs:
         include:
           - php: '7.2'
             wp: 'latest'
-            phpunit: '8.5'
+            phpunit: '7.5'
           - php: '7.4'
             wp: '6.5'
           - php: '8.3'
@@ -116,16 +116,7 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: |
-            coverage-performance-lab.xml
-            coverage-auto-sizes.xml
-            coverage-dominant-color-images.xml
-            coverage-embed-optimizer.xml
-            coverage-image-prioritizer.xml
-            coverage-optimization-detective.xml
-            coverage-speculation-rules.xml
-            coverage-web-worker-offloading.xml
-            coverage-webp-uploads.xml
+          files: ./coverage-performance-lab.xml,./coverage-auto-sizes.xml,./coverage-dominant-color-images.xml,./coverage-embed-optimizer.xml,./coverage-image-prioritizer.xml,./coverage-optimization-detective.xml,./coverage-speculation-rules.xml,./coverage-web-worker-offloading.xml,./coverage-webp-uploads.xml
           flags: single
           name: ${{ matrix.php }}-single-site-coverage
           fail_ci_if_error: true
@@ -134,16 +125,7 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: |
-            coverage-multisite-performance-lab.xml
-            coverage-multisite-auto-sizes.xml
-            coverage-multisite-dominant-color-images.xml
-            coverage-multisite-embed-optimizer.xml
-            coverage-multisite-image-prioritizer.xml
-            coverage-multisite-optimization-detective.xml
-            coverage-multisite-speculation-rules.xml
-            coverage-multisite-web-worker-offloading.xml
-            coverage-multisite-webp-uploads.xml
+          files: ./coverage-multisite-performance-lab.xm,./coverage-multisite-auto-sizes.xm,./coverage-multisite-dominant-color-images.xm,./coverage-multisite-embed-optimizer.xm,./coverage-multisite-image-prioritizer.xm,./coverage-multisite-optimization-detective.xm,./coverage-multisite-speculation-rules.xm,./coverage-multisite-web-worker-offloading.xm,./coverage-multisite-webp-uploads.xml
           flags: multisite
           name: ${{ matrix.php }}-multisite-coverage
           fail_ci_if_error: true
