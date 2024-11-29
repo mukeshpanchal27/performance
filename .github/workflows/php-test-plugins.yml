@@ -73,6 +73,9 @@ jobs:
         run: npm run wp-env start
       - name: Composer Install
         run: npm run wp-env run tests-cli -- --env-cwd="wp-content/plugins/$(basename $(pwd))" composer install --no-interaction --no-progress
+      - name: Install PHPUnit
+        run: composer require --dev phpunit/phpunit:${{ matrix.phpunit }}
+        if: matrix.phpunit != ''
       - name: Running single site unit tests
         run: |
           if [ "${{ matrix.coverage }}" == "true" ]; then
