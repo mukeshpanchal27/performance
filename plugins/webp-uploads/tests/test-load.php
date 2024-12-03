@@ -166,7 +166,6 @@ class Test_WebP_Uploads_Load extends TestCase {
 	 * Don't create the sources property if no transform is provided.
 	 *
 	 * @covers ::wp_get_attachment_metadata
-	 * @covers ::assertArrayNotHasKey
 	 */
 	public function test_it_should_not_create_the_sources_property_if_no_transform_is_provided(): void {
 		add_filter( 'webp_uploads_upload_image_mime_transforms', '__return_empty_array' );
@@ -215,7 +214,6 @@ class Test_WebP_Uploads_Load extends TestCase {
 	 * Not create the sources property if the mime is not specified on the transforms images
 	 *
 	 * @covers ::wp_get_attachment_metadata
-	 * @covers ::assertArrayNotHasKey
 	 */
 	public function test_it_should_not_create_the_sources_property_if_the_mime_is_not_specified_on_the_transforms_images(): void {
 		add_filter(
@@ -242,7 +240,6 @@ class Test_WebP_Uploads_Load extends TestCase {
 	 * Create a WebP version with all the required properties
 	 *
 	 * @covers ::wp_get_attachment_metadata
-	 * @covers ::assertFileExists
 	 */
 	public function test_it_should_create_a_webp_version_with_all_the_required_properties(): void {
 		$attachment_id = self::factory()->attachment->create_upload_object(
