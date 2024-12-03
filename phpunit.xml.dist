@@ -42,8 +42,8 @@
 		</exclude>
 	</groups>
 	<coverage>
-    <include>
-        <directory suffix=".php">plugins</directory>
-    </include>
-</coverage>
+		<include>
+        	<directory suffix=".php">plugins</directory>
+    	</include>
+	</coverage>
 </phpunit>

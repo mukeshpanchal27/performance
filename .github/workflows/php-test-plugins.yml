@@ -84,15 +84,15 @@ jobs:
       - name: Running single site unit tests
         run: |
           if [ "${{ matrix.coverage }}" == "true" ]; then
-            npm run test-php:performance-lab -- -- -- --coverage-clover=coverage-performance-lab.xml
-            npm run test-php:auto-sizes -- -- -- --coverage-clover=coverage-auto-sizes.xml
-            npm run test-php:dominant-color-images -- -- -- --coverage-clover=coverage-dominant-color-images.xml
-            npm run test-php:embed-optimizer -- -- -- --coverage-clover=coverage-embed-optimizer.xml
-            npm run test-php:image-prioritizer -- -- -- --coverage-clover=coverage-image-prioritizer.xml
-            npm run test-php:optimization-detective -- -- -- --coverage-clover=coverage-optimization-detective.xml
-            npm run test-php:speculation-rules -- -- -- --coverage-clover=coverage-speculation-rules.xml
-            npm run test-php:web-worker-offloading -- -- -- --coverage-clover=coverage-web-worker-offloading.xml
-            npm run test-php:webp-uploads -- -- -- --coverage-clover=coverage-webp-uploads.xml
+            npm run test-php:performance-lab -- -- -- --coverage-clover=./reports/coverage-performance-lab.xml
+            npm run test-php:auto-sizes -- -- -- --coverage-clover=./reports/coverage-auto-sizes.xml
+            npm run test-php:dominant-color-images -- -- -- --coverage-clover=./reports/coverage-dominant-color-images.xml
+            npm run test-php:embed-optimizer -- -- -- --coverage-clover=./reports/coverage-embed-optimizer.xml
+            npm run test-php:image-prioritizer -- -- -- --coverage-clover=./reports/coverage-image-prioritizer.xml
+            npm run test-php:optimization-detective -- -- -- --coverage-clover=./reports/coverage-optimization-detective.xml
+            npm run test-php:speculation-rules -- -- -- --coverage-clover=./reports/coverage-speculation-rules.xml
+            npm run test-php:web-worker-offloading -- -- -- --coverage-clover=./reports/coverage-web-worker-offloading.xml
+            npm run test-php:webp-uploads -- -- -- --coverage-clover=./reports/coverage-webp-uploads.xml
           else
             npm run test-php
           fi
@@ -116,7 +116,7 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage-performance-lab.xml,./coverage-auto-sizes.xml,./coverage-dominant-color-images.xml,./coverage-embed-optimizer.xml,./coverage-image-prioritizer.xml,./coverage-optimization-detective.xml,./coverage-speculation-rules.xml,./coverage-web-worker-offloading.xml,./coverage-webp-uploads.xml
+          file: ./reports
           flags: single
           name: ${{ matrix.php }}-single-site-coverage
           fail_ci_if_error: true
@@ -125,7 +125,7 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage-multisite-performance-lab.xm,./coverage-multisite-auto-sizes.xm,./coverage-multisite-dominant-color-images.xm,./coverage-multisite-embed-optimizer.xm,./coverage-multisite-image-prioritizer.xm,./coverage-multisite-optimization-detective.xm,./coverage-multisite-speculation-rules.xm,./coverage-multisite-web-worker-offloading.xm,./coverage-multisite-webp-uploads.xml
+          file: ./reports
           flags: multisite
           name: ${{ matrix.php }}-multisite-coverage
           fail_ci_if_error: true
