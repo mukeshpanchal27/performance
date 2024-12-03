@@ -282,22 +282,106 @@ class Test_OD_Storage_Data extends WP_UnitTestCase {
 		$second = od_get_url_metrics_slug( array( 'p' => 1 ) );
 		$this->assertNotEquals( $second, $first );
 		foreach ( array( $first, $second ) as $slug ) {
-			$this->assertMatchesRegularExpression( '/^[0-9a-f]{32}$/', $slug );
+			$this->assertMatchesRegularExpression( '/^[0-9a-f]{32}\z/', $slug );
 		}
+	}
+
+	/**
+	 * Test od_get_current_url_metrics_etag().
+	 *
+	 * @covers ::od_get_current_url_metrics_etag
+	 */
+	public function test_od_get_current_url_metrics_etag(): void {
+		remove_all_filters( 'od_current_url_metrics_etag_data' );
+		$registry = new OD_Tag_Visitor_Registry();
+
+		$captured_etag_data = array();
+		add_filter(
+			'od_current_url_metrics_etag_data',
+			static function ( array $data ) use ( &$captured_etag_data ) {
+				$captured_etag_data[] = $data;
+				return $data;
+			},
+			PHP_INT_MAX
+		);
+		$etag1 = od_get_current_url_metrics_etag( $registry );
+		$this->assertMatchesRegularExpression( '/^[a-z0-9]{32}\z/', $etag1 );
+		$etag2 = od_get_current_url_metrics_etag( $registry );
+		$this->assertSame( $etag1, $etag2 );
+		$this->assertCount( 2, $captured_etag_data );
+		$this->assertSame( array( 'tag_visitors' => array() ), $captured_etag_data[0] );
+		$this->assertSame( $captured_etag_data[ count( $captured_etag_data ) - 2 ], $captured_etag_data[ count( $captured_etag_data ) - 1 ] );
+
+		$registry->register( 'foo', static function (): void {} );
+		$registry->register( 'bar', static function (): void {} );
+		$registry->register( 'baz', static function (): void {} );
+		$etag3 = od_get_current_url_metrics_etag( $registry );
+		$this->assertNotEquals( $etag2, $etag3 );
+		$this->assertNotEquals( $captured_etag_data[ count( $captured_etag_data ) - 2 ], $captured_etag_data[ count( $captured_etag_data ) - 1 ] );
+		$this->assertSame( array( 'tag_visitors' => array( 'foo', 'bar', 'baz' ) ), $captured_etag_data[ count( $captured_etag_data ) - 1 ] );
+		add_filter(
+			'od_current_url_metrics_etag_data',
+			static function ( $data ): array {
+				$data['last_modified'] = '2024-03-02T01:00:00';
+				return $data;
+			}
+		);
+		$etag4 = od_get_current_url_metrics_etag( $registry );
+		$this->assertNotEquals( $etag3, $etag4 );
+		$this->assertNotEquals( $captured_etag_data[ count( $captured_etag_data ) - 2 ], $captured_etag_data[ count( $captured_etag_data ) - 1 ] );
+		$this->assertSame(
+			array(
+				'tag_visitors'  => array( 'foo', 'bar', 'baz' ),
+				'last_modified' => '2024-03-02T01:00:00',
+			),
+			$captured_etag_data[ count( $captured_etag_data ) - 1 ]
+		);
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array<string, mixed> Data.
+	 */
+	public function data_provider_to_test_hmac(): array {
+		return array(
+			'is_home'   => array(
+				'set_up' => static function (): array {
+					$post_id = self::factory()->post->create();
+					return array(
+						home_url(),
+						od_get_url_metrics_slug( array() ),
+						$post_id,
+					);
+				},
+			),
+			'is_single' => array(
+				'set_up' => static function (): array {
+					$post_id = self::factory()->post->create();
+					return array(
+						get_permalink( $post_id ),
+						od_get_url_metrics_slug( array( 'p' => $post_id ) ),
+						$post_id,
+					);
+				},
+			),
+		);
 	}
 
 	/**
 	 * Test od_get_url_metrics_storage_hmac() and od_verify_url_metrics_storage_hmac().
 	 *
+	 * @dataProvider data_provider_to_test_hmac
+	 *
 	 * @covers ::od_get_url_metrics_storage_hmac
 	 * @covers ::od_verify_url_metrics_storage_hmac
 	 */
-	public function test_od_get_url_metrics_storage_hmac_and_od_verify_url_metrics_storage_hmac(): void {
-		$url  = home_url( '/' );
-		$slug = od_get_url_metrics_slug( array() );
-		$hmac = od_get_url_metrics_storage_hmac( $slug, $url );
-		$this->assertMatchesRegularExpression( '/^[0-9a-f]+$/', $hmac );
-		$this->assertTrue( od_verify_url_metrics_storage_hmac( $hmac, $slug, $url ) );
+	public function test_od_get_url_metrics_storage_hmac_and_od_verify_url_metrics_storage_hmac( Closure $set_up ): void {
+		list( $url, $slug, $cache_purge_post_id ) = $set_up();
+		$this->go_to( $url );
+		$hmac = od_get_url_metrics_storage_hmac( $slug, $url, $cache_purge_post_id );
+		$this->assertMatchesRegularExpression( '/^[0-9a-f]+\z/', $hmac );
+		$this->assertTrue( od_verify_url_metrics_storage_hmac( $hmac, $slug, $url, $cache_purge_post_id ) );
 	}
 
 	/**
