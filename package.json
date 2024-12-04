@@ -73,7 +73,7 @@
     "test-php-multisite:speculation-rules": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/performance composer test-multisite:speculation-rules",
     "test-php-multisite:web-worker-offloading": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/performance composer test-multisite:web-worker-offloading",
     "test-php-multisite:webp-uploads": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/performance composer test-multisite:webp-uploads",
-    "wp-env": "wp-env start --xdebug=develop,coverage",
+    "wp-env": "wp-env",
     "prepare": "husky"
   }
 }

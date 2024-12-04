@@ -73,7 +73,12 @@ jobs:
       - name: Build assets
         run: npm run build
       - name: Install WordPress
-        run: npm run wp-env start
+        run: |
+          if [ "${{ matrix.coverage }}" == "true" ]; then
+            npm run wp-env start -- --xdebug=develop,coverage
+          else
+            npm run wp-env start
+          fi
       - name: Composer Install
         run: npm run wp-env run tests-cli -- --env-cwd="wp-content/plugins/$(basename $(pwd))" composer install --no-interaction --no-progress
       - name: Update Composer Dependencies
