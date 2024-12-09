@@ -42,20 +42,14 @@ function perflab_ffh_assets_test(): array {
 	);
 
 	// Check if far-future headers are enabled for all assets.
-	$far_future_enabled = true;
-	foreach ( $assets as $asset ) {
-		if ( ! perflab_far_future_headers_is_enabled( $asset ) ) {
-			$far_future_enabled = false;
-			break;
-		}
-	}
+	$status = perflab_ffh_check_assets( $assets );
 
-	if ( ! $far_future_enabled ) {
-		$result['status']  = 'recommended';
+	if ( 'good' !== $status ) {
+		$result['status']  = $status;
 		$result['label']   = __( 'Your site does not serve static assets with recommended far-future expiration headers', 'performance-lab' );
 		$result['actions'] = sprintf(
 			'<p>%s</p>',
-			esc_html__( 'Consider adding or adjusting your server configuration (e.g., .htaccess, nginx config, or a caching plugin) to include far-future Cache-Control or Expires headers for static assets.', 'performance-lab' )
+			esc_html__( 'Far-future Cache-Control or Expires headers can be added or adjusted with a small configuration change by your hosting provider.', 'performance-lab' )
 		);
 	}
 
@@ -63,14 +57,54 @@ function perflab_ffh_assets_test(): array {
 }
 
 /**
+ * Checks if far-future expiration headers are enabled for a list of assets.
+ *
+ * @since n.e.x.t
+ *
+ * @param  string[] $assets List of asset URLs to check.
+ * @return string 'good' if far-future headers are enabled for all assets, 'recommended' if some assets are missing headers.
+ */
+function perflab_ffh_check_assets( array $assets ): string {
+	$final_status = 'good';
+
+	foreach ( $assets as $asset ) {
+		$response = wp_remote_get( $asset, array( 'sslverify' => false ) );
+
+		if ( is_wp_error( $response ) ) {
+			continue;
+		}
+
+		$headers = wp_remote_retrieve_headers( $response );
+
+		if ( is_array( $headers ) ) {
+			continue;
+		}
+
+		if ( perflab_ffh_check_headers( $headers ) ) {
+			continue;
+		}
+
+		// If far-future headers are not enabled, attempt a conditional request.
+		if ( perflab_ffh_try_conditional_request( $asset, $headers ) ) {
+			$final_status = 'recommended';
+			continue;
+		}
+
+		$final_status = 'recommended';
+	}
+
+	return $final_status;
+}
+
+/**
  * Checks if far-future expiration headers are enabled.
  *
  * @since n.e.x.t
  *
- * @param  string $url URL to check.
+ * @param WpOrg\Requests\Utility\CaseInsensitiveDictionary $headers Response headers.
  * @return bool True if far-future headers are enabled, false otherwise.
  */
-function perflab_far_future_headers_is_enabled( string $url ): bool {
+function perflab_ffh_check_headers( WpOrg\Requests\Utility\CaseInsensitiveDictionary $headers ): bool {
 	/**
 	 * Filters the threshold for far-future headers.
 	 *
@@ -80,20 +114,12 @@ function perflab_far_future_headers_is_enabled( string $url ): bool {
 	 */
 	$threshold = apply_filters( 'perflab_far_future_headers_threshold', YEAR_IN_SECONDS );
 
-	$response = wp_remote_request( $url, array( 'sslverify' => false ) );
-
-	if ( is_wp_error( $response ) ) {
-		return false;
-	}
-
-	$headers = wp_remote_retrieve_headers( $response );
-
 	$cache_control = isset( $headers['cache-control'] ) ? $headers['cache-control'] : '';
 	$expires       = isset( $headers['expires'] ) ? $headers['expires'] : '';
 
 	// Check Cache-Control header for max-age.
 	$max_age = 0;
-	if ( $cache_control ) {
+	if ( '' !== $cache_control ) {
 		// Cache-Control can have multiple directives; we only care about max-age.
 		$controls = is_array( $cache_control ) ? $cache_control : array( $cache_control );
 		foreach ( $controls as $control ) {
@@ -111,12 +137,47 @@ function perflab_far_future_headers_is_enabled( string $url ): bool {
 
 	// If max-age is not sufficient, check Expires.
 	// Expires is a date; we want to ensure it's far in the future.
-	if ( $expires ) {
+	if ( is_string( $expires ) && '' !== $expires ) {
 		$expires_time = strtotime( $expires );
-		if ( $expires_time && ( $expires_time - time() ) >= $threshold ) {
+		if ( (bool) $expires_time && ( $expires_time - time() ) >= $threshold ) {
 			return true;
 		}
 	}
 
 	return false;
+}
+
+/**
+ * Attempt a conditional request with ETag/Last-Modified.
+ *
+ * @param string                                           $url     The asset URL.
+ * @param WpOrg\Requests\Utility\CaseInsensitiveDictionary $headers The initial response headers.
+ * @return bool True if a 304 response was received.
+ */
+function perflab_ffh_try_conditional_request( string $url, WpOrg\Requests\Utility\CaseInsensitiveDictionary $headers ): bool {
+	$etag          = isset( $headers['etag'] ) ? $headers['etag'] : '';
+	$last_modified = isset( $headers['last-modified'] ) ? $headers['last-modified'] : '';
+
+	$conditional_headers = array();
+	if ( '' !== $etag ) {
+		$conditional_headers['If-None-Match'] = $etag;
+	}
+	if ( '' !== $last_modified ) {
+		$conditional_headers['If-Modified-Since'] = $last_modified;
+	}
+
+	$response = wp_remote_get(
+		$url,
+		array(
+			'sslverify' => false,
+			'headers'   => $conditional_headers,
+		)
+	);
+
+	if ( is_wp_error( $response ) ) {
+		return false;
+	}
+
+	$status_code = wp_remote_retrieve_response_code( $response );
+	return ( 304 === $status_code );
 }
