@@ -71,7 +71,14 @@ function perflab_ffh_assets_test(): array {
  * @return bool True if far-future headers are enabled, false otherwise.
  */
 function perflab_far_future_headers_is_enabled( string $url ): bool {
-	$threshold = YEAR_IN_SECONDS;
+	/**
+	 * Filters the threshold for far-future headers.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param int $threshold Threshold in seconds.
+	 */
+	$threshold = apply_filters( 'perflab_far_future_headers_threshold', YEAR_IN_SECONDS );
 
 	$response = wp_remote_request( $url, array( 'sslverify' => false ) );
 
