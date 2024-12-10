@@ -38,7 +38,10 @@ function perflab_ffh_assets_test(): array {
 
 	// List of assets to check.
 	$assets = array(
-		plugins_url( 'far-future-headers/assets/test.css', __DIR__ ),
+		includes_url( 'js/wp-embed.min.js' ),
+		includes_url( 'css/buttons.min.css' ),
+		includes_url( 'fonts/dashicons.woff2' ),
+		includes_url( 'images/media/video.png' ),
 	);
 
 	// Check if far-future headers are enabled for all assets.
