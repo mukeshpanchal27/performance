@@ -54,15 +54,25 @@ function perflab_ffh_assets_test(): array {
 	$assets = apply_filters( 'perflab_ffh_assets_to_check', $assets );
 
 	// Check if far-future headers are enabled for all assets.
-	$status = perflab_ffh_check_assets( $assets );
+	$results = perflab_ffh_check_assets( $assets );
 
-	if ( 'good' !== $status ) {
-		$result['status']  = $status;
-		$result['label']   = __( 'Your site does not serve static assets with recommended far-future expiration headers', 'performance-lab' );
-		$result['actions'] = sprintf(
-			'<p>%s</p>',
-			esc_html__( 'Far-future Cache-Control or Expires headers can be added or adjusted with a small configuration change by your hosting provider.', 'performance-lab' )
-		);
+	if ( 'good' !== $results['final_status'] ) {
+		$result['status'] = $results['final_status'];
+		$result['label']  = __( 'Your site does not serve static assets with recommended far-future expiration headers', 'performance-lab' );
+
+		if ( count( $results['details'] ) > 0 ) {
+			$table_html        = perflab_ffh_get_extensions_table( $results['details'] );
+			$result['actions'] = sprintf(
+				'<p>%s</p>%s',
+				esc_html__( 'The following file types do not have the recommended far-future headers. Consider adding or adjusting Cache-Control or Expires headers for these asset types.', 'performance-lab' ),
+				$table_html
+			);
+		} else {
+			$result['actions'] = sprintf(
+				'<p>%s</p>',
+				esc_html__( 'Far-future Cache-Control or Expires headers can be added or adjusted with a small configuration change by your hosting provider.', 'performance-lab' )
+			);
+		}
 	}
 
 	return $result;
@@ -74,38 +84,45 @@ function perflab_ffh_assets_test(): array {
  * @since n.e.x.t
  *
  * @param  string[] $assets List of asset URLs to check.
- * @return string 'good' if far-future headers are enabled for all assets, 'recommended' if some assets are missing headers.
+ * @return array{final_status: string, details: string[]} Final status and details.
  */
-function perflab_ffh_check_assets( array $assets ): string {
-	$final_status = 'good';
+function perflab_ffh_check_assets( array $assets ): array {
+	$final_status      = 'good';
+	$extension_results = array(); // Extensions that need improvement.
 
 	foreach ( $assets as $asset ) {
 		$response = wp_remote_get( $asset, array( 'sslverify' => false ) );
+
+		// Extract extension from the URL.
+		$path_info = pathinfo( (string) wp_parse_url( $asset, PHP_URL_PATH ) );
+		$extension = isset( $path_info['extension'] ) ? strtolower( $path_info['extension'] ) : 'unknown';
 
 		if ( is_wp_error( $response ) ) {
 			continue;
 		}
 
 		$headers = wp_remote_retrieve_headers( $response );
-
-		if ( is_array( $headers ) ) {
+		if ( ! is_object( $headers ) ) {
 			continue;
 		}
 
-		if ( perflab_ffh_check_headers( $headers ) ) {
-			continue;
-		}
+		if ( ! perflab_ffh_check_headers( $headers ) ) {
+			if ( ! perflab_ffh_try_conditional_request( $asset, $headers ) ) {
+				$final_status        = 'recommended';
+				$extension_results[] = $extension;
+				continue;
+			}
 
-		// If far-future headers are not enabled, attempt a conditional request.
-		if ( perflab_ffh_try_conditional_request( $asset, $headers ) ) {
-			$final_status = 'recommended';
-			continue;
+			// Conditional pass means still recommended, not fully good.
+			$final_status        = 'recommended';
+			$extension_results[] = $extension;
 		}
-
-		$final_status = 'recommended';
 	}
 
-	return $final_status;
+	return array(
+		'final_status' => $final_status,
+		'details'      => $extension_results,
+	);
 }
 
 /**
@@ -192,4 +209,32 @@ function perflab_ffh_try_conditional_request( string $url, WpOrg\Requests\Utilit
 
 	$status_code = wp_remote_retrieve_response_code( $response );
 	return ( 304 === $status_code );
+}
+
+/**
+ * Generate a table listing file extensions that need far-future headers.
+ *
+ * @since n.e.x.t
+ *
+ * @param string[] $extensions Array of file extensions needing improvement.
+ * @return string HTML formatted table.
+ */
+function perflab_ffh_get_extensions_table( array $extensions ): string {
+	$html_table = sprintf(
+		'<table class="widefat striped"><thead><tr><th scope="col">%s</th><th scope="col">%s</th></tr></thead><tbody>',
+		esc_html__( 'File Extension', 'performance-lab' ),
+		esc_html__( 'Status', 'performance-lab' )
+	);
+
+	foreach ( $extensions as $extension ) {
+		$html_table .= sprintf(
+			'<tr><td>%s</td><td>%s</td></tr>',
+			esc_html( $extension ),
+			esc_html__( 'Needs far-future headers', 'performance-lab' )
+		);
+	}
+
+	$html_table .= '</tbody></table>';
+
+	return $html_table;
 }
