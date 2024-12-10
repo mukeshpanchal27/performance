@@ -44,6 +44,15 @@ function perflab_ffh_assets_test(): array {
 		includes_url( 'images/media/video.png' ),
 	);
 
+	/**
+	 * Filters the list of assets to check for far-future headers.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param string[] $assets List of asset URLs to check.
+	 */
+	$assets = apply_filters( 'perflab_ffh_assets_to_check', $assets );
+
 	// Check if far-future headers are enabled for all assets.
 	$status = perflab_ffh_check_assets( $assets );
 
