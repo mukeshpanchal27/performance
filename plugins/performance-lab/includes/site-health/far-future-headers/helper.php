@@ -61,11 +61,11 @@ function perflab_ffh_assets_test(): array {
 		$result['label']  = __( 'Your site does not serve static assets with recommended far-future expiration headers', 'performance-lab' );
 
 		if ( count( $results['details'] ) > 0 ) {
-			$table_html        = perflab_ffh_get_extensions_table( $results['details'] );
 			$result['actions'] = sprintf(
-				'<p>%s</p>%s',
+				'<p>%s</p>%s<p>%s</p>',
 				esc_html__( 'The following file types do not have the recommended far-future headers. Consider adding or adjusting Cache-Control or Expires headers for these asset types.', 'performance-lab' ),
-				$table_html
+				perflab_ffh_get_extensions_table( $results['details'] ),
+				esc_html__( 'Note: "Conditionally cached" means that the browser can re-validate the resource using ETag or Last-Modified headers. This results in fewer full downloads but still requires the browser to make requests, unlike far-future expiration headers that allow the browser to fully rely on its local cache for a longer duration.', 'performance-lab' )
 			);
 		} else {
 			$result['actions'] = sprintf(
@@ -84,11 +84,11 @@ function perflab_ffh_assets_test(): array {
  * @since n.e.x.t
  *
  * @param  string[] $assets List of asset URLs to check.
- * @return array{final_status: string, details: string[]} Final status and details.
+ * @return array{final_status: string, details: array{extension: string, reason: string}[]} Final status and details.
  */
 function perflab_ffh_check_assets( array $assets ): array {
-	$final_status      = 'good';
-	$extension_results = array(); // Extensions that need improvement.
+	$final_status = 'good';
+	$fail_details = array(); // Array of arrays with 'extension' and 'reason'.
 
 	foreach ( $assets as $asset ) {
 		$response = wp_remote_get( $asset, array( 'sslverify' => false ) );
@@ -98,30 +98,62 @@ function perflab_ffh_check_assets( array $assets ): array {
 		$extension = isset( $path_info['extension'] ) ? strtolower( $path_info['extension'] ) : 'unknown';
 
 		if ( is_wp_error( $response ) ) {
+			// Can't determine headers if request failed, consider it a fail.
+			$final_status   = 'recommended';
+			$fail_details[] = array(
+				'extension' => $extension,
+				'reason'    => __( 'Could not retrieve headers', 'performance-lab' ),
+			);
 			continue;
 		}
 
 		$headers = wp_remote_retrieve_headers( $response );
 		if ( ! is_object( $headers ) ) {
+			// No valid headers retrieved.
+			$final_status   = 'recommended';
+			$fail_details[] = array(
+				'extension' => $extension,
+				'reason'    => __( 'No valid headers retrieved', 'performance-lab' ),
+			);
 			continue;
 		}
 
-		if ( ! perflab_ffh_check_headers( $headers ) ) {
-			if ( ! perflab_ffh_try_conditional_request( $asset, $headers ) ) {
-				$final_status        = 'recommended';
-				$extension_results[] = $extension;
-				continue;
-			}
+		$check = perflab_ffh_check_headers( $headers );
+		if ( isset( $check['passed'] ) && $check['passed'] ) {
+			// This asset passed far-future headers test, no action needed.
+			continue;
+		}
 
-			// Conditional pass means still recommended, not fully good.
-			$final_status        = 'recommended';
-			$extension_results[] = $extension;
+		// If not passed, decide whether to try conditional request.
+		if ( false === $check ) {
+			// Only if no far-future headers at all, we try conditional request.
+			$conditional_pass = perflab_ffh_try_conditional_request( $asset, $headers );
+			if ( ! $conditional_pass ) {
+				$final_status   = 'recommended';
+				$fail_details[] = array(
+					'extension' => $extension,
+					'reason'    => __( 'No far-future headers and no conditional caching', 'performance-lab' ),
+				);
+			} else {
+				$final_status   = 'recommended';
+				$fail_details[] = array(
+					'extension' => $extension,
+					'reason'    => __( 'No far-future headers but conditionally cached', 'performance-lab' ),
+				);
+			}
+		} else {
+			// If there's a max-age or expires but below threshold, we skip conditional.
+			$final_status   = 'recommended';
+			$fail_details[] = array(
+				'extension' => $extension,
+				'reason'    => $check['reason'],
+			);
 		}
 	}
 
 	return array(
 		'final_status' => $final_status,
-		'details'      => $extension_results,
+		'details'      => $fail_details,
 	);
 }
 
@@ -131,9 +163,9 @@ function perflab_ffh_check_assets( array $assets ): array {
  * @since n.e.x.t
  *
  * @param WpOrg\Requests\Utility\CaseInsensitiveDictionary $headers Response headers.
- * @return bool True if far-future headers are enabled, false otherwise.
+ * @return array{passed: bool, reason: string}|false Detailed result. If passed=false, reason explains why it failed and false if no headers found.
  */
-function perflab_ffh_check_headers( WpOrg\Requests\Utility\CaseInsensitiveDictionary $headers ): bool {
+function perflab_ffh_check_headers( WpOrg\Requests\Utility\CaseInsensitiveDictionary $headers ) {
 	/**
 	 * Filters the threshold for far-future headers.
 	 *
@@ -161,19 +193,46 @@ function perflab_ffh_check_headers( WpOrg\Requests\Utility\CaseInsensitiveDictio
 
 	// If max-age meets or exceeds the threshold, we consider it good.
 	if ( $max_age >= $threshold ) {
-		return true;
+		return array(
+			'passed' => true,
+			'reason' => '',
+		);
 	}
 
-	// If max-age is not sufficient, check Expires.
-	// Expires is a date; we want to ensure it's far in the future.
+	// If max-age is too low or not present, check Expires.
 	if ( is_string( $expires ) && '' !== $expires ) {
 		$expires_time = strtotime( $expires );
 		if ( (bool) $expires_time && ( $expires_time - time() ) >= $threshold ) {
-			return true;
+			// Good - Expires far in the future.
+			return array(
+				'passed' => true,
+				'reason' => '',
+			);
 		}
+
+		// Expires header exists but not far enough in the future.
+		if ( $max_age > 0 && $max_age < $threshold ) {
+			return array(
+				'passed' => false,
+				'reason' => __( 'max-age below threshold', 'performance-lab' ),
+			);
+		}
+		return array(
+			'passed' => false,
+			'reason' => __( 'expires below threshold', 'performance-lab' ),
+		);
 	}
 
-	return false;
+	// No max-age or expires found at all or max-age < threshold and no expires.
+	if ( 0 === $max_age ) {
+		return false;
+	} else {
+		// max-age was present but below threshold and no expires.
+		return array(
+			'passed' => false,
+			'reason' => __( 'max-age below threshold', 'performance-lab' ),
+		);
+	}
 }
 
 /**
@@ -212,25 +271,25 @@ function perflab_ffh_try_conditional_request( string $url, WpOrg\Requests\Utilit
 }
 
 /**
- * Generate a table listing file extensions that need far-future headers.
+ * Generate a table listing file extensions that need far-future headers, including reasons.
  *
  * @since n.e.x.t
  *
- * @param string[] $extensions Array of file extensions needing improvement.
+ * @param array<array{extension: string, reason: string}> $fail_details Array of arrays with 'extension' and 'reason'.
  * @return string HTML formatted table.
  */
-function perflab_ffh_get_extensions_table( array $extensions ): string {
+function perflab_ffh_get_extensions_table( array $fail_details ): string {
 	$html_table = sprintf(
 		'<table class="widefat striped"><thead><tr><th scope="col">%s</th><th scope="col">%s</th></tr></thead><tbody>',
 		esc_html__( 'File Extension', 'performance-lab' ),
 		esc_html__( 'Status', 'performance-lab' )
 	);
 
-	foreach ( $extensions as $extension ) {
+	foreach ( $fail_details as $detail ) {
 		$html_table .= sprintf(
 			'<tr><td>%s</td><td>%s</td></tr>',
-			esc_html( $extension ),
-			esc_html__( 'Needs far-future headers', 'performance-lab' )
+			esc_html( $detail['extension'] ),
+			esc_html( $detail['reason'] )
 		);
 	}
 
