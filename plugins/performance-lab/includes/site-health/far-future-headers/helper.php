@@ -84,25 +84,25 @@ function perflab_ffh_assets_test(): array {
  * @since n.e.x.t
  *
  * @param  string[] $assets List of asset URLs to check.
- * @return array{final_status: string, details: array{extension: string, reason: string}[]} Final status and details.
+ * @return array{final_status: string, details: array{filename: string, reason: string}[]} Final status and details.
  */
 function perflab_ffh_check_assets( array $assets ): array {
 	$final_status = 'good';
-	$fail_details = array(); // Array of arrays with 'extension' and 'reason'.
+	$fail_details = array(); // Array of arrays with 'filename' and 'reason'.
 
 	foreach ( $assets as $asset ) {
 		$response = wp_remote_get( $asset, array( 'sslverify' => false ) );
 
-		// Extract extension from the URL.
+		// Extract filename from the URL.
 		$path_info = pathinfo( (string) wp_parse_url( $asset, PHP_URL_PATH ) );
-		$extension = isset( $path_info['extension'] ) ? strtolower( $path_info['extension'] ) : 'unknown';
+		$filename  = isset( $path_info['basename'] ) ? $path_info['basename'] : basename( $asset );
 
 		if ( is_wp_error( $response ) ) {
 			// Can't determine headers if request failed, consider it a fail.
 			$final_status   = 'recommended';
 			$fail_details[] = array(
-				'extension' => $extension,
-				'reason'    => __( 'Could not retrieve headers', 'performance-lab' ),
+				'filename' => $filename,
+				'reason'   => __( 'Could not retrieve headers', 'performance-lab' ),
 			);
 			continue;
 		}
@@ -112,8 +112,8 @@ function perflab_ffh_check_assets( array $assets ): array {
 			// No valid headers retrieved.
 			$final_status   = 'recommended';
 			$fail_details[] = array(
-				'extension' => $extension,
-				'reason'    => __( 'No valid headers retrieved', 'performance-lab' ),
+				'filename' => $filename,
+				'reason'   => __( 'No valid headers retrieved', 'performance-lab' ),
 			);
 			continue;
 		}
@@ -131,22 +131,22 @@ function perflab_ffh_check_assets( array $assets ): array {
 			if ( ! $conditional_pass ) {
 				$final_status   = 'recommended';
 				$fail_details[] = array(
-					'extension' => $extension,
-					'reason'    => __( 'No far-future headers and no conditional caching', 'performance-lab' ),
+					'filename' => $filename,
+					'reason'   => __( 'No far-future headers and no conditional caching', 'performance-lab' ),
 				);
 			} else {
 				$final_status   = 'recommended';
 				$fail_details[] = array(
-					'extension' => $extension,
-					'reason'    => __( 'No far-future headers but conditionally cached', 'performance-lab' ),
+					'filename' => $filename,
+					'reason'   => __( 'No far-future headers but conditionally cached', 'performance-lab' ),
 				);
 			}
 		} else {
 			// If there's a max-age or expires but below threshold, we skip conditional.
 			$final_status   = 'recommended';
 			$fail_details[] = array(
-				'extension' => $extension,
-				'reason'    => $check['reason'],
+				'filename' => $filename,
+				'reason'   => $check['reason'],
 			);
 		}
 	}
@@ -181,7 +181,7 @@ function perflab_ffh_check_headers( WpOrg\Requests\Utility\CaseInsensitiveDictio
 	// Check Cache-Control header for max-age.
 	$max_age = 0;
 	if ( '' !== $cache_control ) {
-		// Cache-Control can have multiple directives; we only care about max-age.
+		// There can be multiple cache-control headers, we only care about max-age.
 		$controls = is_array( $cache_control ) ? $cache_control : array( $cache_control );
 		foreach ( $controls as $control ) {
 			if ( (bool) preg_match( '/max-age\s*=\s*(\d+)/', $control, $matches ) ) {
@@ -271,24 +271,24 @@ function perflab_ffh_try_conditional_request( string $url, WpOrg\Requests\Utilit
 }
 
 /**
- * Generate a table listing file extensions that need far-future headers, including reasons.
+ * Generate a table listing files that need far-future headers, including reasons.
  *
  * @since n.e.x.t
  *
- * @param array<array{extension: string, reason: string}> $fail_details Array of arrays with 'extension' and 'reason'.
+ * @param array<array{filename: string, reason: string}> $fail_details Array of arrays with 'filename' and 'reason'.
  * @return string HTML formatted table.
  */
 function perflab_ffh_get_extensions_table( array $fail_details ): string {
 	$html_table = sprintf(
 		'<table class="widefat striped"><thead><tr><th scope="col">%s</th><th scope="col">%s</th></tr></thead><tbody>',
-		esc_html__( 'File Extension', 'performance-lab' ),
+		esc_html__( 'File', 'performance-lab' ),
 		esc_html__( 'Status', 'performance-lab' )
 	);
 
 	foreach ( $fail_details as $detail ) {
 		$html_table .= sprintf(
 			'<tr><td>%s</td><td>%s</td></tr>',
-			esc_html( $detail['extension'] ),
+			esc_html( $detail['filename'] ),
 			esc_html( $detail['reason'] )
 		);
 	}
