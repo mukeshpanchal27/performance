@@ -98,6 +98,49 @@ class Test_Far_Future_Headers extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that the filter `perflab_ffh_assets_to_check` and `perflab_far_future_headers_threshold` are working as expected.
+	 */
+	public function test_filters(): void {
+		add_filter(
+			'perflab_ffh_assets_to_check',
+			static function ( $assets ) {
+				$assets[] = includes_url( 'images/blank.gif' );
+				return $assets;
+			}
+		);
+
+		add_filter(
+			'perflab_far_future_headers_threshold',
+			static function () {
+				return 1000;
+			}
+		);
+
+		$this->mocked_responses = array(
+			includes_url( 'js/wp-embed.min.js' )     => $this->build_response( 200, array( 'cache-control' => 'max-age=' . 1500 ) ),
+			includes_url( 'css/buttons.min.css' )    => $this->build_response( 200, array( 'cache-control' => 'max-age=' . 500 ) ),
+			includes_url( 'fonts/dashicons.woff2' )  => $this->build_response( 200, array( 'expires' => gmdate( 'D, d M Y H:i:s', time() + 1500 ) . ' GMT' ) ),
+			includes_url( 'images/media/video.png' ) => $this->build_response( 200, array( 'expires' => gmdate( 'D, d M Y H:i:s', time() + 500 ) . ' GMT' ) ),
+			includes_url( 'images/blank.gif' )       => $this->build_response( 200, array( 'cache-control' => 'max-age=' . ( 500 ) ) ),
+		);
+
+		$result = perflab_ffh_check_assets(
+			array(
+				includes_url( 'js/wp-embed.min.js' ),
+				includes_url( 'css/buttons.min.css' ),
+				includes_url( 'fonts/dashicons.woff2' ),
+				includes_url( 'images/media/video.png' ),
+				includes_url( 'images/blank.gif' ),
+			)
+		);
+
+		$this->assertEquals( 'recommended', $result['final_status'] );
+		$this->assertEquals( 'max-age below threshold', $result['details'][0]['reason'] );
+		$this->assertEquals( 'expires below threshold', $result['details'][1]['reason'] );
+		$this->assertEquals( 'max-age below threshold', $result['details'][2]['reason'] );
+	}
+
+	/**
 	 * Mock HTTP requests for assets to simulate different responses.
 	 *
 	 * @param bool                 $response A preemptive return value of an HTTP request. Default false.
