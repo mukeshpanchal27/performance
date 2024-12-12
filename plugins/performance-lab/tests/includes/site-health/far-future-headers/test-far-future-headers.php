@@ -46,6 +46,36 @@ class Test_Far_Future_Headers extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that when an asset has no far-future headers but has conditional caching (ETag/Last-Modified), status is 'recommended'.
+	 */
+	public function test_assets_conditionally_cached(): void {
+		// For conditional caching scenario, setting etag/last-modified headers.
+		$this->mocked_responses = array(
+			'js/wp-embed.min.js'     => $this->build_response( 200, array( 'cache-control' => 'max-age=' . ( YEAR_IN_SECONDS + 1000 ) ) ),
+			'css/buttons.min.css'    => $this->build_response( 200, array( 'etag' => '"123456789"' ) ),
+			'fonts/dashicons.woff2'  => $this->build_response( 200, array( 'last-modified' => gmdate( 'D, d M Y H:i:s', time() - 1000 ) . ' GMT' ) ),
+			'images/media/video.png' => $this->build_response(
+				200,
+				array(
+					'etag'          => '"123456789"',
+					'last-modified' => gmdate( 'D, d M Y H:i:s', time() - 1000 ) . ' GMT',
+				)
+			),
+		);
+
+		// For the asset with just ETag/Last-Modified and no far-future headers, perflab_ffh_try_conditional_request will be attempted.
+		$this->mocked_responses['conditional_304'] = array(
+			'response' => array( 'code' => 304 ),
+			'headers'  => array(),
+			'body'     => '',
+		);
+
+		$result = perflab_ffh_assets_test();
+		$this->assertEquals( 'recommended', $result['status'] );
+		$this->assertNotEmpty( $result['actions'] );
+	}
+
+	/**
 	 * Mock HTTP requests for assets to simulate different responses.
 	 *
 	 * @param bool                 $response A preemptive return value of an HTTP request. Default false.
@@ -54,6 +84,11 @@ class Test_Far_Future_Headers extends WP_UnitTestCase {
 	 * @return array<string, mixed> Mocked response.
 	 */
 	public function mock_http_requests( bool $response, array $args, string $url ): array {
+		// If conditional headers used in second request, simulate a 304 response.
+		if ( isset( $this->mocked_responses['conditional_304'] ) && ( isset( $args['headers']['If-None-Match'] ) || isset( $args['headers']['If-Modified-Since'] ) ) ) {
+			return $this->mocked_responses['conditional_304'];
+		}
+
 		if ( isset( $this->mocked_responses[ $url ] ) ) {
 			return $this->mocked_responses[ $url ];
 		}
