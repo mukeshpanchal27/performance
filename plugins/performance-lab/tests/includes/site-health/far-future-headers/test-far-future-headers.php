@@ -61,18 +61,40 @@ class Test_Far_Future_Headers extends WP_UnitTestCase {
 					'last-modified' => gmdate( 'D, d M Y H:i:s', time() - 1000 ) . ' GMT',
 				)
 			),
-		);
-
-		// For the asset with just ETag/Last-Modified and no far-future headers, perflab_ffh_try_conditional_request will be attempted.
-		$this->mocked_responses['conditional_304'] = array(
-			'response' => array( 'code' => 304 ),
-			'headers'  => array(),
-			'body'     => '',
+			'conditional_304'        => $this->build_response( 304 ),
 		);
 
 		$result = perflab_ffh_assets_test();
 		$this->assertEquals( 'recommended', $result['status'] );
 		$this->assertNotEmpty( $result['actions'] );
+	}
+
+	/**
+	 * Test that different status messages are returned based on the test results.
+	 */
+	public function test_status_messages(): void {
+		$this->mocked_responses = array(
+			includes_url( 'js/wp-embed.min.js' )     => $this->build_response( 200, array( 'cache-control' => 'max-age=' . ( YEAR_IN_SECONDS - 1000 ) ) ),
+			includes_url( 'css/buttons.min.css' )    => $this->build_response( 200, array( 'expires' => gmdate( 'D, d M Y H:i:s', time() + YEAR_IN_SECONDS - 1000 ) . ' GMT' ) ),
+			includes_url( 'fonts/dashicons.woff2' )  => $this->build_response( 200, array( 'etag' => '"123456789"' ) ),
+			includes_url( 'images/media/video.png' ) => $this->build_response( 200, array() ),
+			'conditional_304'                        => $this->build_response( 304 ),
+		);
+
+		$result = perflab_ffh_check_assets(
+			array(
+				includes_url( 'js/wp-embed.min.js' ),
+				includes_url( 'css/buttons.min.css' ),
+				includes_url( 'fonts/dashicons.woff2' ),
+				includes_url( 'images/media/video.png' ),
+			)
+		);
+
+		$this->assertEquals( 'recommended', $result['final_status'] );
+		$this->assertEquals( 'max-age below threshold', $result['details'][0]['reason'] );
+		$this->assertEquals( 'expires below threshold', $result['details'][1]['reason'] );
+		$this->assertEquals( 'No far-future headers but conditionally cached', $result['details'][2]['reason'] );
+		$this->assertEquals( 'No far-future headers and no conditional caching', $result['details'][3]['reason'] );
 	}
 
 	/**
