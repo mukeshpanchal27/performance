@@ -102,9 +102,73 @@ function od_debug_add_assets(): void {
 	if ( ! od_can_optimize_response() ) {
 		return;
 	}
+
+	$slug = od_get_url_metrics_slug( od_get_normalized_query_vars() );
+	$post = OD_URL_Metrics_Post_Type::get_post( $slug );
+
+	global $wp_the_query;
+
+	$tag_visitor_registry = new OD_Tag_Visitor_Registry();
+
+	$current_etag     = od_get_current_url_metrics_etag( $tag_visitor_registry, $wp_the_query, od_get_current_theme_template() );
+	$group_collection = new OD_URL_Metric_Group_Collection(
+		$post instanceof WP_Post ? OD_URL_Metrics_Post_Type::get_url_metrics_from_post( $post ) : array(),
+		$current_etag,
+		od_get_breakpoint_max_widths(),
+		od_get_url_metrics_breakpoint_sample_size(),
+		od_get_url_metric_freshness_ttl()
+	);
+
+	$inp_dots = array();
+
+	/**
+	 * @var OD_URL_Metric_Group $group
+	 */
+	foreach ( $group_collection as $group ) {
+		/**
+		 * @var OD_URL_Metric $url_metric
+		 */
+		foreach ( $group as $url_metric ) {
+			foreach ( $url_metric->get( 'inpData' ) as $inp_data ) {
+				if ( isset( $inp_dots[ $inp_data['interactionTarget'] ] ) ) {
+					$inp_dots[ $inp_data['interactionTarget'] ][] = $inp_data;
+				} else {
+					$inp_dots[ $inp_data['interactionTarget'] ] = array( $inp_data );
+				}
+			}
+		}
+	}
+
 	?>
 		<script>
 			/* TODO: Add INP elements here */
+			let count = 0;
+			for ( const [ interactionTarget, entries ] of Object.entries( <?php echo wp_json_encode( $inp_dots ); ?> ) ) {
+				const el = document.querySelector( interactionTarget );
+				if ( ! el ) {
+					continue;
+				}
+
+				count++;
+
+				const anchor = document.createElement( 'button' );
+				anchor.setAttribute( 'class', 'od-debug-dot' );
+				anchor.setAttribute( 'popovertarget', `od-debug-popover-${count}` );
+				anchor.setAttribute( 'popovertargetaction', 'toggle' );
+				anchor.setAttribute( 'style', `--anchor-name: --od-debug-dot-${count}; position-anchor: --od-debug-element-${count};` );
+				anchor.setAttribute( 'aria-details', `od-debug-popover-${count}` );
+				anchor.textContent = 'Optimization Detective';
+
+				const tooltip = document.createElement( 'div' );
+				tooltip.setAttribute( 'id', `od-debug-popover-${count}` );
+				tooltip.setAttribute( 'popover', '' );
+				tooltip.setAttribute( 'class', 'od-debug-popover' );
+				tooltip.setAttribute( 'style', `position-anchor: --od-debug-dot-${count};` );
+				tooltip.textContent = `INP Element (Value: ${entries[0].value}) (Rating: ${entries[0].rating})`;
+
+				document.body.append(anchor);
+				document.body.append(tooltip);
+			}
 		</script>
 		<style>
 			body:not(.od-debug) .od-debug-dot,
@@ -133,17 +197,17 @@ function od_debug_add_assets(): void {
 				0% {
 					transform: scale(0.8);
 					opacity: 0.5;
-					box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
+					box-shadow: 0 0 0 0 rgba(102, 51, 153, 0.7);
 				}
 				70% {
 					transform: scale(1);
 					opacity: 1;
-					box-shadow: 0 0 0 10px rgba(255, 0, 0, 0);
+					box-shadow: 0 0 0 10px rgba(102, 51, 153, 0);
 				}
 				100% {
 					transform: scale(0.8);
 					opacity: 0.5;
-					box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+					box-shadow: 0 0 0 0 rgba(102, 51, 153, 0);
 				}
 			}
 		</style>
