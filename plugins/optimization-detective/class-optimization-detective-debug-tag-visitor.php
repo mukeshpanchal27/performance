@@ -87,7 +87,6 @@ final class Optimization_Detective_Debug_Tag_Visitor {
 	$popover_text
 </div>
 HTML
-
 				);
 
 				$visited = true;

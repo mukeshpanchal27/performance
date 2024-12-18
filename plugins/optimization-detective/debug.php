@@ -37,16 +37,17 @@ function od_debug_add_inp_schema_properties( array $additional_properties ): arr
 	$additional_properties['inpData'] = array(
 		'description' => __( 'INP metrics', 'optimization-detective' ),
 		'type'        => 'array',
-		'required'    => true,
+		// All extended properties must be optional so that URL Metrics are not all immediately invalidated once an extension is deactivated.
+		'required'    => false,
 		'items'       => array(
-			'type'                 => 'object',
-			'required'             => true,
+			'type'       => 'object',
+			'required'   => true,
 			'properties' => array(
-				'value'   => array(
+				'value'             => array(
 					'type'     => 'number',
 					'required' => true,
 				),
-				'rating'   => array(
+				'rating'            => array(
 					'type'     => 'string',
 					'enum'     => array( 'good', 'needs-improvement', 'poor' ),
 					'required' => true,
@@ -70,7 +71,7 @@ add_filter( 'od_url_metric_schema_root_additional_properties', 'od_debug_add_inp
  *
  * @param WP_Admin_Bar $wp_admin_bar The WP_Admin_Bar instance, passed by reference.
  */
-function od_debug_add_admin_bar_menu_item( WP_Admin_Bar &$wp_admin_bar ) {
+function od_debug_add_admin_bar_menu_item( WP_Admin_Bar &$wp_admin_bar ): void {
 	if ( ! current_user_can( 'customize' ) && ! wp_is_development_mode( 'plugin' ) ) {
 		return;
 	}
@@ -79,15 +80,17 @@ function od_debug_add_admin_bar_menu_item( WP_Admin_Bar &$wp_admin_bar ) {
 		return;
 	}
 
-	$wp_admin_bar->add_menu( array(
-		'id'    => 'optimization-detective-debug',
-		'parent' => null,
-		'group'  => null,
-		'title' => __( 'Optimization Detective', 'optimization-detective' ),
-		'meta'   => array(
-			'onclick' => 'document.body.classList.toggle("od-debug");',
+	$wp_admin_bar->add_menu(
+		array(
+			'id'     => 'optimization-detective-debug',
+			'parent' => null,
+			'group'  => null,
+			'title'  => __( 'Optimization Detective', 'optimization-detective' ),
+			'meta'   => array(
+				'onclick' => 'document.body.classList.toggle("od-debug");',
+			),
 		)
-	) );
+	);
 }
 
 add_action( 'admin_bar_menu', 'od_debug_add_admin_bar_menu_item', 100 );
@@ -95,11 +98,11 @@ add_action( 'admin_bar_menu', 'od_debug_add_admin_bar_menu_item', 100 );
 /**
  * Adds inline JS & CSS for debugging.
  */
-function od_debug_add_assets() {
-		if ( ! od_can_optimize_response() ) {
-			return;
-		}
-		?>
+function od_debug_add_assets(): void {
+	if ( ! od_can_optimize_response() ) {
+		return;
+	}
+	?>
 		<script>
 			/* TODO: Add INP elements here */
 		</script>
@@ -147,4 +150,4 @@ function od_debug_add_assets() {
 		<?php
 }
 
-add_action( 'wp_footer', 'od_debug_add_assets');
+add_action( 'wp_footer', 'od_debug_add_assets' );
