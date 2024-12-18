@@ -70,8 +70,22 @@ function od_get_cache_purge_post_id(): ?int {
  * @param OD_URL_Metric_Group_Collection $group_collection URL Metric group collection.
  */
 function od_get_detection_script( string $slug, OD_URL_Metric_Group_Collection $group_collection ): string {
+	$use_attribution_build = WP_DEBUG || wp_is_development_mode( 'plugin' );
+
+	/**
+	 * Filters whether to use the web-vitals.js build with attribution.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param bool $use_attribution_build Whether to use the attribution build.
+	 */
+	$use_attribution_build = (bool) apply_filters( 'od_use_web_vitals_attribution_build', $use_attribution_build );
+
 	$web_vitals_lib_data = require __DIR__ . '/build/web-vitals.asset.php';
-	$web_vitals_lib_src  = add_query_arg( 'ver', $web_vitals_lib_data['version'], plugin_dir_url( __FILE__ ) . 'build/web-vitals.js' );
+	$web_vitals_lib_src  = $use_attribution_build ?
+		plugin_dir_url( __FILE__ ) . 'build/web-vitals-attribution.js' :
+		plugin_dir_url( __FILE__ ) . 'build/web-vitals.js';
+	$web_vitals_lib_src  = add_query_arg( 'ver', $web_vitals_lib_data['version'], $web_vitals_lib_src );
 
 	/**
 	 * Filters the list of extension script module URLs to import when performing detection.
