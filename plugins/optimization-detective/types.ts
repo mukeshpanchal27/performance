@@ -14,6 +14,12 @@ export interface ElementData {
 
 export type ExtendedElementData = ExcludeProps< ElementData >;
 
+export interface INPData {
+	value: number;
+	rating: string;
+	interactionTarget: string;
+}
+
 export interface URLMetric {
 	url: string;
 	viewport: {
@@ -21,6 +27,7 @@ export interface URLMetric {
 		height: number;
 	};
 	elements: ElementData[];
+	inpData: INPData[];
 }
 
 export type ExtendedRootData = ExcludeProps< URLMetric >;
