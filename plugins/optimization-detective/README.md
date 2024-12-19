@@ -291,6 +291,42 @@ For development and debugging, from repositories on GitHub:
 * [Optimization Detective Store User Agent](https://github.com/westonruter/od-store-user-agent): Stores the User Agent with a URL Metric in the Optimization Detective plugin. This is useful for debugging URL Metrics, in particular to understand what device has a given viewport dimensions.
 * [Optimization Detective Dev Mode](https://github.com/westonruter/od-dev-mode): Adds filters to facilitate development of the Optimization Detective plugin.
 
+## Installation
+
+### Installation from within WordPress
+
+1. Visit **Plugins > Add New** in the WordPress Admin.
+2. Search for **Optimization Detective**.
+3. Install and activate the **Optimization Detective** plugin.
+
+### Manual installation
+
+1. Download the plugin [ZIP from WordPress.org](https://downloads.wordpress.org/plugin/optimization-detective.zip) or, after following the [Getting Started instructions](https://make.wordpress.org/performance/handbook/performance-lab/), create a ZIP build from this repo via `npm run build:plugin:optimization-detective --env zip=true`.
+2. Visit **Plugins > Add New Plugin** in the WordPress Admin.
+3. Click **Upload Plugin**
+4. Select the `optimization-detective.zip` file on your system from step 1 and click **Install Now**.
+5. Click the **Active Plugin** button.
+
+## Feedback
+
+Feedback is encouraged and much appreciated, especially since this plugin may contain future WordPress core features. If you have suggestions or requests for new features, you can [submit them as an issue in the WordPress Performance Team's GitHub repository](https://github.com/WordPress/performance/issues/new/choose). 
+
+## Support
+
+If you need help with troubleshooting or have a question about the plugin, please [create a new topic on our support forum](https://wordpress.org/support/plugin/optimization-detective/#new-topic-0).
+
+## Contributing
+
+Contributions are always welcome! Learn more about how to get involved in the [Core Performance Team Handbook](https://make.wordpress.org/performance/handbook/get-involved/).
+
+The [plugin source code](https://github.com/WordPress/performance/tree/trunk/plugins/optimization-detective) is located in the [WordPress/performance](https://github.com/WordPress/performance) repo on GitHub.
+
+## Security
+
+The Performance team and WordPress community take security bugs seriously. We appreciate your efforts to responsibly disclose your findings, and will make every effort to acknowledge your contributions.
+
+To report a security issue, please visit the [WordPress HackerOne](https://hackerone.com/wordpress) program.
+
 ## Changelog
 
 Please see the [WordPress.org directory listing](https://wordpress.org/plugins/optimization-detective/) for the [changelog](https://wordpress.org/plugins/optimization-detective/#developers).
