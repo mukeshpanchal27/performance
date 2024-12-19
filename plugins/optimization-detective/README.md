@@ -1,5 +1,7 @@
 # [Optimization Detective](https://wordpress.org/plugins/optimization-detective/)
 
+![Performance Lab plugin banner with icon](https://github.com/WordPress/performance/assets/10103365/99d37ba5-27e3-47ea-8ab8-48de75ee69bf)
+
 Provides an API for leveraging real user metrics to detect optimizations to apply on the frontend to improve page performance.
 
 ## Description
