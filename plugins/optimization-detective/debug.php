@@ -37,8 +37,10 @@ function od_debug_add_inp_schema_properties( array $additional_properties ): arr
 	$additional_properties['inpData'] = array(
 		'description' => __( 'INP metrics', 'optimization-detective' ),
 		'type'        => 'array',
-		// All extended properties must be optional so that URL Metrics are not all immediately invalidated once an extension is deactivated. 
-		// Also, no INP data will be sent if the user never interacted with the page.
+		/*
+		 * All extended properties must be optional so that URL Metrics are not all immediately invalidated once an extension is deactivated.
+		 * Also, no INP data will be sent if the user never interacted with the page.
+		 */
 		'required'    => false,
 		'items'       => array(
 			'type'       => 'object',
