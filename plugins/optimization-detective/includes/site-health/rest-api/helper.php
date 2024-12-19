@@ -81,3 +81,25 @@ function od_optimization_detective_rest_api_test(): array {
 
 	return $result;
 }
+
+/**
+ * Periodically runs the Optimization Detective REST API health check.
+ *
+ * @since n.e.x.t
+ */
+function od_schedule_rest_api_health_check(): void {
+	if ( ! (bool) wp_next_scheduled( 'od_rest_api_health_check_event' ) ) {
+		wp_schedule_event( time(), 'hourly', 'od_rest_api_health_check_event' );
+	}
+}
+add_action( 'wp', 'od_schedule_rest_api_health_check' );
+
+/**
+ * Hook for the scheduled REST API health check.
+ *
+ * @since n.e.x.t
+ */
+function od_run_scheduled_rest_api_health_check(): void {
+	od_optimization_detective_rest_api_test();
+}
+add_action( 'od_rest_api_health_check_event', 'od_run_scheduled_rest_api_health_check' );
