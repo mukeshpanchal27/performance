@@ -27,7 +27,7 @@ final class Optimization_Detective_Debug_Tag_Visitor {
 	 * @since n.e.x.t
 	 *
 	 * @param OD_Tag_Visitor_Context $context Tag visitor context.
-	 * @return bool Whether the tag should be tracked in URL Metrics.
+	 * @return false This tag visitor doesn't itself request elements to be tracked in URL Metrics, but will reuse tracking that other tag visitors have opted-in to.
 	 */
 	public function __invoke( OD_Tag_Visitor_Context $context ): bool {
 		$processor = $context->processor;
@@ -37,8 +37,6 @@ final class Optimization_Detective_Debug_Tag_Visitor {
 		}
 
 		$xpath = $processor->get_xpath();
-
-		$visited = false;
 
 		/**
 		 * @var OD_URL_Metric_Group $group
@@ -88,11 +86,7 @@ final class Optimization_Detective_Debug_Tag_Visitor {
 </div>
 HTML
 				);
-
-				$visited = true;
 			}
 		}
-
-		return $visited;
 	}
 }
