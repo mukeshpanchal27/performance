@@ -1,12 +1,14 @@
-# Optimization Detective
+# [Optimization Detective](https://wordpress.org/plugins/optimization-detective/)
 
 Provides an API for leveraging real user metrics to detect optimizations to apply on the frontend to improve page performance.
 
-----
+## Description
 
 This plugin captures real user metrics about what elements are displayed on the page across a variety of device form factors (e.g. desktop, tablet, and phone) in order to apply loading optimizations which are not possible with WordPress’s current server-side heuristics.
 
-This plugin is a dependency which does not provide end-user functionality on its own. For that, please install the dependent plugin [Image Prioritizer](https://wordpress.org/plugins/image-prioritizer/) or [Embed Optimizer](https://wordpress.org/plugins/embed-optimizer/) (among [others](https://github.com/WordPress/performance/labels/%5BPlugin%5D%20Optimization%20Detective) to come from the WordPress Core Performance team).
+This plugin is a dependency which does not provide end-user functionality on its own. For that, please install the dependent plugin [Image Prioritizer](https://wordpress.org/plugins/image-prioritizer/) or [Embed Optimizer](https://wordpress.org/plugins/embed-optimizer/) (among [others](https://github.com/WordPress/performance/labels/%5BPlugin%5D%20Optimization%20Detective) to come from the WordPress Core Performance team). There are currently **no settings** and no user interface for this plugin since it is designed to work without any configuration.
+
+Your site must have the **REST API accessible** to unauthenticated frontend visitors since this is how metrics are collected about how a page should be optimized.
 
 ## Background
 
@@ -23,13 +25,11 @@ At the core of Optimization Detective is the “URL Metric”, information about
 3. Tablet: 601-782px
 4. Desktop: \>782px
 
-When no more URL Metrics are needed for a URL due to the sample size being obtained for the viewport group, it discontinues serving the JavaScript to gather the metrics (leveraging the [web-vitals.js](https://github.com/GoogleChrome/web-vitals) library). With the URL Metrics in hand, the output-buffered page is sent through the HTML Tag Processor and--when the [Image Prioritizer](https://wordpress.org/plugins/image-prioritizer/) dependent plugin is installed--the images which were the LCP element for various breakpoints will get prioritized with high-priority preload links (along with `fetchpriority=high` on the actual `img` tag when it is the common LCP element across all breakpoints). LCP elements with background images added via inline `background-image` styles are also prioritized with preload links.
+When no more URL Metrics are needed for a URL due to the sample size being obtained for the viewport group, it discontinues serving the JavaScript to gather the metrics (leveraging the [web-vitals.js](https://github.com/GoogleChrome/web-vitals) library). With the URL Metrics in hand, the output-buffered page is sent through the HTML Tag Processor and—when the [Image Prioritizer](https://wordpress.org/plugins/image-prioritizer/) dependent plugin is installed—the images which were the LCP element for various breakpoints will get prioritized with high-priority preload links (along with `fetchpriority=high` on the actual `img` tag when it is the common LCP element across all breakpoints). LCP elements with background images added via inline `background-image` styles are also prioritized with preload links.
 
 URL Metrics have a “freshness TTL” after which they will be stale and the JavaScript will be served again to start gathering metrics again to ensure that the right elements continue to get their loading prioritized. When a URL Metrics custom post type hasn't been touched in a while, it is automatically garbage-collected.
 
 👉 **Note:** This plugin optimizes pages for actual visitors, and it depends on visitors to optimize pages (since URL Metrics need to be collected). As such, you won't see optimizations applied immediately after activating the plugin (and dependent plugin(s)). And since administrator users are not normal visitors typically, optimizations are not applied for admins by default (but this can be overridden with the `od_can_optimize_response` filter below). URL Metrics are not collected for administrators because it is likely that additional elements will be present on the page which are not also shown to non-administrators, meaning the URL Metrics could not reliably be reused between them.
-
-There are currently **no settings** and no user interface for this plugin since it is designed to work without any configuration.
 
 When the `WP_DEBUG` constant is enabled, additional logging for Optimization Detective is added to the browser console.
 
@@ -122,7 +122,7 @@ add_filter( 'od_can_optimize_response', '__return_true' );
 
 ### Filter: `od_url_metrics_breakpoint_sample_size` (default: 3)
 
-Filters the sample size for a breakpoint's URL Metrics on a given URL. The sample size must be greater than zero. You can increase the sample size if you want better guarantees that the applied optimizations will be accurate. During development, it may be helpful to reduce the sample size to 1:
+Filters the sample size for a breakpoint's URL Metrics on a given URL. The sample size must be greater than zero. You can increase the sample size if you want better guarantees that the applied optimizations will be accurate. During development, it may be helpful to reduce the sample size to 1 (along with setting the `od_url_metric_storage_lock_ttl` and `od_url_metric_freshness_ttl` filters below) so that you don't have to keep reloading the page to collect new URL Metrics to flush out stale ones during active development:
 
 ```php
 add_filter( 'od_url_metrics_breakpoint_sample_size', function (): int {
@@ -137,6 +137,14 @@ Filters how long a given IP is locked from submitting another metric-storage RES
 ```php
 add_filter( 'od_metrics_storage_lock_ttl', function ( int $ttl ): int {
 	return is_user_logged_in() ? 0 : $ttl;
+} );
+```
+
+During development this is useful to set to zero so you can quickly collect new URL Metrics by reloading the page without having to wait for the storage lock to release:
+
+```php
+add_filter( 'od_metrics_storage_lock_ttl', function ( int $ttl ): int {
+	return 0;
 } );
 ```
 
@@ -253,7 +261,7 @@ See also [example usage](https://github.com/WordPress/performance/blob/6bb8405c5
 
 Filters the data that goes into computing the current ETag for URL Metrics.
 
-The ETag is a unique identifier that changes whenever the underlying data used to generate it changes. By default, the ETag calculation includes the names of registered tag visitors. This ensures that when a new Optimization Detective-dependent plugin is activated (like Image Prioritizer or Embed Optimizer), any existing URL Metrics are immediately considered stale. This happens because the newly registered tag visitors alter the ETag calculation, making it different from the stored ones.
+The ETag is a unique identifier that changes whenever the underlying data used to generate it changes. By default, the ETag calculation includes the names of registered tag visitors. This ensures that when a new Optimization Detective-dependent plugin is activated (like [Image Prioritizer](https://wordpress.org/plugins/image-prioritizer/) or [Embed Optimizer](https://wordpress.org/plugins/embed-optimizer/)), any existing URL Metrics are immediately considered stale. This happens because the newly registered tag visitors alter the ETag calculation, making it different from the stored ones.
 
 When the ETag for URL Metrics in a complete viewport group no longer matches the current environment's ETag, new URL Metrics will then begin to be collected until there are no more stored URL Metrics with the old ETag. These new URL Metrics will include data relevant to the newly activated plugins and their tag visitors.
 
@@ -268,3 +276,21 @@ The supplied context object includes these properties:
 * `$url_metric`: The newly-stored URL Metric.
 * `$url_metric_group`: The viewport group that the URL Metric was added to.
 * `$url_metric_group_collection`: The `OD_URL_Metric_Group_Collection` instance to which the URL Metric was added.
+
+## Extension Plugins
+
+For production, from the WordPress.org Plugin Directory:
+
+* [Image Prioritizer](https://wordpress.org/plugins/image-prioritizer/): Prioritizes the loading of images and videos based on how visible they are to actual visitors; adds fetchpriority and applies lazy loading.
+* [Embed Optimizer](https://wordpress.org/plugins/embed-optimizer/): Optimizes the performance of embeds through lazy-loading, preconnecting, and reserving space to reduce layout shifts. 
+
+For development and debugging, from repositories on GitHub:
+
+* [Optimization Detective Admin UI](https://github.com/westonruter/od-admin-ui): Provides an admin UI to inspect URL Metrics from the Optimization Detective plugin.
+* [Optimization Detective Store Query Vars](https://github.com/westonruter/od-store-query-vars): Stores the Query Vars with a URL Metric in the Optimization Detective plugin. This is useful for debugging URL Metrics, in particular what the slug was computed from.
+* [Optimization Detective Store User Agent](https://github.com/westonruter/od-store-user-agent): Stores the User Agent with a URL Metric in the Optimization Detective plugin. This is useful for debugging URL Metrics, in particular to understand what device has a given viewport dimensions.
+* [Optimization Detective Dev Mode](https://github.com/westonruter/od-dev-mode): Adds filters to facilitate development of the Optimization Detective plugin.
+
+## Changelog
+
+Please see the [WordPress.org directory listing](https://wordpress.org/plugins/optimization-detective/) for the [changelog](https://wordpress.org/plugins/optimization-detective/#developers).
