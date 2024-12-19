@@ -24,10 +24,12 @@ final class Optimization_Detective_Debug_Tag_Visitor {
 	/**
 	 * Visits a tag.
 	 *
+	 * This tag visitor doesn't itself request elements to be tracked in URL Metrics, but will reuse tracking that other tag visitors have opted-in to.
+	 *
 	 * @since n.e.x.t
 	 *
 	 * @param OD_Tag_Visitor_Context $context Tag visitor context.
-	 * @return false This tag visitor doesn't itself request elements to be tracked in URL Metrics, but will reuse tracking that other tag visitors have opted-in to.
+	 * @return false Always returns false.
 	 */
 	public function __invoke( OD_Tag_Visitor_Context $context ): bool {
 		$processor = $context->processor;
@@ -88,5 +90,7 @@ HTML
 				);
 			}
 		}
+
+		return false;
 	}
 }
