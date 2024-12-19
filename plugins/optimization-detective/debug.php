@@ -121,13 +121,7 @@ function od_debug_add_assets(): void {
 
 	$inp_dots = array();
 
-	/**
-	 * @var OD_URL_Metric_Group $group
-	 */
 	foreach ( $group_collection as $group ) {
-		/**
-		 * @var OD_URL_Metric $url_metric
-		 */
 		foreach ( $group as $url_metric ) {
 			foreach ( $url_metric->get( 'inpData' ) as $inp_data ) {
 				if ( isset( $inp_dots[ $inp_data['interactionTarget'] ] ) ) {

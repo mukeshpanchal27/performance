@@ -40,9 +40,6 @@ final class Optimization_Detective_Debug_Tag_Visitor {
 
 		$xpath = $processor->get_xpath();
 
-		/**
-		 * @var OD_URL_Metric_Group $group
-		 */
 		foreach ( $context->url_metric_group_collection as $group ) {
 			// This is the LCP element for this group.
 			if ( $group->get_lcp_element() instanceof OD_Element && $xpath === $group->get_lcp_element()->get_xpath() ) {
