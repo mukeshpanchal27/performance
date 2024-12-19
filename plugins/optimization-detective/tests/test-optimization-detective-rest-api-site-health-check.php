@@ -52,7 +52,7 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test behavior when REST API returns unauthorized error.
+	 * Test behavior when REST API returns an unauthorized error.
 	 */
 	public function test_rest_api_unauthorized(): void {
 		$this->mocked_responses = array(
@@ -67,6 +67,25 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 
 		$this->assertSame( 'recommended', $result['status'] );
 		$this->assertSame( 'unauthorized', isset( $od_rest_api_info['status'] ) ? $od_rest_api_info['status'] : '' );
+		$this->assertFalse( isset( $od_rest_api_info['available'] ) ? $od_rest_api_info['available'] : true );
+	}
+
+	/**
+	 * Test behavior when REST API returns an forbidden error.
+	 */
+	public function test_rest_api_forbidden(): void {
+		$this->mocked_responses = array(
+			get_rest_url( null, OD_REST_API_NAMESPACE . OD_URL_METRICS_ROUTE ) => $this->build_mock_response(
+				403,
+				'Forbidden'
+			),
+		);
+
+		$result           = od_optimization_detective_rest_api_test();
+		$od_rest_api_info = get_option( 'od_rest_api_info', array() );
+
+		$this->assertSame( 'recommended', $result['status'] );
+		$this->assertSame( 'forbidden', isset( $od_rest_api_info['status'] ) ? $od_rest_api_info['status'] : '' );
 		$this->assertFalse( isset( $od_rest_api_info['available'] ) ? $od_rest_api_info['available'] : true );
 	}
 
