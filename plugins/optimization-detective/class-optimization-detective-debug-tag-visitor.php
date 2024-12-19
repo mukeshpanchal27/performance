@@ -47,12 +47,14 @@ final class Optimization_Detective_Debug_Tag_Visitor {
 
 				$processor->set_meta_attribute(
 					'viewport',
-					$group->get_minimum_viewport_width()
+					(string) $group->get_minimum_viewport_width()
 				);
 
+				$style = $processor->get_attribute( 'style' );
+				$style = is_string( $style ) ? $style : '';
 				$processor->set_attribute(
 					'style',
-					"--anchor-name: --od-debug-element-$uuid;" . $processor->get_attribute( 'style' ) ?? ''
+					"--anchor-name: --od-debug-element-$uuid;" . $style
 				);
 
 				$processor->set_meta_attribute(
