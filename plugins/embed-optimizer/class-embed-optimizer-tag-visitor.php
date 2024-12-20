@@ -197,16 +197,14 @@ final class Embed_Optimizer_Tag_Visitor {
 	}
 
 	/**
-	 * Adds preconnect links for embed resources.
+	 * Gets preconnect URLs based on embed type
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param OD_Tag_Visitor_Context $context Tag visitor context, with the cursor currently at an embed block.
+	 * @param OD_HTML_Tag_Processor $processor Processor.
+	 * @return array<non-empty-string> Array of URLs to preconnect to.
 	 */
-	private function add_preconnect_links( OD_Tag_Visitor_Context $context ): void {
-		$processor           = $context->processor;
-		$embed_wrapper_xpath = self::get_embed_wrapper_xpath( $processor->get_xpath() );
-
+	private function get_preconnect_urls( OD_HTML_Tag_Processor $processor ): array {
 		/*
 		* The following embeds have been chosen for optimization due to their relative popularity among all embed types.
 		* See <https://colab.sandbox.google.com/drive/1nSpg3qoCLY-cBTV2zOUkgUCU7R7X2f_R?resourcekey=0-MgT7Ur0pT__vw-5_AHjgWQ#scrollTo=utZv59sXzXvS>.
@@ -267,6 +265,21 @@ final class Embed_Optimizer_Tag_Visitor {
 			$preconnect_hrefs[] = 'https://i.pinimg.com';
 		}
 
+		return $preconnect_hrefs;
+	}
+
+	/**
+	 * Adds preconnect links for embed resources.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param OD_Tag_Visitor_Context $context Tag visitor context, with the cursor currently at an embed block.
+	 */
+	private function add_preconnect_links( OD_Tag_Visitor_Context $context ): void {
+		$processor           = $context->processor;
+		$embed_wrapper_xpath = self::get_embed_wrapper_xpath( $processor->get_xpath() );
+
+		$preconnect_hrefs = $this->get_preconnect_urls( $processor );
 		foreach ( $preconnect_hrefs as $preconnect_href ) {
 			foreach ( $context->url_metric_group_collection as $group ) {
 				if ( ! ( $group->get_element_max_intersection_ratio( $embed_wrapper_xpath ) > 0.0 ) ) {
