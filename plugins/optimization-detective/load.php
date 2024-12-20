@@ -129,6 +129,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 		require_once __DIR__ . '/hooks.php';
 
 		// Load site health checks.
-		require_once __DIR__ . '/includes/site-health/load.php';
+		require_once __DIR__ . '/site-health/load.php';
 	}
 );
