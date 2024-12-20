@@ -73,8 +73,8 @@ function od_optimization_detective_rest_api_test(): array {
 		update_option(
 			'od_rest_api_info',
 			array(
-				'status'    => 'ok',
-				'available' => true,
+				'status_code' => $status_code,
+				'available'   => true,
 			)
 		);
 		return $result;
@@ -88,8 +88,8 @@ function od_optimization_detective_rest_api_test(): array {
 		update_option(
 			'od_rest_api_info',
 			array(
-				'status'    => 'unauthorized',
-				'available' => false,
+				'status_code' => $status_code,
+				'available'   => false,
 			)
 		);
 	} elseif ( 403 === $status_code ) {
@@ -102,8 +102,22 @@ function od_optimization_detective_rest_api_test(): array {
 		update_option(
 			'od_rest_api_info',
 			array(
-				'status'    => 'forbidden',
-				'available' => false,
+				'status_code' => $status_code,
+				'available'   => false,
+			)
+		);
+	} else {
+		$result['status']      = 'recommended';
+		$result['label']       = __( 'Your site encountered error accessing Optimization Detective REST API endpoint', 'optimization-detective' );
+		$result['description'] = sprintf(
+			'<p>%s</p>',
+			esc_html__( 'The Optimization Detective endpoint could not be reached. This might mean the REST API is disabled or blocked.', 'optimization-detective' )
+		);
+		update_option(
+			'od_rest_api_info',
+			array(
+				'status_code' => $status_code,
+				'available'   => false,
 			)
 		);
 	}

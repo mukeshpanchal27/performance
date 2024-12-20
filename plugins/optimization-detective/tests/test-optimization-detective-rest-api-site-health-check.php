@@ -47,7 +47,7 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 		$od_rest_api_info = get_option( 'od_rest_api_info', array() );
 
 		$this->assertSame( 'good', $result['status'] );
-		$this->assertSame( 'ok', isset( $od_rest_api_info['status'] ) ? $od_rest_api_info['status'] : '' );
+		$this->assertSame( 400, isset( $od_rest_api_info['status_code'] ) ? $od_rest_api_info['status_code'] : '' );
 		$this->assertTrue( isset( $od_rest_api_info['available'] ) ? $od_rest_api_info['available'] : false );
 	}
 
@@ -66,7 +66,7 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 		$od_rest_api_info = get_option( 'od_rest_api_info', array() );
 
 		$this->assertSame( 'recommended', $result['status'] );
-		$this->assertSame( 'unauthorized', isset( $od_rest_api_info['status'] ) ? $od_rest_api_info['status'] : '' );
+		$this->assertSame( 401, isset( $od_rest_api_info['status_code'] ) ? $od_rest_api_info['status_code'] : '' );
 		$this->assertFalse( isset( $od_rest_api_info['available'] ) ? $od_rest_api_info['available'] : true );
 	}
 
@@ -85,7 +85,7 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 		$od_rest_api_info = get_option( 'od_rest_api_info', array() );
 
 		$this->assertSame( 'recommended', $result['status'] );
-		$this->assertSame( 'forbidden', isset( $od_rest_api_info['status'] ) ? $od_rest_api_info['status'] : '' );
+		$this->assertSame( 403, isset( $od_rest_api_info['status_code'] ) ? $od_rest_api_info['status_code'] : '' );
 		$this->assertFalse( isset( $od_rest_api_info['available'] ) ? $od_rest_api_info['available'] : true );
 	}
 
