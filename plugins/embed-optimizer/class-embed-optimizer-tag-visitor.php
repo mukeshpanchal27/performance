@@ -103,22 +103,8 @@ final class Embed_Optimizer_Tag_Visitor {
 		}
 
 		$this->reduce_layout_shifts( $context );
-
 		$this->add_preconnect_links( $context );
-
-		// Lazy-loading can only be done once there are URL Metrics collected for both mobile and desktop.
-		if (
-			$context->url_metric_group_collection->get_first_group()->count() > 0
-			&&
-			$context->url_metric_group_collection->get_last_group()->count() > 0
-		) {
-			$embed_wrapper_xpath    = self::get_embed_wrapper_xpath( $processor->get_xpath() );
-			$max_intersection_ratio = $context->url_metric_group_collection->get_element_max_intersection_ratio( $embed_wrapper_xpath );
-			if ( ! ( $max_intersection_ratio > 0.0 ) && embed_optimizer_update_markup( $processor, false ) && ! $this->added_lazy_script ) {
-				$processor->append_body_html( wp_get_inline_script_tag( embed_optimizer_get_lazy_load_script(), array( 'type' => 'module' ) ) );
-				$this->added_lazy_script = true;
-			}
-		}
+		$this->lazy_load_embeds( $context );
 
 		/*
 		 * At this point the tag is a figure.wp-block-embed, and we can return false because this does not need to be
@@ -296,6 +282,34 @@ final class Embed_Optimizer_Tag_Visitor {
 					$group->get_maximum_viewport_width()
 				);
 			}
+		}
+	}
+
+	/**
+	 * Optimizes an embed based on whether it is displayed in any initial viewport.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param OD_Tag_Visitor_Context $context Tag visitor context, with the cursor currently at an embed block.
+	 */
+	private function lazy_load_embeds( OD_Tag_Visitor_Context $context ): void {
+		$processor = $context->processor;
+
+		// Lazy-loading can only be done once there are URL Metrics collected for both mobile and desktop.
+		if (
+			$context->url_metric_group_collection->get_first_group()->count() === 0
+			||
+			$context->url_metric_group_collection->get_last_group()->count() === 0
+		) {
+			return;
+		}
+
+		$embed_wrapper_xpath = self::get_embed_wrapper_xpath( $processor->get_xpath() );
+
+		$max_intersection_ratio = $context->url_metric_group_collection->get_element_max_intersection_ratio( $embed_wrapper_xpath );
+		if ( ! ( $max_intersection_ratio > 0.0 ) && embed_optimizer_update_markup( $processor, false ) && ! $this->added_lazy_script ) {
+			$processor->append_body_html( wp_get_inline_script_tag( embed_optimizer_get_lazy_load_script(), array( 'type' => 'module' ) ) );
+			$this->added_lazy_script = true;
 		}
 	}
 }
