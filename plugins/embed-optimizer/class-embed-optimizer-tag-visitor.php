@@ -206,17 +206,17 @@ final class Embed_Optimizer_Tag_Visitor {
 	 */
 	private function get_preconnect_urls( OD_HTML_Tag_Processor $processor ): array {
 		/*
-		* The following embeds have been chosen for optimization due to their relative popularity among all embed types.
-		* See <https://colab.sandbox.google.com/drive/1nSpg3qoCLY-cBTV2zOUkgUCU7R7X2f_R?resourcekey=0-MgT7Ur0pT__vw-5_AHjgWQ#scrollTo=utZv59sXzXvS>.
-		* The list of hosts being preconnected to was obtained by inserting an embed into a post and then looking
-		* at the network log on the frontend as the embed renders. Each should include the host of the iframe src
-		* as well as URLs for assets used by the embed, _if_ the URL looks like it is not geotargeted (e.g. '-us')
-		* or load-balanced (e.g. 's0.example.com'). For the load balancing case, attempt to load the asset by
-		* incrementing the number appearing in the subdomain (e.g. s1.example.com). If the asset still loads, then
-		* it is a likely case of a load balancing domain name which cannot be safely preconnected since it could
-		* not end up being the load balanced domain used for the embed. Lastly, these domains are only for the URLs
-		* for GET requests, as POST requests are not likely to be part of the critical rendering path.
-		*/
+		 * The following embeds have been chosen for optimization due to their relative popularity among all embed types.
+		 * See <https://colab.sandbox.google.com/drive/1nSpg3qoCLY-cBTV2zOUkgUCU7R7X2f_R?resourcekey=0-MgT7Ur0pT__vw-5_AHjgWQ#scrollTo=utZv59sXzXvS>.
+		 * The list of hosts being preconnected to was obtained by inserting an embed into a post and then looking
+		 * at the network log on the frontend as the embed renders. Each should include the host of the iframe src
+		 * as well as URLs for assets used by the embed, _if_ the URL looks like it is not geotargeted (e.g. '-us')
+		 * or load-balanced (e.g. 's0.example.com'). For the load balancing case, attempt to load the asset by
+		 * incrementing the number appearing in the subdomain (e.g. s1.example.com). If the asset still loads, then
+		 * it is a likely case of a load balancing domain name which cannot be safely preconnected since it could
+		 * not end up being the load balanced domain used for the embed. Lastly, these domains are only for the URLs
+		 * for GET requests, as POST requests are not likely to be part of the critical rendering path.
+		 */
 		$preconnect_hrefs = array();
 		$has_class        = static function ( string $wanted_class ) use ( $processor ): bool {
 			return true === $processor->has_class( $wanted_class );
@@ -282,7 +282,7 @@ final class Embed_Optimizer_Tag_Visitor {
 		$preconnect_hrefs = $this->get_preconnect_urls( $processor );
 		foreach ( $preconnect_hrefs as $preconnect_href ) {
 			foreach ( $context->url_metric_group_collection as $group ) {
-				if ( ! ( $group->get_element_max_intersection_ratio( $embed_wrapper_xpath ) > 0.0 ) ) {
+				if ( $group->get_element_max_intersection_ratio( $embed_wrapper_xpath ) < PHP_FLOAT_EPSILON ) {
 					continue;
 				}
 
@@ -320,7 +320,7 @@ final class Embed_Optimizer_Tag_Visitor {
 		$embed_wrapper_xpath = self::get_embed_wrapper_xpath( $processor->get_xpath() );
 
 		$max_intersection_ratio = $context->url_metric_group_collection->get_element_max_intersection_ratio( $embed_wrapper_xpath );
-		if ( ! ( $max_intersection_ratio > 0.0 ) && embed_optimizer_update_markup( $processor, false ) && ! $this->added_lazy_script ) {
+		if ( $max_intersection_ratio < PHP_FLOAT_EPSILON && embed_optimizer_update_markup( $processor, false ) && ! $this->added_lazy_script ) {
 			$processor->append_body_html( wp_get_inline_script_tag( embed_optimizer_get_lazy_load_script(), array( 'type' => 'module' ) ) );
 			$this->added_lazy_script = true;
 		}
