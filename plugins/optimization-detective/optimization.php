@@ -78,7 +78,12 @@ function od_buffer_output( $passthrough ) {
  * @access private
  */
 function od_maybe_add_template_output_buffer_filter(): void {
-	if ( ! od_can_optimize_response() || isset( $_GET['optimization_detective_disabled'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$od_rest_api_info = get_option( 'od_rest_api_info' );
+	if (
+		! od_can_optimize_response() ||
+		isset( $_GET['optimization_detective_disabled'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		( isset( $od_rest_api_info['available'] ) && ! (bool) $od_rest_api_info['available'] )
+	) {
 		return;
 	}
 	$callback = 'od_optimize_template_output_buffer';
@@ -225,12 +230,6 @@ function od_optimize_template_output_buffer( string $buffer ): string {
 
 	// Whether we need to add the data-od-xpath attribute to elements and whether the detection script should be injected.
 	$needs_detection = ! $group_collection->is_every_group_complete();
-
-	// Disable detection if the REST API is disabled.
-	$od_rest_api_info = get_option( 'od_rest_api_info' );
-	if ( is_array( $od_rest_api_info ) && isset( $od_rest_api_info['available'] ) ) {
-		$needs_detection = (bool) $od_rest_api_info['available'];
-	}
 
 	do {
 		$tracked_in_url_metrics = false;
