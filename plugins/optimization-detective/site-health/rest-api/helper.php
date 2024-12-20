@@ -49,79 +49,53 @@ function od_optimization_detective_rest_api_test(): array {
 			'<p>%s</p>',
 			esc_html__( 'The Optimization Detective endpoint could not be reached. This might mean the REST API is disabled or blocked.', 'optimization-detective' )
 		);
-		update_option(
-			'od_rest_api_info',
-			array(
-				'error_message' => $response->get_error_message(),
-				'error_code'    => $response->get_error_code(),
-				'available'     => false,
-			)
-		);
-		return $result;
-	}
-
-	$status_code     = wp_remote_retrieve_response_code( $response );
-	$data            = json_decode( wp_remote_retrieve_body( $response ), true );
-	$expected_params = array( 'slug', 'current_etag', 'hmac', 'url', 'viewport', 'elements' );
-	if (
-		400 === $status_code
-		&& isset( $data['data']['params'] )
-		&& is_array( $data['data']['params'] )
-		&& count( $expected_params ) === count( array_intersect( $data['data']['params'], $expected_params ) )
-	) {
-		// The REST API endpoint is available.
-		update_option(
-			'od_rest_api_info',
-			array(
-				'status_code' => $status_code,
-				'available'   => true,
-			)
-		);
-		return $result;
-	} elseif ( 401 === $status_code ) {
-		$result['status']      = 'recommended';
-		$result['label']       = __( 'Your site encountered unauthorized error for Optimization Detective REST API endpoint', 'optimization-detective' );
-		$result['description'] = sprintf(
-			'<p>%s</p>',
-			esc_html__( 'The REST API endpoint requires authentication. Ensure proper credentials are provided.', 'optimization-detective' )
-		);
-		update_option(
-			'od_rest_api_info',
-			array(
-				'status_code' => $status_code,
-				'available'   => false,
-			)
-		);
-	} elseif ( 403 === $status_code ) {
-		$result['status']      = 'recommended';
-		$result['label']       = __( 'Your site encountered forbidden error for Optimization Detective REST API endpoint', 'optimization-detective' );
-		$result['description'] = sprintf(
-			'<p>%s</p>',
-			esc_html__( 'The REST API endpoint is blocked check server or security settings.', 'optimization-detective' )
-		);
-		update_option(
-			'od_rest_api_info',
-			array(
-				'status_code' => $status_code,
-				'available'   => false,
-			)
+		$info                  = array(
+			'error_message' => $response->get_error_message(),
+			'error_code'    => $response->get_error_code(),
+			'available'     => false,
 		);
 	} else {
-		$result['status']      = 'recommended';
-		$result['label']       = __( 'Your site encountered error accessing Optimization Detective REST API endpoint', 'optimization-detective' );
-		$result['description'] = sprintf(
-			'<p>%s</p>',
-			esc_html__( 'The Optimization Detective endpoint could not be reached. This might mean the REST API is disabled or blocked.', 'optimization-detective' )
+		$status_code     = wp_remote_retrieve_response_code( $response );
+		$data            = json_decode( wp_remote_retrieve_body( $response ), true );
+		$expected_params = array( 'slug', 'current_etag', 'hmac', 'url', 'viewport', 'elements' );
+		$info            = array(
+			'status_code' => $status_code,
+			'available'   => false,
 		);
-		update_option(
-			'od_rest_api_info',
-			array(
-				'status_code' => $status_code,
-				'available'   => false,
-			)
-		);
+
+		if (
+			400 === $status_code
+			&& isset( $data['data']['params'] )
+			&& is_array( $data['data']['params'] )
+			&& count( $expected_params ) === count( array_intersect( $data['data']['params'], $expected_params ) )
+		) {
+			// The REST API endpoint is available.
+			$info['available'] = true;
+		} elseif ( 401 === $status_code ) {
+			$result['status']      = 'recommended';
+			$result['label']       = __( 'Your site encountered unauthorized error for Optimization Detective REST API endpoint', 'optimization-detective' );
+			$result['description'] = sprintf(
+				'<p>%s</p>',
+				esc_html__( 'The REST API endpoint requires authentication. Ensure proper credentials are provided.', 'optimization-detective' )
+			);
+		} elseif ( 403 === $status_code ) {
+			$result['status']      = 'recommended';
+			$result['label']       = __( 'Your site encountered forbidden error for Optimization Detective REST API endpoint', 'optimization-detective' );
+			$result['description'] = sprintf(
+				'<p>%s</p>',
+				esc_html__( 'The REST API endpoint is blocked check server or security settings.', 'optimization-detective' )
+			);
+		} else {
+			$result['status']      = 'recommended';
+			$result['label']       = __( 'Your site encountered error accessing Optimization Detective REST API endpoint', 'optimization-detective' );
+			$result['description'] = sprintf(
+				'<p>%s</p>',
+				esc_html__( 'The Optimization Detective endpoint could not be reached. This might mean the REST API is disabled or blocked.', 'optimization-detective' )
+			);
+		}
 	}
 
+	update_option( 'od_rest_api_info', $info );
 	return $result;
 }
 
