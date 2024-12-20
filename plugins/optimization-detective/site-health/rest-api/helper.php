@@ -52,8 +52,9 @@ function od_optimization_detective_rest_api_test(): array {
 		update_option(
 			'od_rest_api_info',
 			array(
-				'status'    => 'error',
-				'available' => false,
+				'error_message' => $response->get_error_message(),
+				'error_code'    => $response->get_error_code(),
+				'available'     => false,
 			)
 		);
 		return $result;
