@@ -106,7 +106,7 @@ function od_optimization_detective_rest_api_test(): array {
  */
 function od_schedule_rest_api_health_check(): void {
 	if ( ! (bool) wp_next_scheduled( 'od_rest_api_health_check_event' ) ) {
-		wp_schedule_event( time(), 'hourly', 'od_rest_api_health_check_event' );
+		wp_schedule_event( time(), 'weekly', 'od_rest_api_health_check_event' );
 	}
 }
 
