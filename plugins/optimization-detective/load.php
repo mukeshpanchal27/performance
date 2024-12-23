@@ -143,5 +143,7 @@ function od_plugin_activation(): void {
 	if ( ! (bool) get_option( 'od_rest_api_info' ) ) {
 		add_option( 'od_rest_api_info', array() );
 	}
+	require_once __DIR__ . '/site-health/rest-api/helper.php';
+	od_schedule_rest_api_health_check();
 }
 register_activation_hook( __FILE__, 'od_plugin_activation' );
