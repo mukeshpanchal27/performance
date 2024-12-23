@@ -98,15 +98,19 @@ function image_prioritizer_filter_extension_module_urls( $extension_module_urls 
 }
 
 /**
- * Filters additional properties for the element item schema for Optimization Detective.
+ * Filters additional properties for the root schema for Optimization Detective.
  *
  * @since 0.3.0
  * @access private
  *
- * @param array<string, array{type: string}> $additional_properties Additional properties.
+ * @param array<string, array{type: string}>|mixed $additional_properties Additional properties.
  * @return array<string, array{type: string}> Additional properties.
  */
-function image_prioritizer_add_element_item_schema_properties( array $additional_properties ): array {
+function image_prioritizer_add_root_schema_properties( $additional_properties ): array {
+	if ( ! is_array( $additional_properties ) ) {
+		$additional_properties = array();
+	}
+
 	$additional_properties['lcpElementExternalBackgroundImage'] = array(
 		'type'       => 'object',
 		'properties' => array(
