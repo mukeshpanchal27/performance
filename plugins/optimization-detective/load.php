@@ -132,3 +132,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 		require_once __DIR__ . '/site-health/load.php';
 	}
 );
+
+/**
+ * Activation hook for the plugin.
+ *
+ * @since n.e.x.t
+ */
+function od_plugin_activation(): void {
+	// Add the option if it doesn't exist.
+	if ( ! (bool) get_option( 'od_rest_api_info' ) ) {
+		add_option( 'od_rest_api_info', array() );
+	}
+}
+register_activation_hook( __FILE__, 'od_plugin_activation' );
