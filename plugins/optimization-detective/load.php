@@ -60,7 +60,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					 * means that the plugin must be bootstrapped here to run the activation logic.
 					 */
 					$bootstrap();
-					od_plugin_activation();
+					od_rest_api_health_check_plugin_activation();
 				}
 			);
 		}
@@ -144,12 +144,3 @@ if ( ! defined( 'ABSPATH' ) ) {
 		require_once __DIR__ . '/site-health/load.php';
 	}
 );
-
-/**
- * Activation hook for the plugin.
- *
- * @since n.e.x.t
- */
-function od_plugin_activation(): void {
-	od_rest_api_health_check_plugin_activation();
-}
