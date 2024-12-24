@@ -51,9 +51,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 			 * action), so this is why it gets initialized at priority 9.
 			 */
 			add_action( 'init', $bootstrap, 9 );
+
 			register_activation_hook(
 				__FILE__,
 				static function () use ( $bootstrap ): void {
+					/*
+					 * The activation hook is called before the init action, so the plugin is not loaded yet. This
+					 * means that the plugin must be bootstrapped here to run the activation logic.
+					 */
 					$bootstrap();
 					od_plugin_activation();
 				}
@@ -146,18 +151,5 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since n.e.x.t
  */
 function od_plugin_activation(): void {
-	// Add the option if it doesn't exist.
-	if ( ! (bool) get_option( 'od_rest_api_info' ) ) {
-		add_option( 'od_rest_api_info', array() );
-	}
-	od_schedule_rest_api_health_check();
-	// Run the check immediately after Optimization Detective is activated.
-	add_action(
-		'activated_plugin',
-		static function ( string $plugin ): void {
-			if ( 'optimization-detective/load.php' === $plugin ) {
-				od_optimization_detective_rest_api_test();
-			}
-		}
-	);
+	od_rest_api_health_check_plugin_activation();
 }

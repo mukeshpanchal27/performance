@@ -147,3 +147,25 @@ function od_rest_api_health_check_admin_notice( string $plugin_file ): void {
 		);
 	}
 }
+
+/**
+ * Plugin activation hook for the REST API health check.
+ *
+ * @since n.e.x.t
+ */
+function od_rest_api_health_check_plugin_activation(): void {
+	// Add the option if it doesn't exist.
+	if ( ! (bool) get_option( 'od_rest_api_info' ) ) {
+		add_option( 'od_rest_api_info', array() );
+	}
+	od_schedule_rest_api_health_check();
+	// Run the check immediately after Optimization Detective is activated.
+	add_action(
+		'activated_plugin',
+		static function ( string $plugin ): void {
+			if ( 'optimization-detective/load.php' === $plugin ) {
+				od_optimization_detective_rest_api_test();
+			}
+		}
+	);
+}
