@@ -93,6 +93,7 @@ function od_optimization_detective_rest_api_test(): array {
 				esc_html__( 'The Optimization Detective endpoint could not be reached. This might mean the REST API is disabled or blocked.', 'optimization-detective' )
 			);
 		}
+		$info['error_message'] = $result['label'];
 	}
 
 	update_option( 'od_rest_api_info', $info );
@@ -117,4 +118,32 @@ function od_schedule_rest_api_health_check(): void {
  */
 function od_run_scheduled_rest_api_health_check(): void {
 	od_optimization_detective_rest_api_test();
+}
+
+/**
+ * Displays an admin notice if the REST API health check fails.
+ *
+ * @since n.e.x.t
+ *
+ * @param string $plugin_file Plugin file.
+ */
+function od_rest_api_health_check_admin_notice( string $plugin_file ): void {
+	if ( 'optimization-detective/load.php' !== $plugin_file ) {
+		return;
+	}
+
+	$od_rest_api_info = get_option( 'od_rest_api_info', array() );
+	if (
+		isset( $od_rest_api_info['available'] ) &&
+		! (bool) $od_rest_api_info['available'] &&
+		isset( $od_rest_api_info['error_message'] )
+	) {
+		wp_admin_notice(
+			esc_html( $od_rest_api_info['error_message'] ),
+			array(
+				'type'               => 'warning',
+				'additional_classes' => array( 'inline', 'notice-alt' ),
+			)
+		);
+	}
 }

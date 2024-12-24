@@ -51,6 +51,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 			 * action), so this is why it gets initialized at priority 9.
 			 */
 			add_action( 'init', $bootstrap, 9 );
+			register_activation_hook(
+				__FILE__,
+				static function () use ( $bootstrap ): void {
+					$bootstrap();
+					od_plugin_activation();
+				}
+			);
 		}
 
 		// Register this copy of the plugin.
@@ -143,7 +150,14 @@ function od_plugin_activation(): void {
 	if ( ! (bool) get_option( 'od_rest_api_info' ) ) {
 		add_option( 'od_rest_api_info', array() );
 	}
-	require_once __DIR__ . '/site-health/rest-api/helper.php';
 	od_schedule_rest_api_health_check();
+	// Run the check immediately after Optimization Detective is activated.
+	add_action(
+		'activated_plugin',
+		static function ( string $plugin ): void {
+			if ( 'optimization-detective/load.php' === $plugin ) {
+				od_optimization_detective_rest_api_test();
+			}
+		}
+	);
 }
-register_activation_hook( __FILE__, 'od_plugin_activation' );
