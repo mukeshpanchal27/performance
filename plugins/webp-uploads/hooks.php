@@ -732,11 +732,7 @@ add_action( 'wp_head', 'webp_uploads_render_generator' );
  * @since 2.1.0
  */
 function webp_uploads_init(): void {
-	if ( webp_uploads_is_picture_element_enabled() ) {
-		add_filter( 'wp_content_img_tag', 'webp_uploads_wrap_image_in_picture', 10, 3 );
-	} else {
-		add_filter( 'wp_content_img_tag', 'webp_uploads_update_image_references', 10, 3 ); // Run after wp_filter_content_tags.
-	}
+	add_filter( 'wp_content_img_tag', webp_uploads_is_picture_element_enabled() ? 'webp_uploads_wrap_image_in_picture' : 'webp_uploads_update_image_references', 10, 3 );
 }
 add_action( 'init', 'webp_uploads_init' );
 
