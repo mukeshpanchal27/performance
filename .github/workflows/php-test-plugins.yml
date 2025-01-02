@@ -81,13 +81,10 @@ jobs:
         run: npm run wp-env run tests-cli -- --env-cwd="wp-content/plugins/$(basename $(pwd))" composer install --no-interaction --no-progress
       - name: Update Composer Dependencies
         run: composer update --with-all-dependencies --no-interaction --no-progress
-      - name: Update Platform Dependency
-        if: matrix.php == '8.2'
-        run: composer config platform.php 7.3
       - name: Install PHPUnit
         run: |
           if [ "${{ matrix.php }}" == "8.2" ]; then
-            composer require phpunit/phpunit:${{ matrix.phpunit }} --with-all-dependencies
+            composer require phpunit/phpunit:${{ matrix.phpunit }} --with-all-dependencies --ignore-platform-reqs
           else
             composer require --dev phpunit/phpunit:${{ matrix.phpunit }}
           fi
