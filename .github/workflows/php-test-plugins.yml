@@ -49,6 +49,8 @@ jobs:
             wp: '6.6'
           - php: '8.3'
             wp: 'trunk'
+          - php: '8.4'
+            wp: 'trunk'
           - php: '8.2'
             wp: 'latest'
             # coverage: true # TODO: Uncomment once coverage reports are fixed. See <https://github.com/WordPress/performance/pull/1586#issuecomment-2474498387>.
