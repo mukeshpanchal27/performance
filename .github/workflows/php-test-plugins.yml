@@ -52,9 +52,9 @@ jobs:
             wp: '6.6'
           - php: '8.3'
             wp: 'trunk'
-            phpunit: '8.5'
+            phpunit: '8.5.41'
           - php: '8.2'
-            phpunit: '8.5'
+            phpunit: '8.5.41'
             wp: 'latest'
             coverage: true
     env:
@@ -83,6 +83,8 @@ jobs:
         run: npm run wp-env run tests-cli -- --env-cwd="wp-content/plugins/$(basename $(pwd))" composer install --no-interaction --no-progress
       - name: Update Composer Dependencies
         run: composer update --with-all-dependencies --no-interaction --no-progress
+      - name: Update PHPUnit Polyfills
+        run: composer update --dev yoast/phpunit-polyfills --with-dependencies
       - name: Install PHPUnit
         run: |
           if [ "${{ matrix.php }}" == "8.2" || [ "${{ matrix.php }}" == "8.3" ]; then
