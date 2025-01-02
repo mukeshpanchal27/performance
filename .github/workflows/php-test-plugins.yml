@@ -52,9 +52,9 @@ jobs:
             wp: '6.6'
           - php: '8.3'
             wp: 'trunk'
-            phpunit: '9.6'
+            phpunit: '8.5'
           - php: '8.2'
-            phpunit: '9.6'
+            phpunit: '8.5'
             wp: 'latest'
             coverage: true
     env:

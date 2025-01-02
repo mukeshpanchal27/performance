@@ -43,7 +43,7 @@
 	</groups>
 	<coverage>
 		<include>
-        	<directory suffix=".php">plugins</directory>
-    	</include>
+			<directory suffix=".php">plugins</directory>
+		</include>
 	</coverage>
 </phpunit>
