@@ -51,7 +51,6 @@ jobs:
             wp: '6.6'
           - php: '8.3'
             wp: 'trunk'
-            phpunit: '9.6'
           - php: '8.2'
             phpunit: '9.6'
             wp: 'latest'
@@ -88,7 +87,7 @@ jobs:
       - name: Install PHPUnit
         run: |
           if [ "${{ matrix.php }}" == "8.2" || [ "${{ matrix.php }}" == "8.3" ]; then
-            composer require --dev phpunit/phpunit:${{ matrix.phpunit }} --with-all-dependencies
+            composer update phpunit/phpunit:${{ matrix.phpunit }} --with-all-dependencies
           else
             composer require --dev phpunit/phpunit:${{ matrix.phpunit }}
           fi
