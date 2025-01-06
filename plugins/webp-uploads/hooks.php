@@ -512,23 +512,12 @@ add_action( 'delete_attachment', 'webp_uploads_remove_sources_files', 10, 1 );
 /**
  * Filters `wp_content_img_tag` to update images so that they use the preferred MIME type where possible.
  *
- * By default, this is `image/webp`, if the current attachment contains the targeted MIME
- * type. In the near future this will be filterable.
- *
- * Note that most of this function will not be needed for an eventual core implementation as it
- * would rely on `wp_filter_content_tags()`.
- *
- * @since 1.0.0
- * @since n.e.x.t Added the `$context` and `$attachment_id` parameters.
- *
- * @see wp_filter_content_tags()
- *
  * @param string $filtered_image Full img tag with attributes that will replace the source img tag.
  * @param string $context        Additional context, like the current filter name or the function name from where this was called.
  * @param int    $attachment_id  The image attachment ID. May be 0 in case the image is not an attachment.
  * @return string The content with the updated references to the images.
  */
-function webp_uploads_update_image_references( string $filtered_image, string $context, int $attachment_id ): string {
+function webp_uploads_filter_image_tag( string $filtered_image, string $context, int $attachment_id ): string {
 	// Bail early if request is not for the frontend.
 	if ( ! webp_uploads_in_frontend_body() ) {
 		return $filtered_image;
@@ -732,7 +721,7 @@ add_action( 'wp_head', 'webp_uploads_render_generator' );
  * @since 2.1.0
  */
 function webp_uploads_init(): void {
-	add_filter( 'wp_content_img_tag', webp_uploads_is_picture_element_enabled() ? 'webp_uploads_wrap_image_in_picture' : 'webp_uploads_update_image_references', 10, 3 );
+	add_filter( 'wp_content_img_tag', webp_uploads_is_picture_element_enabled() ? 'webp_uploads_wrap_image_in_picture' : 'webp_uploads_filter_image_tag', 10, 3 );
 }
 add_action( 'init', 'webp_uploads_init' );
 
