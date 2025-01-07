@@ -26,6 +26,18 @@
       "pluginPath": "/wordpress/wp-content/plugins/email-log"
     },
     {
+      "step": "installTheme",
+      "themeData": {
+        "resource": "url",
+        "url": "https://downloads.wordpress.org/theme/storefront.zip"
+      },
+      "ifAlreadyInstalled": "skip",
+      "options": {
+        "activate": true,
+        "importStarterContent": false
+      }
+    },
+    {
       "step": "login",
       "username": "admin"
     }
