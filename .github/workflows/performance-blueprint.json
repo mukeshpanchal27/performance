@@ -27,7 +27,7 @@
     },
     {
       "step": "installTheme",
-      "themeData": {
+      "themeZipFile": {
         "resource": "url",
         "url": "https://downloads.wordpress.org/theme/storefront.zip"
       },
