@@ -45,8 +45,6 @@ jobs:
         wp: [ 'latest' ]
         coverage: [false]
         include:
-          - php: '7.2'
-            wp: 'latest'
           - php: '7.4'
             wp: '6.6'
           - php: '8.3'
@@ -73,7 +71,7 @@ jobs:
       - name: Install WordPress
         run: |
           if [ "${{ matrix.coverage }}" == "true" ]; then
-            npm run wp-env start -- --xdebug=develop,coverage
+            npm run wp-env start -- --xdebug=coverage
           else
             npm run wp-env start
           fi
@@ -124,7 +122,7 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./single-site-reports
+          directory: ./single-site-reports
           flags: single
           name: ${{ matrix.php }}-single-site-coverage
           fail_ci_if_error: true
@@ -133,7 +131,7 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./multisite-reports
+          directory: ./multisite-reports
           flags: multisite
           name: ${{ matrix.php }}-multisite-coverage
           fail_ci_if_error: true
