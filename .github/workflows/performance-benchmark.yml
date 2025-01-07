@@ -1,0 +1,44 @@
+name: Performance Benchmark
+
+on:
+  push:
+    branches:
+      - smoke-testing
+  pull_request:
+    branches:
+      - trunk
+
+jobs:
+  performance:
+    name: 'Run tests'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup proper PHP version
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 7.4
+        tools: composer
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version-file: '.nvmrc'
+        cache: 'npm'
+
+    - name: Node install
+      run: npm ci
+
+    - name: Build
+      run: npm run build
+
+    - name: Run performance tests
+      uses: swissspidy/wp-performance-action@v2
+      with:
+        urls: |
+          /
+          /wp-admin/
+        blueprint: './.github/workflows/performance-blueprint.json'
+        iterations: 5
+        repetitions: 1
