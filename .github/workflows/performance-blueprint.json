@@ -1,58 +1,49 @@
 {
-	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
-	"plugins": [
-		"woocommerce",
-		"email-log"
-	],
-	"extraLibraries": [
-		"wp-cli"
-	],
-	"steps": [
-		{
-			"step": "defineWpConfigConsts",
-			"consts": {
-				"WP_DEBUG": true,
-				"WP_CACHE": true
-			}
-		},
-		{
-			"step": "activatePlugin",
-			"pluginName": "WooCommerce",
-			"pluginPath": "/wordpress/wp-content/plugins/woocommerce"
-		},
-		{
-			"step": "activatePlugin",
-			"pluginName": "Email Log",
-			"pluginPath": "/wordpress/wp-content/plugins/email-log"
-		},
-		{
-			"step": "activatePlugin",
-			"pluginName": "WooCommerce Product Vendors",
-			"pluginPath": "/wordpress/wp-content/plugins/woocommerce-product-vendors"
-		},
-		{
-			"step": "installTheme",
-			"themeZipFile": {
-				"resource": "url",
-				"url": "https://downloads.wordpress.org/theme/storefront.zip"
-			},
-			"ifAlreadyInstalled": "skip",
-			"options": {
-				"activate": true,
-				"importStarterContent": false
-			}
-		},
-		{
-			"step": "wp-cli",
-			"command": [
-				"term create wcpv_product_vendors 'Vendor' --porcelain",
-				"eval-file",
-				"php -r '$term_id = trim(fgets(STDIN)); echo \"term meta set {$term_id} vendor_data '{\\\"email\\\":\\\"sample@example.com\\\"}'\"';'"
-			]
-		},
-		{
-			"step": "login",
-			"username": "admin"
-		}
-	]
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "plugins": [
+    "woocommerce",
+    "email-log"
+  ],
+  "extraLibraries": [
+    "wp-cli"
+  ],
+  "steps": [
+    {
+      "step": "defineWpConfigConsts",
+      "consts": {
+        "WP_DEBUG": true,
+        "WP_CACHE": true
+      }
+    },
+    {
+      "step": "activatePlugin",
+      "pluginName": "WooCommerce",
+      "pluginPath": "/wordpress/wp-content/plugins/woocommerce"
+    },
+    {
+      "step": "activatePlugin",
+      "pluginName": "Email Log",
+      "pluginPath": "/wordpress/wp-content/plugins/email-log"
+    },
+    {
+      "step": "installTheme",
+      "themeZipFile": {
+        "resource": "wordpress.org/themes",
+        "slug": "storefront"
+      },
+      "ifAlreadyInstalled": "skip",
+      "options": {
+        "activate": true,
+        "importStarterContent": false
+      }
+    },
+    {
+      "step": "runPHP",
+      "code": "<?php\nrequire '/wordpress/wp-load.php';\n\n// Create the 'Vendor' term under 'category' taxonomy\n$term = wp_insert_term('Vendor', 'category');\n\n// Check if the term was created successfully\nif (is_wp_error($term)) {\n    echo 'Error creating term: ' . $term->get_error_message();\n} else {\n    $term_id = $term['term_id'];\n    // Set the term meta for 'vendor_data'\n    update_term_meta($term_id, 'vendor_data', json_encode(['email' => 'sample@example.com']));\n    echo 'Term created and meta data set successfully.';\n}\n"
+    },
+    {
+      "step": "login",
+      "username": "admin"
+    }
+  ]
 }
