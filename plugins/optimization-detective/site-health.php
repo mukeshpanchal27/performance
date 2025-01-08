@@ -26,7 +26,6 @@ function od_optimization_detective_add_rest_api_test( array $tests ): array {
 
 	return $tests;
 }
-add_filter( 'site_status_tests', 'od_optimization_detective_add_rest_api_test' );
 
 /**
  * Tests availability of the Optimization Detective REST API endpoint.
@@ -187,7 +186,3 @@ function od_rest_api_health_check_plugin_activation(): void {
 		}
 	);
 }
-
-// Hook for the scheduled REST API health check.
-add_action( 'od_rest_api_health_check_event', 'od_run_scheduled_rest_api_health_check' );
-add_action( 'after_plugin_row_meta', 'od_rest_api_health_check_admin_notice', 30 );
