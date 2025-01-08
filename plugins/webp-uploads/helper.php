@@ -28,7 +28,7 @@ function webp_uploads_get_upload_image_mime_transforms(): array {
 
 	$default_transforms = array(
 		'image/jpeg' => array( 'image/' . $output_format ),
-		'image/webp' => array( 'image/webp' ),
+		'image/webp' => array( 'image/' . $output_format ),
 		'image/avif' => array( 'image/avif' ),
 		'image/png'  => array( 'image/' . $output_format ),
 	);
@@ -414,7 +414,7 @@ function webp_uploads_is_fallback_enabled(): bool {
 /**
  * Checks if the `perflab_generate_all_fallback_sizes` option is enabled.
  *
- * @since n.e.x.t
+ * @since 2.4.0
  *
  * @return bool Whether the option is enabled. Default is false.
  */
