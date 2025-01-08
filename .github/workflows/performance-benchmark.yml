@@ -37,5 +37,5 @@ jobs:
           /
           /wp-admin/
         blueprint: './.github/workflows/performance-blueprint.json'
-        iterations: 10
+        iterations: 5
         repetitions: 1
