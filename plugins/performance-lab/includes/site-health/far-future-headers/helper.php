@@ -52,6 +52,7 @@ function perflab_ffh_assets_test(): array {
 	 * @param string[] $assets List of asset URLs to check.
 	 */
 	$assets = apply_filters( 'perflab_ffh_assets_to_check', $assets );
+	$assets = array_filter( (array) $assets, 'is_string' );
 
 	// Check if far-future headers are enabled for all assets.
 	$results = perflab_ffh_check_assets( $assets );
