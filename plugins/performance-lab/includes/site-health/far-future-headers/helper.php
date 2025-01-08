@@ -109,7 +109,7 @@ function perflab_ffh_check_assets( array $assets ): array {
 		}
 
 		$headers = wp_remote_retrieve_headers( $response );
-		if ( ! is_object( $headers ) ) {
+		if ( ! is_object( $headers ) && 0 === count( $headers ) ) {
 			// No valid headers retrieved.
 			$final_status   = 'recommended';
 			$fail_details[] = array(
@@ -163,10 +163,10 @@ function perflab_ffh_check_assets( array $assets ): array {
  *
  * @since n.e.x.t
  *
- * @param WpOrg\Requests\Utility\CaseInsensitiveDictionary $headers Response headers.
+ * @param WpOrg\Requests\Utility\CaseInsensitiveDictionary|array<string, string|array<string>> $headers Response headers.
  * @return array{passed: bool, reason: string}|false Detailed result. If passed=false, reason explains why it failed and false if no headers found.
  */
-function perflab_ffh_check_headers( WpOrg\Requests\Utility\CaseInsensitiveDictionary $headers ) {
+function perflab_ffh_check_headers( $headers ) {
 	/**
 	 * Filters the threshold for far-future headers.
 	 *
@@ -239,11 +239,13 @@ function perflab_ffh_check_headers( WpOrg\Requests\Utility\CaseInsensitiveDictio
 /**
  * Attempt a conditional request with ETag/Last-Modified.
  *
- * @param string                                           $url     The asset URL.
- * @param WpOrg\Requests\Utility\CaseInsensitiveDictionary $headers The initial response headers.
+ * @since n.e.x.t
+ *
+ * @param string                                                                               $url     The asset URL.
+ * @param WpOrg\Requests\Utility\CaseInsensitiveDictionary|array<string, string|array<string>> $headers The initial response headers.
  * @return bool True if a 304 response was received.
  */
-function perflab_ffh_try_conditional_request( string $url, WpOrg\Requests\Utility\CaseInsensitiveDictionary $headers ): bool {
+function perflab_ffh_try_conditional_request( string $url, $headers ): bool {
 	$etag          = isset( $headers['etag'] ) ? $headers['etag'] : '';
 	$last_modified = isset( $headers['last-modified'] ) ? $headers['last-modified'] : '';
 
