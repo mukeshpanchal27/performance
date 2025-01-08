@@ -215,55 +215,55 @@ final class Embed_Optimizer_Tag_Visitor {
 	 * @return array<non-empty-string> Array of URLs to preconnect to.
 	 */
 	private function get_preconnect_urls( OD_HTML_Tag_Processor $processor ): array {
-		$preconnect_hrefs = array();
-		$has_class        = static function ( string $wanted_class ) use ( $processor ): bool {
+		$urls      = array();
+		$has_class = static function ( string $wanted_class ) use ( $processor ): bool {
 			return true === $processor->has_class( $wanted_class );
 		};
 
 		if ( $has_class( 'wp-block-embed-youtube' ) ) {
-			$preconnect_hrefs[] = 'https://www.youtube.com';
-			$preconnect_hrefs[] = 'https://i.ytimg.com';
+			$urls[] = 'https://www.youtube.com';
+			$urls[] = 'https://i.ytimg.com';
 		} elseif ( $has_class( 'wp-block-embed-twitter' ) ) {
-			$preconnect_hrefs[] = 'https://syndication.twitter.com';
-			$preconnect_hrefs[] = 'https://pbs.twimg.com';
+			$urls[] = 'https://syndication.twitter.com';
+			$urls[] = 'https://pbs.twimg.com';
 		} elseif ( $has_class( 'wp-block-embed-vimeo' ) ) {
-			$preconnect_hrefs[] = 'https://player.vimeo.com';
-			$preconnect_hrefs[] = 'https://f.vimeocdn.com';
-			$preconnect_hrefs[] = 'https://i.vimeocdn.com';
+			$urls[] = 'https://player.vimeo.com';
+			$urls[] = 'https://f.vimeocdn.com';
+			$urls[] = 'https://i.vimeocdn.com';
 		} elseif ( $has_class( 'wp-block-embed-spotify' ) ) {
-			$preconnect_hrefs[] = 'https://apresolve.spotify.com';
-			$preconnect_hrefs[] = 'https://embed-cdn.spotifycdn.com';
-			$preconnect_hrefs[] = 'https://encore.scdn.co';
-			$preconnect_hrefs[] = 'https://i.scdn.co';
+			$urls[] = 'https://apresolve.spotify.com';
+			$urls[] = 'https://embed-cdn.spotifycdn.com';
+			$urls[] = 'https://encore.scdn.co';
+			$urls[] = 'https://i.scdn.co';
 		} elseif ( $has_class( 'wp-block-embed-videopress' ) || $has_class( 'wp-block-embed-wordpress-tv' ) ) {
-			$preconnect_hrefs[] = 'https://video.wordpress.com';
-			$preconnect_hrefs[] = 'https://public-api.wordpress.com';
-			$preconnect_hrefs[] = 'https://videos.files.wordpress.com';
-			$preconnect_hrefs[] = 'https://v0.wordpress.com'; // This does not appear to be a load-balanced domain since v1.wordpress.com is not valid.
+			$urls[] = 'https://video.wordpress.com';
+			$urls[] = 'https://public-api.wordpress.com';
+			$urls[] = 'https://videos.files.wordpress.com';
+			$urls[] = 'https://v0.wordpress.com'; // This does not appear to be a load-balanced domain since v1.wordpress.com is not valid.
 		} elseif ( $has_class( 'wp-block-embed-instagram' ) ) {
-			$preconnect_hrefs[] = 'https://www.instagram.com';
-			$preconnect_hrefs[] = 'https://static.cdninstagram.com';
-			$preconnect_hrefs[] = 'https://scontent.cdninstagram.com';
+			$urls[] = 'https://www.instagram.com';
+			$urls[] = 'https://static.cdninstagram.com';
+			$urls[] = 'https://scontent.cdninstagram.com';
 		} elseif ( $has_class( 'wp-block-embed-tiktok' ) ) {
-			$preconnect_hrefs[] = 'https://www.tiktok.com';
+			$urls[] = 'https://www.tiktok.com';
 			// Note: The other domains used for TikTok embeds include https://lf16-tiktok-web.tiktokcdn-us.com,
 			// https://lf16-cdn-tos.tiktokcdn-us.com, and https://lf16-tiktok-common.tiktokcdn-us.com among others
 			// which either appear to be geo-targeted ('-us') _or_ load-balanced ('lf16'). So these are not added
 			// to the preconnected hosts.
 		} elseif ( $has_class( 'wp-block-embed-amazon' ) ) {
-			$preconnect_hrefs[] = 'https://read.amazon.com';
-			$preconnect_hrefs[] = 'https://m.media-amazon.com';
+			$urls[] = 'https://read.amazon.com';
+			$urls[] = 'https://m.media-amazon.com';
 		} elseif ( $has_class( 'wp-block-embed-soundcloud' ) ) {
-			$preconnect_hrefs[] = 'https://w.soundcloud.com';
-			$preconnect_hrefs[] = 'https://widget.sndcdn.com';
+			$urls[] = 'https://w.soundcloud.com';
+			$urls[] = 'https://widget.sndcdn.com';
 			// Note: There is also https://i1.sndcdn.com which is for the album art, but the '1' indicates it may be geotargeted/load-balanced.
 		} elseif ( $has_class( 'wp-block-embed-pinterest' ) ) {
-			$preconnect_hrefs[] = 'https://assets.pinterest.com';
-			$preconnect_hrefs[] = 'https://widgets.pinterest.com';
-			$preconnect_hrefs[] = 'https://i.pinimg.com';
+			$urls[] = 'https://assets.pinterest.com';
+			$urls[] = 'https://widgets.pinterest.com';
+			$urls[] = 'https://i.pinimg.com';
 		}
 
-		return $preconnect_hrefs;
+		return $urls;
 	}
 
 	/**
