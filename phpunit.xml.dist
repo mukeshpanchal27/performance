@@ -41,4 +41,9 @@
 			<group>ms-required</group>
 		</exclude>
 	</groups>
+	<coverage>
+		<include>
+			<directory suffix=".php">plugins</directory>
+		</include>
+	</coverage>
 </phpunit>
