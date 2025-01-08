@@ -197,26 +197,24 @@ final class Embed_Optimizer_Tag_Visitor {
 	}
 
 	/**
-	 * Gets preconnect URLs based on embed type
+	 * Gets preconnect URLs based on embed type.
+	 *
+	 * The following embeds have been chosen for optimization due to their relative popularity among all embed types.
+	 * The list of hosts being preconnected to was obtained by inserting an embed into a post and then looking
+	 * at the network log on the frontend as the embed renders. Each should include the host of the iframe src
+	 * as well as URLs for assets used by the embed, _if_ the URL looks like it is not geotargeted (e.g. '-us')
+	 * or load-balanced (e.g. 's0.example.com'). For the load balancing case, attempt to load the asset by
+	 * incrementing the number appearing in the subdomain (e.g. s1.example.com). If the asset still loads, then
+	 * it is a likely case of a load balancing domain name which cannot be safely preconnected since it could
+	 * not end up being the load balanced domain used for the embed. Lastly, these domains are only for the URLs
+	 * for GET requests, as POST requests are not likely to be part of the critical rendering path.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param OD_HTML_Tag_Processor $processor Processor.
+	 * @param OD_HTML_Tag_Processor $processor Processor, with the cursor currently at an embed block.
 	 * @return array<non-empty-string> Array of URLs to preconnect to.
 	 */
 	private function get_preconnect_urls( OD_HTML_Tag_Processor $processor ): array {
-		/*
-		 * The following embeds have been chosen for optimization due to their relative popularity among all embed types.
-		 * See <https://colab.sandbox.google.com/drive/1nSpg3qoCLY-cBTV2zOUkgUCU7R7X2f_R?resourcekey=0-MgT7Ur0pT__vw-5_AHjgWQ#scrollTo=utZv59sXzXvS>.
-		 * The list of hosts being preconnected to was obtained by inserting an embed into a post and then looking
-		 * at the network log on the frontend as the embed renders. Each should include the host of the iframe src
-		 * as well as URLs for assets used by the embed, _if_ the URL looks like it is not geotargeted (e.g. '-us')
-		 * or load-balanced (e.g. 's0.example.com'). For the load balancing case, attempt to load the asset by
-		 * incrementing the number appearing in the subdomain (e.g. s1.example.com). If the asset still loads, then
-		 * it is a likely case of a load balancing domain name which cannot be safely preconnected since it could
-		 * not end up being the load balanced domain used for the embed. Lastly, these domains are only for the URLs
-		 * for GET requests, as POST requests are not likely to be part of the critical rendering path.
-		 */
 		$preconnect_hrefs = array();
 		$has_class        = static function ( string $wanted_class ) use ( $processor ): bool {
 			return true === $processor->has_class( $wanted_class );
@@ -279,8 +277,7 @@ final class Embed_Optimizer_Tag_Visitor {
 		$processor           = $context->processor;
 		$embed_wrapper_xpath = self::get_embed_wrapper_xpath( $processor->get_xpath() );
 
-		$preconnect_hrefs = $this->get_preconnect_urls( $processor );
-		foreach ( $preconnect_hrefs as $preconnect_href ) {
+		foreach ( $this->get_preconnect_urls( $processor ) as $preconnect_url ) {
 			foreach ( $context->url_metric_group_collection as $group ) {
 				if ( $group->get_element_max_intersection_ratio( $embed_wrapper_xpath ) < PHP_FLOAT_EPSILON ) {
 					continue;
@@ -289,7 +286,7 @@ final class Embed_Optimizer_Tag_Visitor {
 				$context->link_collection->add_link(
 					array(
 						'rel'  => 'preconnect',
-						'href' => $preconnect_href,
+						'href' => $preconnect_url,
 					),
 					$group->get_minimum_viewport_width(),
 					$group->get_maximum_viewport_width()
