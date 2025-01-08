@@ -1,7 +1,6 @@
 name: Performance Benchmark
 
 on:
-  push:
   pull_request:
     branches:
       - trunk
@@ -38,5 +37,5 @@ jobs:
           /
           /wp-admin/
         blueprint: './.github/workflows/performance-blueprint.json'
-        iterations: 5
+        iterations: 10
         repetitions: 1
