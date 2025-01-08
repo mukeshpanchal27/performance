@@ -2,8 +2,6 @@ name: Performance Benchmark
 
 on:
   push:
-    branches:
-      - smoke-testing
   pull_request:
     branches:
       - trunk
