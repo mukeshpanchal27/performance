@@ -1,45 +1,58 @@
 {
-  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
-  "plugins": [
-    "woocommerce",
-    "email-log"
-  ],
-  "extraLibraries": [
-    "wp-cli"
-  ],
-  "steps": [
-    {
-      "step": "defineWpConfigConsts",
-      "consts": {
-        "WP_DEBUG": true,
-        "WP_CACHE": true
-      }
-    },
-    {
-      "step": "activatePlugin",
-      "pluginName": "WooCommerce",
-      "pluginPath": "/wordpress/wp-content/plugins/woocommerce"
-    },
-    {
-      "step": "activatePlugin",
-      "pluginName": "Email Log",
-      "pluginPath": "/wordpress/wp-content/plugins/email-log"
-    },
-    {
-      "step": "installTheme",
-      "themeZipFile": {
-        "resource": "url",
-        "url": "https://downloads.wordpress.org/theme/storefront.zip"
-      },
-      "ifAlreadyInstalled": "skip",
-      "options": {
-        "activate": true,
-        "importStarterContent": false
-      }
-    },
-    {
-      "step": "login",
-      "username": "admin"
-    }
-  ]
+	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+	"plugins": [
+		"woocommerce",
+		"email-log"
+	],
+	"extraLibraries": [
+		"wp-cli"
+	],
+	"steps": [
+		{
+			"step": "defineWpConfigConsts",
+			"consts": {
+				"WP_DEBUG": true,
+				"WP_CACHE": true
+			}
+		},
+		{
+			"step": "activatePlugin",
+			"pluginName": "WooCommerce",
+			"pluginPath": "/wordpress/wp-content/plugins/woocommerce"
+		},
+		{
+			"step": "activatePlugin",
+			"pluginName": "Email Log",
+			"pluginPath": "/wordpress/wp-content/plugins/email-log"
+		},
+		{
+			"step": "activatePlugin",
+			"pluginName": "WooCommerce Product Vendors",
+			"pluginPath": "/wordpress/wp-content/plugins/woocommerce-product-vendors"
+		},
+		{
+			"step": "installTheme",
+			"themeZipFile": {
+				"resource": "url",
+				"url": "https://downloads.wordpress.org/theme/storefront.zip"
+			},
+			"ifAlreadyInstalled": "skip",
+			"options": {
+				"activate": true,
+				"importStarterContent": false
+			}
+		},
+		{
+			"step": "wp-cli",
+			"command": [
+				"term create wcpv_product_vendors 'Vendor' --porcelain",
+				"eval-file",
+				"php -r '$term_id = trim(fgets(STDIN)); echo \"term meta set {$term_id} vendor_data '{\\\"email\\\":\\\"sample@example.com\\\"}'\"';'"
+			]
+		},
+		{
+			"step": "login",
+			"username": "admin"
+		}
+	]
 }
