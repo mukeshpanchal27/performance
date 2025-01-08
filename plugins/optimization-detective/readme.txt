@@ -17,7 +17,7 @@ This plugin is a dependency which does not provide end-user functionality on its
 
 Your site must have the **REST API accessible** to frontend visitors since this is how metrics are collected about how a page should be optimized.
 
-Please refer to the [full plugin documentation](https://github.com/WordPress/performance/blob/trunk/plugins/optimization-detective/README.md) for background information, the technical foundation, filter/action hooks, and use cases/examples.
+Please refer to the [full plugin documentation](https://github.com/WordPress/performance/blob/trunk/plugins/optimization-detective/README.md) for background information, the technical foundation, [filter/action hooks](https://github.com/WordPress/performance/blob/trunk/plugins/optimization-detective/docs/hooks.md), and [extensions](https://github.com/WordPress/performance/blob/trunk/plugins/optimization-detective/docs/extensions.md) that show use cases and examples.
 
 == Installation ==
 
