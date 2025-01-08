@@ -34,7 +34,7 @@ jobs:
       run: npm run build
 
     - name: Run performance tests
-      uses: swissspidy/wp-performance-action@main
+      uses: swissspidy/wp-performance-action@v2
       with:
         urls: |
           /
