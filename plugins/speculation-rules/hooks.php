@@ -19,6 +19,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  */
 function plsr_print_speculation_rules(): void {
+	// Skip speculative loading for logged-in users.
+	if ( is_user_logged_in() ) {
+		return;
+	}
+
 	// Skip speculative loading for sites without pretty permalinks, unless explicitly enabled.
 	if ( ! (bool) get_option( 'permalink_structure' ) ) {
 		/**
