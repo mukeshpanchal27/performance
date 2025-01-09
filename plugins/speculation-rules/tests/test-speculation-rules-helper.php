@@ -97,6 +97,31 @@ class Test_Speculation_Rules_Helper extends WP_UnitTestCase {
 	/**
 	 * @covers ::plsr_get_speculation_rules
 	 */
+	public function test_plsr_get_speculation_rules_href_exclude_paths_with_pretty_permalinks(): void {
+		update_option( 'permalink_structure', '/%year%/%monthnum%/%day%/%postname%/' );
+
+		$rules              = plsr_get_speculation_rules();
+		$href_exclude_paths = $rules['prerender'][0]['where']['and'][1]['not']['href_matches'];
+
+		$this->assertSameSets(
+			array(
+				'/wp-login.php',
+				'/wp-admin/*',
+				'/wp-content/uploads/*',
+				'/wp-content/*',
+				'/wp-content/plugins/*',
+				'/wp-content/themes/stylesheet/*',
+				'/wp-content/themes/template/*',
+				'/*\\?(.+)',
+			),
+			$href_exclude_paths,
+			'Snapshot: ' . var_export( $href_exclude_paths, true )
+		);
+	}
+
+	/**
+	 * @covers ::plsr_get_speculation_rules
+	 */
 	public function test_plsr_get_speculation_rules_href_exclude_paths_with_mode(): void {
 		// Add filter that adds an exclusion only if the mode is 'prerender'.
 		add_filter(
