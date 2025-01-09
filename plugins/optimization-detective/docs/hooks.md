@@ -1,3 +1,5 @@
+[Optimization Detective Documentation](./README.md):
+
 # Optimization Detective Hooks
 
 ## Actions

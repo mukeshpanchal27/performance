@@ -1,3 +1,5 @@
+[Optimization Detective Documentation](./README.md):
+
 # Optimization Detective Extensions
 
 The Optimization Detective plugin is a designed as a dependency for other plugins to extend to implement actual optimizations. Here you can find use cases and examples for how Optimization Detective is extended as well as a list of available extensions.

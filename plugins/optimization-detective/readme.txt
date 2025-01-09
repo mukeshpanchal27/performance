@@ -17,21 +17,23 @@ This plugin is a dependency which does not provide end-user functionality on its
 
 Your site must have the **REST API accessible** to frontend visitors since this is how metrics are collected about how a page should be optimized.
 
-Please refer to the [full plugin documentation](https://github.com/WordPress/performance/blob/trunk/plugins/optimization-detective/README.md) for background information, the technical foundation, [filter/action hooks](https://github.com/WordPress/performance/blob/trunk/plugins/optimization-detective/docs/hooks.md), and [extensions](https://github.com/WordPress/performance/blob/trunk/plugins/optimization-detective/docs/extensions.md) that show use cases and examples.
+Please refer to the [full plugin documentation](https://github.com/WordPress/performance/blob/trunk/plugins/optimization-detective/docs/README.md) for a [technical introduction](https://github.com/WordPress/performance/blob/trunk/plugins/optimization-detective/docs/introduction.md), [filter/action hooks](https://github.com/WordPress/performance/blob/trunk/plugins/optimization-detective/docs/hooks.md), and [extensions](https://github.com/WordPress/performance/blob/trunk/plugins/optimization-detective/docs/extensions.md) that show use cases and examples.
 
 == Installation ==
 
-= Installation from within WordPress =
+= Installation from the directory within WordPress =
 
-1. Visit **Plugins > Add New**.
+1. Visit **Plugins > Add New** in the WordPress Admin.
 2. Search for **Optimization Detective**.
 3. Install and activate the **Optimization Detective** plugin.
 
 = Manual installation =
 
-1. Upload the entire `optimization-detective` folder to the `/wp-content/plugins/` directory.
-2. Visit **Plugins**.
-3. Activate the **Optimization Detective** plugin.
+1. Download the plugin [ZIP from WordPress.org](https://downloads.wordpress.org/plugin/optimization-detective.zip) or, after following the [Getting Started instructions](https://make.wordpress.org/performance/handbook/performance-lab/), create a ZIP build from a clone of the [GitHub repo](https://github.com/WordPress/performance) via `npm run build:plugin:optimization-detective --env zip=true`.
+2. Visit **Plugins > Add New Plugin** in the WordPress Admin.
+3. Click **Upload Plugin**
+4. Select the `optimization-detective.zip` file on your system from step 1 and click **Install Now**.
+5. Click the **Active Plugin** button.
 
 == Frequently Asked Questions ==
 

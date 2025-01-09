@@ -1,16 +1,6 @@
-# [Optimization Detective](https://wordpress.org/plugins/optimization-detective/)
+[Optimization Detective Documentation](./README.md):
 
-![Performance Lab plugin banner with icon](https://github.com/WordPress/performance/assets/10103365/99d37ba5-27e3-47ea-8ab8-48de75ee69bf)
-
-Provides an API for leveraging real user metrics to detect optimizations to apply on the frontend to improve page performance.
-
-## Description
-
-This plugin captures real user metrics about what elements are displayed on the page across a variety of device form factors (e.g. desktop, tablet, and phone) in order to apply loading optimizations which are not possible with WordPress’s current server-side heuristics.
-
-This plugin is a dependency which does not provide end-user functionality on its own. For that, please install the dependent plugin [Image Prioritizer](https://wordpress.org/plugins/image-prioritizer/) or [Embed Optimizer](https://wordpress.org/plugins/embed-optimizer/) (among [others](https://github.com/WordPress/performance/labels/%5BPlugin%5D%20Optimization%20Detective) to come from the WordPress Core Performance team). There are currently **no settings** and no user interface for this plugin since it is designed to work without any configuration.
-
-Your site must have the **REST API accessible** to unauthenticated frontend visitors since this is how metrics are collected about how a page should be optimized.
+# Optimization Detective Introduction
 
 ## Background
 
@@ -34,51 +24,3 @@ URL Metrics have a “freshness TTL” after which they will be stale and the Ja
 👉 **Note:** This plugin optimizes pages for actual visitors, and it depends on visitors to optimize pages (since URL Metrics need to be collected). As such, you won't see optimizations applied immediately after activating the plugin (and dependent plugin(s)). And since administrator users are not normal visitors typically, optimizations are not applied for admins by default (but this can be overridden with the `od_can_optimize_response` filter below). URL Metrics are not collected for administrators because it is likely that additional elements will be present on the page which are not also shown to non-administrators, meaning the URL Metrics could not reliably be reused between them.
 
 When the `WP_DEBUG` constant is enabled, additional logging for Optimization Detective is added to the browser console.
-
-## Extensions, Use Cases, and Examples
-
-See [extensions documentation](./docs/extensions.md). 
-
-## Hooks
-
-See [hooks documentation](./docs/hooks.md).
-
-## Installation
-
-### Installation from within WordPress
-
-1. Visit **Plugins > Add New** in the WordPress Admin.
-2. Search for **Optimization Detective**.
-3. Install and activate the **Optimization Detective** plugin.
-
-### Manual installation
-
-1. Download the plugin [ZIP from WordPress.org](https://downloads.wordpress.org/plugin/optimization-detective.zip) or, after following the [Getting Started instructions](https://make.wordpress.org/performance/handbook/performance-lab/), create a ZIP build from this repo via `npm run build:plugin:optimization-detective --env zip=true`.
-2. Visit **Plugins > Add New Plugin** in the WordPress Admin.
-3. Click **Upload Plugin**
-4. Select the `optimization-detective.zip` file on your system from step 1 and click **Install Now**.
-5. Click the **Active Plugin** button.
-
-## Feedback
-
-Feedback is encouraged and much appreciated, especially since this plugin may contain future WordPress core features. If you have suggestions or requests for new features, you can [submit them as an issue in the WordPress Performance Team's GitHub repository](https://github.com/WordPress/performance/issues/new/choose). 
-
-## Support
-
-If you need help with troubleshooting or have a question about the plugin, please [create a new topic on our support forum](https://wordpress.org/support/plugin/optimization-detective/#new-topic-0).
-
-## Contributing
-
-Contributions are always welcome! Learn more about how to get involved in the [Core Performance Team Handbook](https://make.wordpress.org/performance/handbook/get-involved/).
-
-The [plugin source code](https://github.com/WordPress/performance/tree/trunk/plugins/optimization-detective) is located in the [WordPress/performance](https://github.com/WordPress/performance) repo on GitHub.
-
-## Security
-
-The Performance team and WordPress community take security bugs seriously. We appreciate your efforts to responsibly disclose your findings, and will make every effort to acknowledge your contributions.
-
-To report a security issue, please visit the [WordPress HackerOne](https://hackerone.com/wordpress) program.
-
-## Changelog
-
-Please see the [WordPress.org directory listing](https://wordpress.org/plugins/optimization-detective/) for the [changelog](https://wordpress.org/plugins/optimization-detective/#developers).
