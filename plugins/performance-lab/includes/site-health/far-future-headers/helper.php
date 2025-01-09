@@ -175,16 +175,15 @@ function perflab_ffh_check_headers( $headers ) {
 	 */
 	$threshold = apply_filters( 'perflab_far_future_headers_threshold', YEAR_IN_SECONDS );
 
-	$cache_control = isset( $headers['cache-control'] ) ? $headers['cache-control'] : '';
-	$expires       = isset( $headers['expires'] ) ? $headers['expires'] : '';
+	$cache_control = $headers['cache-control'] ?? '';
+	$expires       = $headers['expires'] ?? '';
 
 	// Check Cache-Control header for max-age.
 	$max_age = 0;
 	if ( '' !== $cache_control ) {
 		// There can be multiple cache-control headers, we only care about max-age.
-		$controls = is_array( $cache_control ) ? $cache_control : array( $cache_control );
-		foreach ( $controls as $control ) {
-			if ( (bool) preg_match( '/max-age\s*=\s*(\d+)/', $control, $matches ) ) {
+		foreach ( (array) $cache_control as $control ) {
+			if ( 1 === preg_match( '/max-age\s*=\s*(\d+)/', $control, $matches ) ) {
 				$max_age = (int) $matches[1];
 				break;
 			}
@@ -202,7 +201,7 @@ function perflab_ffh_check_headers( $headers ) {
 	// If max-age is too low or not present, check Expires.
 	if ( is_string( $expires ) && '' !== $expires ) {
 		$expires_time = strtotime( $expires );
-		if ( (bool) $expires_time && ( $expires_time - time() ) >= $threshold ) {
+		if ( is_int( $expires_time ) && ( $expires_time - time() ) >= $threshold ) {
 			// Good - Expires far in the future.
 			return array(
 				'passed' => true,
@@ -211,7 +210,7 @@ function perflab_ffh_check_headers( $headers ) {
 		}
 
 		// Expires header exists but not far enough in the future.
-		if ( $max_age > 0 && $max_age < $threshold ) {
+		if ( $max_age > 0 ) {
 			return array(
 				'passed' => false,
 				'reason' => sprintf(
