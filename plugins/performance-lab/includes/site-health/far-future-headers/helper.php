@@ -96,7 +96,7 @@ function perflab_ffh_check_assets( array $assets ): array {
 
 		// Extract filename from the URL.
 		$path_info = pathinfo( (string) wp_parse_url( $asset, PHP_URL_PATH ) );
-		$filename  = isset( $path_info['basename'] ) ? $path_info['basename'] : basename( $asset );
+		$filename  = $path_info['basename'] ?? basename( $asset );
 
 		if ( is_wp_error( $response ) ) {
 			// Can't determine headers if request failed, consider it a fail.
@@ -129,14 +129,13 @@ function perflab_ffh_check_assets( array $assets ): array {
 		if ( false === $check ) {
 			// Only if no far-future headers at all, we try conditional request.
 			$conditional_pass = perflab_ffh_try_conditional_request( $asset, $headers );
+			$final_status     = 'recommended';
 			if ( ! $conditional_pass ) {
-				$final_status   = 'recommended';
 				$fail_details[] = array(
 					'filename' => $filename,
 					'reason'   => __( 'No far-future headers and no conditional caching', 'performance-lab' ),
 				);
 			} else {
-				$final_status   = 'recommended';
 				$fail_details[] = array(
 					'filename' => $filename,
 					'reason'   => __( 'No far-future headers but conditionally cached', 'performance-lab' ),
