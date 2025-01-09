@@ -215,12 +215,22 @@ function perflab_ffh_check_headers( $headers ) {
 		if ( $max_age > 0 && $max_age < $threshold ) {
 			return array(
 				'passed' => false,
-				'reason' => __( 'max-age below threshold', 'performance-lab' ),
+				'reason' => sprintf(
+					/* translators: 1: actual max-age value in seconds, 2: threshold in seconds */
+					__( 'max-age below threshold (actual: %1$s seconds, threshold: %2$s seconds)', 'performance-lab' ),
+					$max_age,
+					$threshold
+				),
 			);
 		}
 		return array(
 			'passed' => false,
-			'reason' => __( 'expires below threshold', 'performance-lab' ),
+			'reason' => sprintf(
+				/* translators: 1: actual Expires header value, 2: threshold in seconds */
+				__( 'expires below threshold (actual: %1$s, threshold: %2$s seconds)', 'performance-lab' ),
+				$expires,
+				$threshold
+			),
 		);
 	}
 
@@ -231,7 +241,12 @@ function perflab_ffh_check_headers( $headers ) {
 		// max-age was present but below threshold and no expires.
 		return array(
 			'passed' => false,
-			'reason' => __( 'max-age below threshold', 'performance-lab' ),
+			'reason' => sprintf(
+				/* translators: 1: actual max-age value in seconds, 2: threshold in seconds */
+				__( 'max-age below threshold (actual: %1$s seconds, threshold: %2$s seconds)', 'performance-lab' ),
+				$max_age,
+				$threshold
+			),
 		);
 	}
 }
