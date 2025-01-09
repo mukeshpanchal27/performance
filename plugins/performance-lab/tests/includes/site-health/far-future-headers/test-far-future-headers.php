@@ -91,8 +91,8 @@ class Test_Far_Future_Headers extends WP_UnitTestCase {
 		);
 
 		$this->assertEquals( 'recommended', $result['final_status'] );
-		$this->assertEquals( 'max-age below threshold', $result['details'][0]['reason'] );
-		$this->assertEquals( 'expires below threshold', $result['details'][1]['reason'] );
+		$this->assertStringContainsString( 'max-age below threshold (actual:', $result['details'][0]['reason'] );
+		$this->assertStringContainsString( 'expires below threshold (actual:', $result['details'][1]['reason'] );
 		$this->assertEquals( 'No far-future headers but conditionally cached', $result['details'][2]['reason'] );
 		$this->assertEquals( 'No far-future headers and no conditional caching', $result['details'][3]['reason'] );
 	}
@@ -135,9 +135,9 @@ class Test_Far_Future_Headers extends WP_UnitTestCase {
 		);
 
 		$this->assertEquals( 'recommended', $result['final_status'] );
-		$this->assertEquals( 'max-age below threshold', $result['details'][0]['reason'] );
-		$this->assertEquals( 'expires below threshold', $result['details'][1]['reason'] );
-		$this->assertEquals( 'max-age below threshold', $result['details'][2]['reason'] );
+		$this->assertStringContainsString( 'max-age below threshold (actual:', $result['details'][0]['reason'] );
+		$this->assertStringContainsString( 'expires below threshold (actual:', $result['details'][1]['reason'] );
+		$this->assertStringContainsString( 'max-age below threshold (actual:', $result['details'][2]['reason'] );
 	}
 
 	/**
