@@ -80,6 +80,10 @@ function od_debug_add_admin_bar_menu_item( WP_Admin_Bar &$wp_admin_bar ): void {
 		return;
 	}
 
+	if ( ! is_admin_bar_showing() ) {
+		return;
+	}
+
 	if ( is_admin() ) {
 		return;
 	}
@@ -103,7 +107,7 @@ add_action( 'admin_bar_menu', 'od_debug_add_admin_bar_menu_item', 100 );
  * Adds inline JS & CSS for debugging.
  */
 function od_debug_add_assets(): void {
-	if ( ! od_can_optimize_response() ) {
+	if ( ! current_user_can( 'customize' ) && ! wp_is_development_mode( 'plugin' ) ) {
 		return;
 	}
 
