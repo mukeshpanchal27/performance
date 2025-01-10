@@ -18,12 +18,19 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param OD_Tag_Visitor_Registry $registry Tag visitor registry.
  */
 function od_debug_register_tag_visitors( OD_Tag_Visitor_Registry $registry ): void {
+	if ( ! current_user_can( 'customize' ) && ! wp_is_development_mode( 'plugin' ) ) {
+		return;
+	}
+
+	if ( ! is_admin_bar_showing() ) {
+		return;
+	}
+
 	$debug_visitor = new Optimization_Detective_Debug_Tag_Visitor();
 	$registry->register( 'optimization-detective/debug', $debug_visitor );
 }
 
 add_action( 'od_register_tag_visitors', 'od_debug_register_tag_visitors', PHP_INT_MAX );
-
 
 /**
  * Filters additional properties for the element item schema for Optimization Detective.
@@ -108,6 +115,10 @@ add_action( 'admin_bar_menu', 'od_debug_add_admin_bar_menu_item', 100 );
  */
 function od_debug_add_assets(): void {
 	if ( ! current_user_can( 'customize' ) && ! wp_is_development_mode( 'plugin' ) ) {
+		return;
+	}
+
+	if ( ! is_admin_bar_showing() ) {
 		return;
 	}
 

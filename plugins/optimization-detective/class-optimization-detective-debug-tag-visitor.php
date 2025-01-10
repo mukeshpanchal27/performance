@@ -1,8 +1,8 @@
 <?php
 /**
- * Image Prioritizer: IP_Img_Tag_Visitor class
+ * Optimization Detective: Optimization_Detective_Debug_Tag_Visitor class
  *
- * @package image-prioritizer
+ * @package optimization-detective
  * @since n.e.x.t
  */
 
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Tag visitor that optimizes IMG tags.
+ * Tag visitor for the Optimization Detective debug helper.
  *
  * @phpstan-import-type LinkAttributes from OD_Link_Collection
  *
