@@ -200,8 +200,9 @@ function perflab_ffh_check_headers( $headers ) {
 
 	// If max-age is too low or not present, check Expires.
 	if ( is_string( $expires ) && '' !== $expires ) {
-		$expires_time = strtotime( $expires );
-		if ( is_int( $expires_time ) && ( $expires_time - time() ) >= $threshold ) {
+		$expires_time   = strtotime( $expires );
+		$remaining_time = is_int( $expires_time ) ? $expires_time - time() : 0;
+		if ( $remaining_time >= $threshold ) {
 			// Good - Expires far in the future.
 			return array(
 				'passed' => true,
@@ -216,18 +217,18 @@ function perflab_ffh_check_headers( $headers ) {
 				'reason' => sprintf(
 					/* translators: 1: actual max-age value in seconds, 2: threshold in seconds */
 					__( 'max-age below threshold (actual: %1$s seconds, threshold: %2$s seconds)', 'performance-lab' ),
-					$max_age,
-					$threshold
+					number_format_i18n( $max_age ),
+					number_format_i18n( $threshold )
 				),
 			);
 		}
 		return array(
 			'passed' => false,
 			'reason' => sprintf(
-				/* translators: 1: actual Expires header value, 2: threshold in seconds */
-				__( 'expires below threshold (actual: %1$s, threshold: %2$s seconds)', 'performance-lab' ),
-				$expires,
-				$threshold
+				/* translators: 1: actual Expires header value in seconds, 2: threshold in seconds */
+				__( 'expires below threshold (actual: %1$s seconds, threshold: %2$s seconds)', 'performance-lab' ),
+				number_format_i18n( $remaining_time ),
+				number_format_i18n( $threshold )
 			),
 		);
 	}
@@ -242,8 +243,8 @@ function perflab_ffh_check_headers( $headers ) {
 			'reason' => sprintf(
 				/* translators: 1: actual max-age value in seconds, 2: threshold in seconds */
 				__( 'max-age below threshold (actual: %1$s seconds, threshold: %2$s seconds)', 'performance-lab' ),
-				$max_age,
-				$threshold
+				number_format_i18n( $max_age ),
+				number_format_i18n( $threshold )
 			),
 		);
 	}
