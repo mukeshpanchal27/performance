@@ -180,7 +180,7 @@ function od_debug_add_assets(): void {
 		<style>
 			body:not(.od-debug) .od-debug-dot,
 			body:not(.od-debug) .od-debug-popover {
-				/*display: none;*/
+				display: none;
 			}
 
 			.od-debug-dot {
