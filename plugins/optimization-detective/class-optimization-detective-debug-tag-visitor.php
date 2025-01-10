@@ -54,7 +54,7 @@ final class Optimization_Detective_Debug_Tag_Visitor {
 				$style = is_string( $style ) ? $style : '';
 				$processor->set_attribute(
 					'style',
-					"--anchor-name: --od-debug-element-$uuid;" . $style
+					"anchor-name: --od-debug-element-$uuid;" . $style
 				);
 
 				$processor->set_meta_attribute(
@@ -68,14 +68,14 @@ final class Optimization_Detective_Debug_Tag_Visitor {
 				$processor->append_body_html(
 					<<<HTML
 <button
-	class="od-debug-dot"
+	class="od-debug-dot od-debug-dot-lcp"
 	type="button"
 	popovertarget="od-debug-popover-$uuid"
 	popovertargetaction="toggle"
-	style="--anchor-name: --od-debug-dot-$uuid; position-anchor: --od-debug-element-$uuid;"
+	style="anchor-name: --od-debug-dot-$uuid; position-anchor: --od-debug-element-$uuid;"
 	aria-details="od-debug-popover-$uuid"
+	aria-label="$anchor_text"
 	>
-	$anchor_text
 </button>
 <div
 	id="od-debug-popover-$uuid"

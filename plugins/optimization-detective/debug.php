@@ -156,20 +156,22 @@ function od_debug_add_assets(): void {
 
 				count++;
 
+				el.style.setProperty( 'anchor-name', `--od-debug-element-${count};` );
+
 				const anchor = document.createElement( 'button' );
-				anchor.setAttribute( 'class', 'od-debug-dot' );
+				anchor.setAttribute( 'class', 'od-debug-dot od-debug-dot-inp' );
 				anchor.setAttribute( 'popovertarget', `od-debug-popover-${count}` );
 				anchor.setAttribute( 'popovertargetaction', 'toggle' );
-				anchor.setAttribute( 'style', `--anchor-name: --od-debug-dot-${count}; position-anchor: --od-debug-element-${count};` );
+				anchor.setAttribute( 'style', `anchor-name: --od-debug-dot-${count}; position-anchor: --od-debug-element-${count};` );
 				anchor.setAttribute( 'aria-details', `od-debug-popover-${count}` );
-				anchor.textContent = 'Optimization Detective';
+				anchor.setAttribute( 'aria-label', 'INP element' );
 
 				const tooltip = document.createElement( 'div' );
 				tooltip.setAttribute( 'id', `od-debug-popover-${count}` );
 				tooltip.setAttribute( 'popover', '' );
 				tooltip.setAttribute( 'class', 'od-debug-popover' );
 				tooltip.setAttribute( 'style', `position-anchor: --od-debug-dot-${count};` );
-				tooltip.textContent = `INP Element (Value: ${entries[0].value}) (Rating: ${entries[0].rating})`;
+				tooltip.textContent = `INP Element (Value: ${entries[0].value}) (Rating: ${entries[0].rating}) (Tag name: ${el.tagName})`;
 
 				document.body.append(anchor);
 				document.body.append(tooltip);
@@ -185,6 +187,7 @@ function od_debug_add_assets(): void {
 				height: 2em;
 				width: 2em;
 				background: rebeccapurple;
+				border: 0;
 				border-radius: 50%;
 				animation: pulse 2s infinite;
 				position: absolute;
@@ -194,8 +197,9 @@ function od_debug_add_assets(): void {
 
 			.od-debug-popover {
 				position: absolute;
-				position-area: right;
-				margin: 5px 0 0 5px;
+				position-area: top;
+				bottom: anchor-size(height);
+				margin: 0;
 			}
 
 			@keyframes pulse {
