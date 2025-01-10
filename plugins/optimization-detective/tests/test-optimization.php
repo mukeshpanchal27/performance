@@ -249,7 +249,7 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 					wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 					$this->go_to( home_url( '/' ) );
 				},
-				'expected' => false,
+				'expected' => true,
 			),
 		);
 	}
