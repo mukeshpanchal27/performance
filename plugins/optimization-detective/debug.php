@@ -51,9 +51,9 @@ function od_debug_add_inp_schema_properties( array $additional_properties ): arr
 		 */
 		'required'    => false,
 		'items'       => array(
-			'type'       => 'object',
-			'required'   => true,
-			'properties' => array(
+			'type'                 => 'object',
+			'required'             => true,
+			'properties'           => array(
 				'value'             => array(
 					'type'     => 'number',
 					'required' => true,
@@ -68,6 +68,7 @@ function od_debug_add_inp_schema_properties( array $additional_properties ): arr
 					'required' => true,
 				),
 			),
+			'additionalProperties' => true,
 		),
 	);
 	return $additional_properties;
