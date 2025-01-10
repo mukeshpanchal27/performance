@@ -83,8 +83,8 @@ function od_get_detection_script( string $slug, OD_URL_Metric_Group_Collection $
 
 	$web_vitals_lib_data = require __DIR__ . '/build/web-vitals.asset.php';
 	$web_vitals_lib_src  = $use_attribution_build ?
-		plugin_dir_url( __FILE__ ) . 'build/web-vitals-attribution.js' :
-		plugin_dir_url( __FILE__ ) . 'build/web-vitals.js';
+		plugins_url( 'build/web-vitals-attribution.js', __FILE__ ) :
+		plugins_url( 'build/web-vitals.js', __FILE__ );
 	$web_vitals_lib_src  = add_query_arg( 'ver', $web_vitals_lib_data['version'], $web_vitals_lib_src );
 
 	/**
@@ -132,7 +132,7 @@ function od_get_detection_script( string $slug, OD_URL_Metric_Group_Collection $
 	return wp_get_inline_script_tag(
 		sprintf(
 			'import detect from %s; detect( %s );',
-			wp_json_encode( add_query_arg( 'ver', OPTIMIZATION_DETECTIVE_VERSION, plugin_dir_url( __FILE__ ) . od_get_asset_path( 'detect.js' ) ) ),
+			wp_json_encode( plugins_url( add_query_arg( 'ver', OPTIMIZATION_DETECTIVE_VERSION, od_get_asset_path( 'detect.js' ) ), __FILE__ ) ),
 			wp_json_encode( $detect_args )
 		),
 		array( 'type' => 'module' )
