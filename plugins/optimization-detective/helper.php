@@ -107,3 +107,31 @@ function od_get_asset_path( string $src_path, ?string $min_path = null ): string
 
 	return $min_path;
 }
+
+/**
+ * Get the group collection for the current request.
+ *
+ * @since n.e.x.t
+ * @access private
+ *
+ * @global WP_Query $wp_the_query WP_Query object.
+ *
+ * @param OD_Tag_Visitor_Registry $tag_visitor_registry Tag visitor registry.
+ * @return OD_URL_Metric_Group_Collection Group collection instance.
+ */
+function od_get_group_collection( OD_Tag_Visitor_Registry $tag_visitor_registry ): OD_URL_Metric_Group_Collection {
+	global $wp_the_query;
+
+	$slug = od_get_url_metrics_slug( od_get_normalized_query_vars() );
+	$post = OD_URL_Metrics_Post_Type::get_post( $slug );
+
+	$current_etag = od_get_current_url_metrics_etag( $tag_visitor_registry, $wp_the_query, od_get_current_theme_template() );
+
+	return new OD_URL_Metric_Group_Collection(
+		$post instanceof WP_Post ? OD_URL_Metrics_Post_Type::get_url_metrics_from_post( $post ) : array(),
+		$current_etag,
+		od_get_breakpoint_max_widths(),
+		od_get_url_metrics_breakpoint_sample_size(),
+		od_get_url_metric_freshness_ttl()
+	);
+}

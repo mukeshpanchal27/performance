@@ -111,21 +111,12 @@ function od_debug_add_assets(): void {
 		return;
 	}
 
-	$slug = od_get_url_metrics_slug( od_get_normalized_query_vars() );
-	$post = OD_URL_Metrics_Post_Type::get_post( $slug );
-
-	global $wp_the_query;
-
 	$tag_visitor_registry = new OD_Tag_Visitor_Registry();
 
-	$current_etag     = od_get_current_url_metrics_etag( $tag_visitor_registry, $wp_the_query, od_get_current_theme_template() );
-	$group_collection = new OD_URL_Metric_Group_Collection(
-		$post instanceof WP_Post ? OD_URL_Metrics_Post_Type::get_url_metrics_from_post( $post ) : array(),
-		$current_etag,
-		od_get_breakpoint_max_widths(),
-		od_get_url_metrics_breakpoint_sample_size(),
-		od_get_url_metric_freshness_ttl()
-	);
+	/** This action is documented in optimization.php. */
+	do_action( 'od_register_tag_visitors', $tag_visitor_registry );
+
+	$group_collection = od_get_group_collection( $tag_visitor_registry );
 
 	$inp_dots = array();
 
