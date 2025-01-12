@@ -10,7 +10,7 @@ return static function ( Test_Image_Prioritizer_Helper $test_case ): void {
 	);
 
 	foreach ( array_merge( $breakpoint_max_widths, array( 1600 ) ) as $i => $viewport_width ) {
-		$elements = array(
+		$elements                = array(
 			array(
 				'isLCP' => false,
 				'xpath' => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::IMG]',

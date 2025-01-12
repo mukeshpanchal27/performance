@@ -1,6 +1,6 @@
 <?php
 return static function ( Test_Image_Prioritizer_Helper $test_case ): void {
-	$slug = od_get_url_metrics_slug( od_get_normalized_query_vars() );
+	$slug        = od_get_url_metrics_slug( od_get_normalized_query_vars() );
 	$sample_size = od_get_url_metrics_breakpoint_sample_size();
 
 	// Only populate the largest (desktop) viewport group.

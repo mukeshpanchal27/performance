@@ -1,7 +1,7 @@
 <?php
 return static function ( Test_Image_Prioritizer_Helper $test_case ): void {
 	$breakpoint_max_widths = array( 480, 600, 782 );
-	$sample_size = od_get_url_metrics_breakpoint_sample_size();
+	$sample_size           = od_get_url_metrics_breakpoint_sample_size();
 
 	add_filter(
 		'od_breakpoint_max_widths',

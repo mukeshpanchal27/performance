@@ -1,10 +1,10 @@
 <?php
 return static function ( Test_Image_Prioritizer_Helper $test_case ): void {
-	$slug = od_get_url_metrics_slug( od_get_normalized_query_vars() );
+	$slug        = od_get_url_metrics_slug( od_get_normalized_query_vars() );
 	$sample_size = od_get_url_metrics_breakpoint_sample_size();
 
 	$get_dom_rect = static function ( $left, $top, $width, $height ) {
-		$dom_rect = array(
+		$dom_rect           = array(
 			'top'    => $top,
 			'left'   => $left,
 			'width'  => $width,
@@ -13,16 +13,16 @@ return static function ( Test_Image_Prioritizer_Helper $test_case ): void {
 			'y'      => $top,
 		);
 		$dom_rect['bottom'] = $dom_rect['top'] + $height;
-		$dom_rect['right'] = $dom_rect['left'] + $width;
+		$dom_rect['right']  = $dom_rect['left'] + $width;
 		return $dom_rect;
 	};
 
-	$width = 10;
-	$height = 10;
-	$above_viewport_rect = $get_dom_rect( 0, -100, $width, $height );
-	$left_of_viewport_rect = $get_dom_rect( -100, 0, $width, $height );
+	$width                  = 10;
+	$height                 = 10;
+	$above_viewport_rect    = $get_dom_rect( 0, -100, $width, $height );
+	$left_of_viewport_rect  = $get_dom_rect( -100, 0, $width, $height );
 	$right_of_viewport_rect = $get_dom_rect( 10000000, 0, $width, $height );
-	$below_viewport_rect = $get_dom_rect( 0, 1000000, $width, $height );
+	$below_viewport_rect    = $get_dom_rect( 0, 1000000, $width, $height );
 
 	foreach ( array_merge( od_get_breakpoint_max_widths(), array( 1000 ) ) as $viewport_width ) {
 		for ( $i = 0; $i < $sample_size; $i++ ) {

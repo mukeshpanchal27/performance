@@ -11,7 +11,7 @@ return static function ( Test_Image_Prioritizer_Helper $test_case ): void {
 	);
 	$sample_size = od_get_url_metrics_breakpoint_sample_size();
 
-	$slug = od_get_url_metrics_slug( od_get_normalized_query_vars() );
+	$slug                                = od_get_url_metrics_slug( od_get_normalized_query_vars() );
 	$div_index_to_viewport_width_mapping = array(
 		0 => $desktop_breakpoint,
 		1 => $tablet_breakpoint,
