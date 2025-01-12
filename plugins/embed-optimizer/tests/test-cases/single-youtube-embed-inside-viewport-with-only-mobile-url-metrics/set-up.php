@@ -7,7 +7,7 @@ return static function ( Test_Embed_Optimizer_Optimization_Detective $test_case 
 				'viewport_width' => 100,
 				'elements'       => array(
 					array(
-						'xpath'                     => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::FIGURE]/*[1][self::DIV]',
+						'xpath'                     => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[1][self::FIGURE]/*[1][self::DIV]',
 						'isLCP'                     => false,
 						'intersectionRatio'         => 1,
 						'resizedBoundingClientRect' => array_merge( $test_case->get_sample_dom_rect(), array( 'height' => 500 ) ),
