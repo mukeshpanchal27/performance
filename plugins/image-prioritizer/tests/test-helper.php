@@ -195,8 +195,8 @@ class Test_Image_Prioritizer_Helper extends WP_UnitTestCase {
 		$html_end_doc   = '</div></body></html>';
 
 		$buffer = od_optimize_template_output_buffer( $html_start_doc . $buffer . $html_end_doc );
-		$buffer = preg_replace( '#.+?<body[^>]*>#s', '', $buffer );
-		$buffer = preg_replace( '#</body>.*$#s', '', $buffer );
+		$buffer = preg_replace( '#.+?<body[^>]*><div[^>]*>#s', '', $buffer );
+		$buffer = preg_replace( '#</div></body>.*$#s', '', $buffer );
 
 		$this->assertEquals(
 			$this->remove_initial_tabs( $expected ),
