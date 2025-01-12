@@ -214,21 +214,22 @@ trait Optimization_Detective_Test_Helpers {
 		$buffer = od_optimize_template_output_buffer( $buffer );
 
 		// Normalize script module content so changes do not impact snapshots.
-		$p = new WP_HTML_Tag_Processor( $buffer );
-		while ( $p->next_tag( array( 'tag_name' => 'SCRIPT' ) ) ) {
-			if ( 'module' !== $p->get_attribute( 'type' ) ) {
-				continue;
-			}
-			$text = $p->get_modifiable_text();
-			$text = str_replace( "/* <![CDATA[ */\n", '', $text );
-			$text = str_replace( "/* ]]> */\n", '', $text );
-			$text = trim( $text );
-			if ( 1 === preg_match( '/^(import|const) \w+/', $text, $matches ) ) {
-				$text = '/* ' . $matches[0] . ' ... */';
-			}
-			$p->set_modifiable_text( $text );
-		}
-		$buffer = $p->get_updated_html();
+		$buffer = preg_replace_callback(
+			'#(<script type="module">)(.+?)(</script>)#s',
+			static function ( $matches ) {
+				array_shift( $matches );
+				list( $start_tag, $text, $end_tag ) = $matches;
+
+				$text = str_replace( "/* <![CDATA[ */\n", '', $text );
+				$text = str_replace( "/* ]]> */\n", '', $text );
+				$text = trim( $text );
+				if ( 1 === preg_match( '/^(import|const) \w+/', $text, $matches ) ) {
+					$text = '/* ' . $matches[0] . ' ... */';
+				}
+				return $start_tag . $text . $end_tag;
+			},
+			$buffer
+		);
 
 		// Undo replacements so that the placeholders are restored to the buffer for persisting in the snapshot.
 		$snapshot = $buffer;
