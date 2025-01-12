@@ -14,8 +14,6 @@
  *     isLCP?: bool,
  *     intersectionRatio?: float
  * }
- *
- * @phpstan-type SnapshotSetUpCallback Closure( Test_Image_Prioritizer_Helper $test_case, WP_UnitTest_Factory $factory ): (void|array<string, string>)
  */
 trait Optimization_Detective_Test_Helpers {
 
@@ -156,36 +154,22 @@ trait Optimization_Detective_Test_Helpers {
 	 * Loads snapshot test cases.
 	 *
 	 * @param non-empty-string $directory Directory for test cases.
-	 * @return array<string, array{ set_up: Closure, buffer: string, expected: string|null }> Test cases.
+	 * @return array<string, array{ directory: non-empty-string }> Test cases.
 	 */
 	public function load_snapshot_test_cases( string $directory ): array {
 		$test_cases = array();
 		foreach ( (array) glob( $directory . '/*' ) as $test_case ) {
+			// TODO: Remove this.
 			if ( ! file_exists( "$test_case/set-up.php" ) ) {
 				continue;
 			}
-
-			$buffer_file_path = "$test_case/buffer.html";
-
-			$buffer = file_get_contents( $buffer_file_path );
-			if ( ! is_string( $buffer ) ) {
-				throw new Exception( "Missing test case file: $buffer_file_path" );
-			}
-
-			$expected_file_path = "$test_case/expected.html";
-			if ( file_exists( $expected_file_path ) ) {
-				$expected = file_get_contents( $expected_file_path );
-				if ( ! is_string( $expected ) ) {
-					throw new Exception( "Missing test case file: $expected_file_path" );
-				}
-			} else {
-				$expected = null;
-			}
-
+			/**
+			 * Test case directory.
+			 *
+			 * @var non-empty-string $test_case
+			 */
 			$test_cases[ basename( $test_case ) ] = array(
-				'set_up'   => require "$test_case/set-up.php",
-				'buffer'   => $buffer,
-				'expected' => $expected,
+				'directory' => $test_case,
 			);
 		}
 		return $test_cases;
@@ -194,19 +178,41 @@ trait Optimization_Detective_Test_Helpers {
 	/**
 	 * Asserts equality against snapshot.
 	 *
-	 * @phpstan-param SnapshotSetUpCallback $set_up
-	 *
-	 * @param Closure     $set_up     Set up.
-	 * @param string      $buffer     Buffer.
-	 * @param string|null $expected   Expected. Null when expected content not yet available, in which case an actual.html will be output for renaming to expected.html.
+	 * @param non-empty-string $directory Directory for test cases.
 	 */
-	public function assert_snapshot_equals( Closure $set_up, string $buffer, ?string $expected ): void {
+	public function assert_snapshot_equals( string $directory ): void {
+		$set_up_file = "$directory/set-up.php";
+		if ( ! file_exists( $set_up_file ) ) {
+			throw new Exception( "Missing required file: $directory/set-up.php" );
+		}
+
+		$set_up      = require $set_up_file;
+		$buffer_file = "$directory/buffer.html";
+
+		$buffer = file_get_contents( $buffer_file );
+		if ( ! is_string( $buffer ) ) {
+			throw new Exception( "Missing test case file: $buffer_file" );
+		}
+
+		$expected_file = "$directory/expected.html";
+		$actual_file   = "$directory/actual.html";
+		if ( file_exists( $expected_file ) ) {
+			$expected = file_get_contents( $expected_file );
+			if ( ! is_string( $expected ) ) {
+				throw new Exception( "Missing test case file: $expected_file" );
+			}
+		} else {
+			$expected = null;
+		}
+
 		$replacements = $set_up( $this, $this::factory() );
 
 		// Replace placeholders with values computed in set_up.
 		if ( is_array( $replacements ) && count( $replacements ) > 0 ) {
-			$buffer   = str_replace( array_keys( $replacements ), array_values( $replacements ), $buffer );
-			$expected = str_replace( array_keys( $replacements ), array_values( $replacements ), $expected );
+			$buffer = str_replace( array_keys( $replacements ), array_values( $replacements ), $buffer );
+			if ( is_string( $expected ) ) {
+				$expected = str_replace( array_keys( $replacements ), array_values( $replacements ), $expected );
+			}
 		}
 
 		$buffer = od_optimize_template_output_buffer( $buffer );
@@ -234,10 +240,27 @@ trait Optimization_Detective_Test_Helpers {
 			$snapshot = str_replace( array_values( $replacements ), array_keys( $replacements ), $snapshot );
 		}
 
-		$this->assertEquals(
-			$this->remove_initial_tabs( $expected ),
-			$this->remove_initial_tabs( $buffer ),
-			"Buffer snapshot:\n$snapshot"
-		);
+		$buffer = $this->remove_initial_tabs( $buffer );
+		if ( is_string( $expected ) ) {
+			$expected = $this->remove_initial_tabs( $expected );
+		}
+
+		if ( $buffer !== $expected ) {
+			file_put_contents( $actual_file, $snapshot ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+		}
+
+		$rel_actual_file   = str_replace( trailingslashit( getcwd() ), '', $actual_file );
+		$rel_expected_file = str_replace( trailingslashit( getcwd() ), '', $expected_file );
+		$rel_buffer_file   = str_replace( trailingslashit( getcwd() ), '', $buffer_file );
+
+		if ( null === $expected ) {
+			$this->markTestIncomplete( "Examine $actual_file to see if it is expected and if so rename to $expected_file." );
+		} else {
+			$this->assertEquals(
+				$expected,
+				$buffer,
+				"Examine $rel_actual_file for differences with $rel_buffer_file and if acceptable move to $rel_expected_file"
+			);
+		}
 	}
 }

@@ -6,10 +6,8 @@
  *
  * @noinspection PhpUnhandledExceptionInspection
  *
-
-/**
- * @phpstan-import-type SnapshotSetUpCallback from Optimization_Detective_Test_Helpers
  */
+
 class Test_Embed_Optimizer_Optimization_Detective extends WP_UnitTestCase {
 	use Optimization_Detective_Test_Helpers;
 
@@ -84,7 +82,9 @@ class Test_Embed_Optimizer_Optimization_Detective extends WP_UnitTestCase {
 	/**
 	 * Data provider.
 	 *
-	 * @return array<string, array{ set_up: Closure, buffer: string, expected: string|null }> Test cases.
+	 * @noinspection PhpDocMissingThrowsInspection
+	 *
+	 * @return array<string, array{ directory: non-empty-string }> Test cases.
 	 */
 	public function data_provider_test_od_optimize_template_output_buffer(): array {
 		// TODO: Delete this commented-out code and the PHP files it would load.
@@ -110,28 +110,21 @@ class Test_Embed_Optimizer_Optimization_Detective extends WP_UnitTestCase {
 //
 //			file_put_contents( $dir . DIRECTORY_SEPARATOR . 'set-up.php', "<?php\nreturn $set_up_function_source;\n" );
 //		}
+
 		return $this->load_snapshot_test_cases( __DIR__ . '/test-cases' );
 	}
 
 	/**
 	 * Test embed_optimizer_visit_tag().
 	 *
-	 * @covers Embed_Optimizer_Tag_Visitor
+	 * @covers       Embed_Optimizer_Tag_Visitor
 	 * @covers ::embed_optimizer_update_markup
 	 *
 	 * @dataProvider data_provider_test_od_optimize_template_output_buffer
 	 *
-	 * @phpstan-param SnapshotSetUpCallback $set_up
-	 *
-	 * @param Closure     $set_up Setup function.
-	 * @param string      $buffer   Buffer.
-	 * @param string|null $expected Expected content. Null when expected content not yet available, in which case an actual.html will be output for renaming to expected.html.
+	 * @param non-empty-string $directory Test case directory.
 	 */
-	public function test_od_optimize_template_output_buffer( Closure $set_up, string $buffer, ?string $expected ): void {
-		$this->assert_snapshot_equals(
-			$set_up,
-			$buffer,
-			$expected
-		);
+	public function test_od_optimize_template_output_buffer( string $directory ): void {
+		$this->assert_snapshot_equals( $directory );
 	}
 }

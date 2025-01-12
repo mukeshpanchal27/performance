@@ -7,9 +7,6 @@
  * @noinspection PhpUnhandledExceptionInspection
  */
 
-/**
- * @phpstan-import-type SnapshotSetUpCallback from Optimization_Detective_Test_Helpers
- */
 class Test_Image_Prioritizer_Helper extends WP_UnitTestCase {
 	use Optimization_Detective_Test_Helpers;
 
@@ -75,7 +72,9 @@ class Test_Image_Prioritizer_Helper extends WP_UnitTestCase {
 	/**
 	 * Data provider.
 	 *
-	 * @return array<string, array{ set_up: Closure, buffer: string, expected: string|null }> Test cases.
+	 * @noinspection PhpDocMissingThrowsInspection
+	 *
+	 * @return array<string, array{ directory: non-empty-string }> Test cases.
 	 */
 	public function data_provider_test_filter_tag_visitors(): array {
 		// TODO: Delete this commented-out code and the PHP files it would load.
@@ -115,18 +114,10 @@ class Test_Image_Prioritizer_Helper extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_provider_test_filter_tag_visitors
 	 *
-	 * @phpstan-param SnapshotSetUpCallback $set_up
-	 *
-	 * @param Closure     $set_up Setup function.
-	 * @param string      $buffer   Buffer.
-	 * @param string|null $expected Expected content. Null when expected content not yet available, in which case an actual.html will be output for renaming to expected.html.
+	 * @param non-empty-string $directory Test case directory.
 	 */
-	public function test_end_to_end( Closure $set_up, string $buffer, ?string $expected ): void {
-		$this->assert_snapshot_equals(
-			$set_up,
-			$buffer,
-			$expected
-		);
+	public function test_end_to_end( string $directory ): void {
+		$this->assert_snapshot_equals( $directory );
 	}
 
 	/**
