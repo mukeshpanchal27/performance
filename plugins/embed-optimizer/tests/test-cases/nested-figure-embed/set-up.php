@@ -36,6 +36,7 @@ return static function ( Test_Embed_Optimizer_Optimization_Detective $test_case 
 				'video_with_poster',
 				static function ( OD_Tag_Visitor_Context $context ) use ( $test_case ): bool {
 					static $seen_video_count = 0;
+
 					$processor = $context->processor;
 					if ( $processor->get_tag() !== 'VIDEO' ) {
 						return false;

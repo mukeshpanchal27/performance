@@ -24,7 +24,7 @@ return static function ( Test_Embed_Optimizer_Optimization_Detective $test_case 
 					if ( $processor->get_tag() === 'BODY' ) {
 						$test_case->assertFalse( $processor->is_tag_closer() );
 
-						$reflection = new ReflectionObject( $processor );
+						$reflection         = new ReflectionObject( $processor );
 						$bookmarks_property = $reflection->getProperty( 'bookmarks' );
 						$bookmarks_property->setAccessible( true );
 						$bookmarks = $bookmarks_property->getValue( $processor );
