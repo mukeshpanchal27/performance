@@ -72,35 +72,9 @@ class Test_Image_Prioritizer_Helper extends WP_UnitTestCase {
 	/**
 	 * Data provider.
 	 *
-	 * @noinspection PhpDocMissingThrowsInspection
-	 *
 	 * @return array<string, array{ directory: non-empty-string }> Test cases.
 	 */
 	public function data_provider_test_filter_tag_visitors(): array {
-		// TODO: Delete this commented-out code and the PHP files it would load.
-//		$test_cases = array();
-//		foreach ( (array) glob( __DIR__ . '/test-cases/*.php' ) as $test_case ) {
-//			$name                = basename( $test_case, '.php' );
-//			$test_cases[ $name ] = require $test_case;
-//
-//			$dir = dirname( $test_case ) . DIRECTORY_SEPARATOR . $name;
-//			if ( ! file_exists( $dir ) ) {
-//				mkdir( $dir );
-//			}
-//			file_put_contents( $dir . DIRECTORY_SEPARATOR . 'buffer.html', trim( preg_replace( "/^\t\t/m", "", $test_cases[ $name ]['buffer'] ) ) . PHP_EOL );
-//			file_put_contents( $dir . DIRECTORY_SEPARATOR . 'expected.html', trim( preg_replace( "/^\t\t/m", "", $test_cases[ $name ]['expected'] ) ) . PHP_EOL );
-//
-//			$test_case_source = file_get_contents( $test_case );
-//			if ( ! preg_match( "/'set_up'\s*=>\s+(.+?}),\s*'buffer'\s*=>/s", $test_case_source, $matches ) ) {
-//				throw new Exception( "Pattern match faiulure!!! for $test_case" );
-//			}
-//
-//			$set_up_function_source = trim( $matches[1] );
-//			$set_up_function_source = preg_replace( '/^\t/m', '', $set_up_function_source );
-//
-//			file_put_contents( $dir . DIRECTORY_SEPARATOR . 'set-up.php', "<?php\nreturn $set_up_function_source;\n" );
-//		}
-
 		return $this->load_snapshot_test_cases( __DIR__ . '/test-cases' );
 	}
 
@@ -115,6 +89,8 @@ class Test_Image_Prioritizer_Helper extends WP_UnitTestCase {
 	 * @dataProvider data_provider_test_filter_tag_visitors
 	 *
 	 * @param non-empty-string $directory Test case directory.
+	 *
+	 * @noinspection PhpDocMissingThrowsInspection
 	 */
 	public function test_end_to_end( string $directory ): void {
 		$this->assert_snapshot_equals( $directory );

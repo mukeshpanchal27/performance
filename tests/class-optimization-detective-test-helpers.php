@@ -159,10 +159,6 @@ trait Optimization_Detective_Test_Helpers {
 	public function load_snapshot_test_cases( string $directory ): array {
 		$test_cases = array();
 		foreach ( (array) glob( $directory . '/*' ) as $test_case ) {
-			// TODO: Remove this.
-			if ( ! file_exists( "$test_case/set-up.php" ) ) {
-				continue;
-			}
 			/**
 			 * Test case directory.
 			 *
