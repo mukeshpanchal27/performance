@@ -8,6 +8,9 @@
  * @todo There are "Cannot resolve ..." errors and "Element img doesn't have a required attribute src" warnings that should be excluded from inspection.
  */
 
+/**
+ * @phpstan-import-type SnapshotSetUpCallback from Optimization_Detective_Test_Helpers
+ */
 class Test_OD_Optimization extends WP_UnitTestCase {
 	use Optimization_Detective_Test_Helpers;
 
@@ -271,7 +274,7 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 	/**
 	 * Data provider.
 	 *
-	 * @return array<string, array{ set_up: Closure, buffer: string, expected: string }> Test cases.
+	 * @return array<string, array{ set_up: Closure, buffer: string, expected: string|null }> Test cases.
 	 */
 	public function data_provider_test_od_optimize_template_output_buffer(): array {
 		// TODO: Delete this commented-out code and the PHP files it would load.
@@ -308,8 +311,14 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 	 * @covers ::od_is_response_html_content_type
 	 *
 	 * @dataProvider data_provider_test_od_optimize_template_output_buffer
+	 *
+	 * @phpstan-param SnapshotSetUpCallback $set_up
+	 *
+	 * @param Closure     $set_up Setup function.
+	 * @param string      $buffer   Buffer.
+	 * @param string|null $expected Expected content. Null when expected content not yet available, in which case an actual.html will be output for renaming to expected.html.
 	 */
-	public function test_od_optimize_template_output_buffer( Closure $set_up, string $buffer, string $expected ): void {
+	public function test_od_optimize_template_output_buffer( Closure $set_up, string $buffer, ?string $expected ): void {
 		add_action(
 			'od_register_tag_visitors',
 			function ( OD_Tag_Visitor_Registry $tag_visitor_registry ): void {
@@ -345,20 +354,7 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 		$this->assert_snapshot_equals(
 			$set_up,
 			$buffer,
-			$expected,
-			static function ( $output ) {
-				return preg_replace_callback(
-					':(<script type="module">)(.+?)(</script>):s',
-					static function ( $matches ) {
-						array_shift( $matches );
-						if ( false !== strpos( $matches[1], 'import detect' ) ) {
-							$matches[1] = '/* import detect ... */';
-						}
-						return implode( '', $matches );
-					},
-					$output
-				);
-			}
+			$expected
 		);
 	}
 }

@@ -14,6 +14,8 @@
  *     isLCP?: bool,
  *     intersectionRatio?: float
  * }
+ *
+ * @phpstan-type SnapshotSetUpCallback Closure( Test_Image_Prioritizer_Helper $test_case, WP_UnitTest_Factory $factory ): (void|array<string, string>)
  */
 trait Optimization_Detective_Test_Helpers {
 
@@ -154,7 +156,7 @@ trait Optimization_Detective_Test_Helpers {
 	 * Loads snapshot test cases.
 	 *
 	 * @param non-empty-string $directory Directory for test cases.
-	 * @return array<string, array{ set_up: Closure, buffer: string, expected: string }> Test cases.
+	 * @return array<string, array{ set_up: Closure, buffer: string, expected: string|null }> Test cases.
 	 */
 	public function load_snapshot_test_cases( string $directory ): array {
 		$test_cases = array();
@@ -163,10 +165,27 @@ trait Optimization_Detective_Test_Helpers {
 				continue;
 			}
 
+			$buffer_file_path = "$test_case/buffer.html";
+
+			$buffer = file_get_contents( $buffer_file_path );
+			if ( ! is_string( $buffer ) ) {
+				throw new Exception( "Missing test case file: $buffer_file_path" );
+			}
+
+			$expected_file_path = "$test_case/expected.html";
+			if ( file_exists( $expected_file_path ) ) {
+				$expected = file_get_contents( $expected_file_path );
+				if ( ! is_string( $expected ) ) {
+					throw new Exception( "Missing test case file: $expected_file_path" );
+				}
+			} else {
+				$expected = null;
+			}
+
 			$test_cases[ basename( $test_case ) ] = array(
 				'set_up'   => require "$test_case/set-up.php",
-				'buffer'   => file_get_contents( "$test_case/buffer.html" ),
-				'expected' => file_get_contents( "$test_case/expected.html" ),
+				'buffer'   => $buffer,
+				'expected' => $expected,
 			);
 		}
 		return $test_cases;
@@ -175,28 +194,50 @@ trait Optimization_Detective_Test_Helpers {
 	/**
 	 * Asserts equality against snapshot.
 	 *
-	 * @param Closure      $set_up     Set up.
-	 * @param string       $buffer     Buffer.
-	 * @param string       $expected   Expected.
-	 * @param Closure|null $normalizer Normalizer.
+	 * @phpstan-param SnapshotSetUpCallback $set_up
+	 *
+	 * @param Closure     $set_up     Set up.
+	 * @param string      $buffer     Buffer.
+	 * @param string|null $expected   Expected. Null when expected content not yet available, in which case an actual.html will be output for renaming to expected.html.
 	 */
-	public function assert_snapshot_equals( Closure $set_up, string $buffer, string $expected, ?Closure $normalizer = null ): void {
-		$result = $set_up( $this, $this::factory(), $buffer, $expected );
-		if ( is_array( $result ) ) {
-			$buffer   = $result[0];
-			$expected = $result[1];
+	public function assert_snapshot_equals( Closure $set_up, string $buffer, ?string $expected ): void {
+		$replacements = $set_up( $this, $this::factory() );
+
+		// Replace placeholders with values computed in set_up.
+		if ( is_array( $replacements ) && count( $replacements ) > 0 ) {
+			$buffer   = str_replace( array_keys( $replacements ), array_values( $replacements ), $buffer );
+			$expected = str_replace( array_keys( $replacements ), array_values( $replacements ), $expected );
 		}
 
 		$buffer = od_optimize_template_output_buffer( $buffer );
 
-		if ( $normalizer ) {
-			$buffer = $normalizer( $buffer );
+		// Normalize script module content so changes do not impact snapshots.
+		$p = new WP_HTML_Tag_Processor( $buffer );
+		while ( $p->next_tag( array( 'tag_name' => 'SCRIPT' ) ) ) {
+			if ( 'module' !== $p->get_attribute( 'type' ) ) {
+				continue;
+			}
+			$text = $p->get_modifiable_text();
+			$text = str_replace( "/* <![CDATA[ */\n", '', $text );
+			$text = str_replace( "/* ]]> */\n", '', $text );
+			$text = trim( $text );
+			if ( 1 === preg_match( '/^(import|const) \w+/', $text, $matches ) ) {
+				$text = '/* ' . $matches[0] . ' ... */';
+			}
+			$p->set_modifiable_text( $text );
+		}
+		$buffer = $p->get_updated_html();
+
+		// Undo replacements so that the placeholders are restored to the buffer for persisting in the snapshot.
+		$snapshot = $buffer;
+		if ( is_array( $replacements ) && count( $replacements ) > 0 ) {
+			$snapshot = str_replace( array_values( $replacements ), array_keys( $replacements ), $snapshot );
 		}
 
 		$this->assertEquals(
 			$this->remove_initial_tabs( $expected ),
 			$this->remove_initial_tabs( $buffer ),
-			"Buffer snapshot:\n$buffer"
+			"Buffer snapshot:\n$snapshot"
 		);
 	}
 }

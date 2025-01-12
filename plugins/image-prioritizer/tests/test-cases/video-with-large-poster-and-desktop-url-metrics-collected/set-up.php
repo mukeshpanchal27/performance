@@ -1,5 +1,5 @@
 <?php
-return static function ( Test_Image_Prioritizer_Helper $test_case, WP_UnitTest_Factory $factory, string $buffer, string $expected ): array {
+return static function ( Test_Image_Prioritizer_Helper $test_case, WP_UnitTest_Factory $factory ): array {
 	$breakpoint_max_widths = array( 480, 600, 782 );
 	add_filter(
 		'od_breakpoint_max_widths',
@@ -42,12 +42,9 @@ return static function ( Test_Image_Prioritizer_Helper $test_case, WP_UnitTest_F
 	$expected_url = wp_get_attachment_image_url( $attachment_id, array( (int) $element['boundingClientRect']['width'], 0 ) );
 
 	$replacements = array(
-		'{{full_url}}' => $full_url,
+		'{{full_url}}'     => $full_url,
 		'{{expected_url}}' => $expected_url,
 	);
 
-	return array(
-		str_replace( array_keys( $replacements ), array_values( $replacements ), $buffer ),
-		str_replace( array_keys( $replacements ), array_values( $replacements ), $expected ),
-	);
+	return $replacements;
 };
