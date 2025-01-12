@@ -149,4 +149,54 @@ trait Optimization_Detective_Test_Helpers {
 			$items
 		);
 	}
+
+	/**
+	 * Loads snapshot test cases.
+	 *
+	 * @param non-empty-string $directory Directory for test cases.
+	 * @return array<string, array{ set_up: Closure, buffer: string, expected: string }> Test cases.
+	 */
+	public function load_snapshot_test_cases( string $directory ): array {
+		$test_cases = array();
+		foreach ( (array) glob( $directory . '/*' ) as $test_case ) {
+			if ( ! file_exists( "$test_case/set-up.php" ) ) {
+				continue;
+			}
+
+			$test_cases[ basename( $test_case ) ] = array(
+				'set_up'   => require "$test_case/set-up.php",
+				'buffer'   => file_get_contents( "$test_case/buffer.html" ),
+				'expected' => file_get_contents( "$test_case/expected.html" ),
+			);
+		}
+		return $test_cases;
+	}
+
+	/**
+	 * Asserts equality against snapshot.
+	 *
+	 * @param Closure      $set_up     Set up.
+	 * @param string       $buffer     Buffer.
+	 * @param string       $expected   Expected.
+	 * @param Closure|null $normalizer Normalizer.
+	 */
+	public function assert_snapshot_equals( Closure $set_up, string $buffer, string $expected, ?Closure $normalizer = null ): void {
+		$result = $set_up( $this, $this::factory(), $buffer, $expected );
+		if ( is_array( $result ) ) {
+			$buffer   = $result[0];
+			$expected = $result[1];
+		}
+
+		$buffer = od_optimize_template_output_buffer( $buffer );
+
+		if ( $normalizer ) {
+			$buffer = $normalizer( $buffer );
+		}
+
+		$this->assertEquals(
+			$this->remove_initial_tabs( $expected ),
+			$this->remove_initial_tabs( $buffer ),
+			"Buffer snapshot:\n$buffer"
+		);
+	}
 }

@@ -1,7 +1,9 @@
 <?php
 return array(
-	'set_up'   => static function (): void {},
-	// Smallest PNG courtesy of <https://evanhahn.com/worlds-smallest-png/>.
+	'set_up'   => static function (): void {
+		// Smallest PNG courtesy of <https://evanhahn.com/worlds-smallest-png/>.
+		// There should be no data-od-xpath added to the IMG because it is using a data: URL.
+	},
 	'buffer'   => '
 		<html lang="en">
 			<head>
@@ -13,7 +15,6 @@ return array(
 			</body>
 		</html>
 	',
-	// There should be no data-od-xpath added to the IMG because it is using a data: URL.
 	'expected' => '
 		<html lang="en">
 			<head>

@@ -271,15 +271,34 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 	/**
 	 * Data provider.
 	 *
-	 * @return array<string, mixed> Data.
+	 * @return array<string, array{ set_up: Closure, buffer: string, expected: string }> Test cases.
 	 */
 	public function data_provider_test_od_optimize_template_output_buffer(): array {
-		$test_cases = array();
-		foreach ( (array) glob( __DIR__ . '/test-cases/*.php' ) as $test_case ) {
-			$name                = basename( $test_case, '.php' );
-			$test_cases[ $name ] = require $test_case;
-		}
-		return $test_cases;
+		// TODO: Delete this commented-out code and the PHP files it would load.
+//		$test_cases = array();
+//		foreach ( (array) glob( __DIR__ . '/test-cases/*.php' ) as $test_case ) {
+//			$name                = basename( $test_case, '.php' );
+//			$test_cases[ $name ] = require $test_case;
+//
+//			$dir = dirname( $test_case ) . DIRECTORY_SEPARATOR . $name;
+//			if ( ! file_exists( $dir ) ) {
+//				mkdir( $dir );
+//			}
+//			file_put_contents( $dir . DIRECTORY_SEPARATOR . 'buffer.html', trim( preg_replace( "/^\t\t/m", "", $test_cases[ $name ]['buffer'] ) ) . PHP_EOL );
+//			file_put_contents( $dir . DIRECTORY_SEPARATOR . 'expected.html', trim( preg_replace( "/^\t\t/m", "", $test_cases[ $name ]['expected'] ) ) . PHP_EOL );
+//
+//			$test_case_source = file_get_contents( $test_case );
+//			if ( ! preg_match( "/'set_up'\s*=>\s+(.+?}),\s*'buffer'\s*=>/s", $test_case_source, $matches ) ) {
+//				throw new Exception( "Pattern match faiulure!!! for $test_case" );
+//			}
+//
+//			$set_up_function_source = trim( $matches[1] );
+//			$set_up_function_source = preg_replace( '/^\t/m', '', $set_up_function_source );
+//
+//			file_put_contents( $dir . DIRECTORY_SEPARATOR . 'set-up.php', "<?php\nreturn $set_up_function_source;\n" );
+//		}
+
+		return $this->load_snapshot_test_cases( __DIR__ . '/test-cases' );
 	}
 
 	/**
@@ -291,8 +310,6 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 	 * @dataProvider data_provider_test_od_optimize_template_output_buffer
 	 */
 	public function test_od_optimize_template_output_buffer( Closure $set_up, string $buffer, string $expected ): void {
-		$set_up( $this );
-
 		add_action(
 			'od_register_tag_visitors',
 			function ( OD_Tag_Visitor_Registry $tag_visitor_registry ): void {
@@ -325,16 +342,23 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 			}
 		);
 
-		$buffer = preg_replace(
-			':<script type="module">.+?</script>:s',
-			'<script type="module">/* import detect ... */</script>',
-			od_optimize_template_output_buffer( $buffer )
-		);
-
-		$this->assertEquals(
-			$this->remove_initial_tabs( $expected ),
-			$this->remove_initial_tabs( $buffer ),
-			"Buffer snapshot:\n$buffer"
+		$this->assert_snapshot_equals(
+			$set_up,
+			$buffer,
+			$expected,
+			static function ( $output ) {
+				return preg_replace_callback(
+					':(<script type="module">)(.+?)(</script>):s',
+					static function ( $matches ) {
+						array_shift( $matches );
+						if ( false !== strpos( $matches[1], 'import detect' ) ) {
+							$matches[1] = '/* import detect ... */';
+						}
+						return implode( '', $matches );
+					},
+					$output
+				);
+			}
 		);
 	}
 }

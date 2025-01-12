@@ -25,8 +25,8 @@ return array(
 				)
 			);
 		}
+		// Note: loading=lazy is not removed from these images because URL Metrics are only gathered for desktop so far. Both mobile and desktop URL Metrics are required to proceed with lazy-loading.
 	},
-	// Note: loading=lazy is not removed from these images because URL Metrics are only gathered for desktop so far. Both mobile and desktop URL Metrics are required to proceed with lazy-loading.
 	'buffer'   => '
 		<html lang="en">
 			<head>
