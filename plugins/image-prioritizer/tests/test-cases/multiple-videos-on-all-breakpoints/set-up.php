@@ -18,25 +18,25 @@ return static function ( Test_Image_Prioritizer_Helper $test_case ): void {
 					'elements'       => array(
 						array(
 							'isLCP'              => true,
-							'xpath'              => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::VIDEO]',
+							'xpath'              => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[1][self::VIDEO]',
 							'boundingClientRect' => $test_case->get_sample_dom_rect(),
 							'intersectionRatio'  => 1.0,
 						),
 						array(
 							'isLCP'              => false,
-							'xpath'              => '/*[1][self::HTML]/*[2][self::BODY]/*[2][self::VIDEO]',
+							'xpath'              => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[2][self::VIDEO]',
 							'boundingClientRect' => $test_case->get_sample_dom_rect(),
 							'intersectionRatio'  => 0.1,
 						),
 						array(
 							'isLCP'              => false,
-							'xpath'              => '/*[1][self::HTML]/*[2][self::BODY]/*[3][self::VIDEO]',
+							'xpath'              => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[3][self::VIDEO]',
 							'boundingClientRect' => $test_case->get_sample_dom_rect(),
 							'intersectionRatio'  => 0.0,
 						),
 						array(
 							'isLCP'              => false,
-							'xpath'              => '/*[1][self::HTML]/*[2][self::BODY]/*[4][self::VIDEO]',
+							'xpath'              => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[4][self::VIDEO]',
 							'boundingClientRect' => $test_case->get_sample_dom_rect(),
 							'intersectionRatio'  => 0.0,
 						),
