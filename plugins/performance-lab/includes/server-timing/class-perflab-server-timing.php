@@ -220,7 +220,7 @@ class Perflab_Server_Timing {
 		 *
 		 * @since 1.8.0
 		 *
-		 * @param bool $use_output_buffer Whether to use an output buffer.
+		 * @param bool $enabled Whether to use an output buffer.
 		 */
 		return (bool) apply_filters( 'perflab_server_timing_use_output_buffer', $enabled );
 	}
