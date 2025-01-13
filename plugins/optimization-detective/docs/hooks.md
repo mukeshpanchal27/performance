@@ -67,8 +67,7 @@ Filters whether the current response can be optimized. By default, detection and
 2. It’s not a post embed template (`is_embed()`).
 3. It’s not the Customizer preview (`is_customize_preview()`)
 4. It’s not the response to a `POST` request.
-5. The user is not an administrator (`current_user_can( 'customize' )`), unless you're in plugin development mode (`wp_is_development_mode( 'plugin' )`).
-6. There is at least one queried post on the page. This is used to facilitate the purging of page caches after a new URL Metric is stored.
+5. There is at least one queried post on the page. This is used to facilitate the purging of page caches after a new URL Metric is stored.
 
 To force every response to be optimized regardless of the conditions above, you can do:
 
