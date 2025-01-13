@@ -51,18 +51,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 			 * action), so this is why it gets initialized at priority 9.
 			 */
 			add_action( 'init', $bootstrap, 9 );
-
-			register_activation_hook(
-				__FILE__,
-				static function () use ( $bootstrap ): void {
-					/*
-					 * The activation hook is called before the init action, so the plugin is not loaded yet. This
-					 * means that the plugin must be bootstrapped here to run the activation logic.
-					 */
-					$bootstrap();
-					od_rest_api_health_check_plugin_activation();
-				}
-			);
 		}
 
 		// Register this copy of the plugin.

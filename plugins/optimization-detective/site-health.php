@@ -62,12 +62,9 @@ function od_optimization_detective_rest_api_test(): array {
 	if ( is_wp_error( $response ) ) {
 		$result['status']      = 'recommended';
 		$result['label']       = __( 'Error accessing the REST API endpoint', 'optimization-detective' );
-		$result['description'] = sprintf(
-			'<p>%s</p>',
-			esc_html__( 'There was an issue reaching the REST API endpoint. This might be due to server settings or the REST API being disabled.', 'optimization-detective' )
-		);
+		$result['description'] = esc_html__( 'There was an issue reaching the REST API endpoint. This might be due to server settings or the REST API being disabled.', 'optimization-detective' );
 		$info                  = array(
-			'error_message' => $response->get_error_message(),
+			'error_message' => $result['description'],
 			'error_code'    => $response->get_error_code(),
 			'available'     => false,
 		);
@@ -91,27 +88,23 @@ function od_optimization_detective_rest_api_test(): array {
 		} elseif ( 401 === $status_code ) {
 			$result['status']      = 'recommended';
 			$result['label']       = __( 'Authorization should not be required to access the REST API endpoint.', 'optimization-detective' );
-			$result['description'] = sprintf(
-				'<p>%s</p>',
-				esc_html__( 'To collect URL metrics, the REST API endpoint should be accessible without requiring authorization.', 'optimization-detective' )
-			);
+			$result['description'] = esc_html__( 'To collect URL metrics, the REST API endpoint should be accessible without requiring authorization.', 'optimization-detective' );
 		} elseif ( 403 === $status_code ) {
 			$result['status']      = 'recommended';
 			$result['label']       = __( 'The REST API endpoint should not be forbidden.', 'optimization-detective' );
-			$result['description'] = sprintf(
-				'<p>%s</p>',
-				esc_html__( 'The REST API endpoint is blocked. Please review your server or security settings.', 'optimization-detective' )
-			);
+			$result['description'] = esc_html__( 'The REST API endpoint is blocked. Please review your server or security settings.', 'optimization-detective' );
 		} else {
 			$result['status']      = 'recommended';
 			$result['label']       = __( 'Error accessing the REST API endpoint', 'optimization-detective' );
-			$result['description'] = sprintf(
-				'<p>%s</p>',
-				esc_html__( 'There was an issue reaching the REST API endpoint. This might be due to server settings or the REST API being disabled.', 'optimization-detective' )
-			);
+			$result['description'] = esc_html__( 'There was an issue reaching the REST API endpoint. This might be due to server settings or the REST API being disabled.', 'optimization-detective' );
 		}
-		$info['error_message'] = $result['label'];
+		$info['error_message'] = $result['description'];
 	}
+
+	$result['description'] = sprintf(
+		'<p>%s</p>',
+		$result['description']
+	);
 
 	update_option( 'od_rest_api_info', $info );
 	return $result;
@@ -129,14 +122,14 @@ function od_rest_api_health_check_admin_notice( string $plugin_file ): void {
 		return;
 	}
 
-	$od_rest_api_info = get_option( 'od_rest_api_info', array() );
+	$rest_api_info = get_option( 'od_rest_api_info', array() );
 	if (
-		isset( $od_rest_api_info['available'] ) &&
-		! (bool) $od_rest_api_info['available'] &&
-		isset( $od_rest_api_info['error_message'] )
+		isset( $rest_api_info['available'] ) &&
+		false === $rest_api_info['available'] &&
+		isset( $rest_api_info['error_message'] )
 	) {
 		wp_admin_notice(
-			esc_html( $od_rest_api_info['error_message'] ),
+			esc_html( $rest_api_info['error_message'] ),
 			array(
 				'type'               => 'warning',
 				'additional_classes' => array( 'inline', 'notice-alt' ),
@@ -151,17 +144,27 @@ function od_rest_api_health_check_admin_notice( string $plugin_file ): void {
  * @since n.e.x.t
  */
 function od_rest_api_health_check_plugin_activation(): void {
-	// Add the option if it doesn't exist.
-	if ( ! (bool) get_option( 'od_rest_api_info' ) ) {
-		add_option( 'od_rest_api_info', array() );
+	// If the option already exists, do nothing.
+	if ( false !== get_option( 'od_rest_api_info' ) ) {
+		return;
 	}
-	// Run the check immediately after Optimization Detective is activated.
-	add_action(
-		'activated_plugin',
-		static function ( string $plugin ): void {
-			if ( 'optimization-detective/load.php' === $plugin ) {
-				od_optimization_detective_rest_api_test();
-			}
-		}
-	);
+
+	// This will populate the od_rest_api_info option so that the function won't execute on the next page load.
+	od_optimization_detective_rest_api_test();
+
+	// Get the updated option.
+	$rest_api_info = get_option( 'od_rest_api_info', array() );
+	if (
+		isset( $rest_api_info['available'] ) &&
+		false === $rest_api_info['available'] &&
+		isset( $rest_api_info['error_message'] )
+	) {
+		wp_admin_notice(
+			esc_html( $rest_api_info['error_message'] ),
+			array(
+				'type'               => 'warning',
+				'additional_classes' => array( 'notice-alt' ),
+			)
+		);
+	}
 }
