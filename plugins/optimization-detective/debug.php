@@ -200,6 +200,8 @@ function od_debug_add_assets(): void {
 				position-area: top;
 				bottom: anchor-size(height);
 				margin: 0;
+				padding: .25em .5em;
+				border: none;
 			}
 
 			@keyframes pulse {
