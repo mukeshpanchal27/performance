@@ -113,7 +113,7 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	 * @var string
 	 * @link https://github.com/WordPress/performance/issues/1787
 	 */
-	const XPATH_PATTERN = '^/HTML/BODY/[a-zA-Z0-9:_-]+(/\*\[\d+\]\[self::[a-zA-Z0-9:_-]+\])*$';
+	const XPATH_PATTERN = '^(/([a-zA-Z0-9:_-]+|\*\[\d+\]\[self::[a-zA-Z0-9:_-]+\]))+$';
 
 	/**
 	 * Bookmark for the end of the HEAD.
@@ -565,7 +565,7 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 		if ( null === $this->current_xpath ) {
 			$this->current_xpath = '';
 			foreach ( $this->get_indexed_breadcrumbs() as $i => list( $tag_name, $index ) ) {
-				if ( $i < 3 ) {
+				if ( $i < 2 || ( 2 === $i && '/HTML/BODY' === $this->current_xpath ) ) {
 					$this->current_xpath .= "/$tag_name";
 				} else {
 					$this->current_xpath .= sprintf( '/*[%d][self::%s]', $index + 1, $tag_name );
