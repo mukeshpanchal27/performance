@@ -90,6 +90,74 @@ HTML
 			}
 		}
 
+		// Add JavaScript to annotate all INP elements.
+		if ( $processor->get_tag() === 'BODY' ) {
+			foreach ( $context->url_metric_group_collection as $group ) {
+				$inp_dots = array();
+
+				foreach ( $group as $url_metric ) {
+					$inp_data_set = $url_metric->get( 'inpData' );
+					if ( ! is_array( $inp_data_set ) ) {
+						continue;
+					}
+
+					foreach ( $inp_data_set as $inp_data ) {
+						if ( isset( $inp_dots[ $inp_data['interactionTarget'] ] ) ) {
+							$inp_dots[ $inp_data['interactionTarget'] ][] = array(
+								'value' => $inp_data['value'],
+								'rating' => $inp_data['rating'],
+							);
+						} else {
+							$inp_dots[ $inp_data['interactionTarget'] ] = array( array(
+								'value' => $inp_data['value'],
+								'rating' => $inp_data['rating'],
+							) );
+						}
+					}
+				}
+			}
+
+			$inp_dots_json = wp_json_encode( $inp_dots );
+
+			// TODO: Maybe only add the $inp_dots_json here and move the rest to an external script.
+			if ( ! empty( $inp_dots ) ) {
+				$processor->append_body_html(<<<HTML
+<script>
+	let count = 0;
+	for ( const [ interactionTarget, entries ] of Object.entries( $inp_dots_json ) ) {
+		const el = document.querySelector( interactionTarget );
+		if ( ! el ) {
+			continue;
+		}
+
+		count++;
+
+		el.style.setProperty( 'anchor-name', `--od-debug-element-\${count};` );
+
+		const anchor = document.createElement( 'button' );
+		anchor.setAttribute( 'class', 'od-debug-dot od-debug-dot-inp' );
+		anchor.setAttribute( 'popovertarget', `od-debug-popover-\${count}` );
+		anchor.setAttribute( 'popovertargetaction', 'toggle' );
+		anchor.setAttribute( 'style', `anchor-name: --od-debug-dot-\${count}; position-anchor: --od-debug-element-\${count};` );
+		anchor.setAttribute( 'aria-details', `od-debug-popover-\${count}` );
+		anchor.setAttribute( 'aria-label', 'INP element' );
+
+		const tooltip = document.createElement( 'div' );
+		tooltip.setAttribute( 'id', `od-debug-popover-\${count}` );
+		tooltip.setAttribute( 'popover', '' );
+		tooltip.setAttribute( 'class', 'od-debug-popover' );
+		tooltip.setAttribute( 'style', `position-anchor: --od-debug-dot-\${count};` );
+		tooltip.textContent = `INP Element (Value: \${entries[0].value}) (Rating: \${entries[0].rating}) (Tag name: \${el.tagName})`;
+
+		document.body.append(anchor);
+		document.body.append(tooltip);
+	}
+</script>
+HTML
+				);
+			}
+		}
+
 		return false;
 	}
 }

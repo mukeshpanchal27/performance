@@ -118,65 +118,7 @@ function od_debug_add_assets(): void {
 	if ( ! is_admin_bar_showing() ) {
 		return;
 	}
-
-	$tag_visitor_registry = new OD_Tag_Visitor_Registry();
-
-	/** This action is documented in optimization.php. */
-	do_action( 'od_register_tag_visitors', $tag_visitor_registry );
-
-	$group_collection = od_get_group_collection( $tag_visitor_registry );
-
-	$inp_dots = array();
-
-	foreach ( $group_collection as $group ) {
-		foreach ( $group as $url_metric ) {
-			$inp_data_set = $url_metric->get( 'inpData' );
-			if ( ! is_array( $inp_data_set ) ) {
-				continue;
-			}
-			foreach ( $inp_data_set as $inp_data ) {
-				if ( isset( $inp_dots[ $inp_data['interactionTarget'] ] ) ) {
-					$inp_dots[ $inp_data['interactionTarget'] ][] = $inp_data;
-				} else {
-					$inp_dots[ $inp_data['interactionTarget'] ] = array( $inp_data );
-				}
-			}
-		}
-	}
-
 	?>
-		<script>
-			/* TODO: Add INP elements here */
-			let count = 0;
-			for ( const [ interactionTarget, entries ] of Object.entries( <?php echo wp_json_encode( $inp_dots ); ?> ) ) {
-				const el = document.querySelector( interactionTarget );
-				if ( ! el ) {
-					continue;
-				}
-
-				count++;
-
-				el.style.setProperty( 'anchor-name', `--od-debug-element-${count};` );
-
-				const anchor = document.createElement( 'button' );
-				anchor.setAttribute( 'class', 'od-debug-dot od-debug-dot-inp' );
-				anchor.setAttribute( 'popovertarget', `od-debug-popover-${count}` );
-				anchor.setAttribute( 'popovertargetaction', 'toggle' );
-				anchor.setAttribute( 'style', `anchor-name: --od-debug-dot-${count}; position-anchor: --od-debug-element-${count};` );
-				anchor.setAttribute( 'aria-details', `od-debug-popover-${count}` );
-				anchor.setAttribute( 'aria-label', 'INP element' );
-
-				const tooltip = document.createElement( 'div' );
-				tooltip.setAttribute( 'id', `od-debug-popover-${count}` );
-				tooltip.setAttribute( 'popover', '' );
-				tooltip.setAttribute( 'class', 'od-debug-popover' );
-				tooltip.setAttribute( 'style', `position-anchor: --od-debug-dot-${count};` );
-				tooltip.textContent = `INP Element (Value: ${entries[0].value}) (Rating: ${entries[0].rating}) (Tag name: ${el.tagName})`;
-
-				document.body.append(anchor);
-				document.body.append(tooltip);
-			}
-		</script>
 		<style>
 			body:not(.od-debug) .od-debug-dot,
 			body:not(.od-debug) .od-debug-popover {
