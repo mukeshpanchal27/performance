@@ -170,10 +170,14 @@ function od_is_response_html_content_type(): bool {
  * @since 0.1.0
  * @access private
  *
+ * @global WP_Query $wp_the_query WP_Query object.
+ *
  * @param string $buffer Template output buffer.
  * @return string Filtered template output buffer.
  */
 function od_optimize_template_output_buffer( string $buffer ): string {
+	global $wp_the_query;
+
 	// If the content-type is not HTML or the output does not start with '<', then abort since the buffer is definitely not HTML.
 	if (
 		! od_is_response_html_content_type() ||
@@ -193,6 +197,7 @@ function od_optimize_template_output_buffer( string $buffer ): string {
 	}
 
 	$slug = od_get_url_metrics_slug( od_get_normalized_query_vars() );
+	$post = OD_URL_Metrics_Post_Type::get_post( $slug );
 
 	$tag_visitor_registry = new OD_Tag_Visitor_Registry();
 
@@ -205,7 +210,14 @@ function od_optimize_template_output_buffer( string $buffer ): string {
 	 */
 	do_action( 'od_register_tag_visitors', $tag_visitor_registry );
 
-	$group_collection     = od_get_group_collection( $tag_visitor_registry );
+	$current_etag         = od_get_current_url_metrics_etag( $tag_visitor_registry, $wp_the_query, od_get_current_theme_template() );
+	$group_collection     = new OD_URL_Metric_Group_Collection(
+		$post instanceof WP_Post ? OD_URL_Metrics_Post_Type::get_url_metrics_from_post( $post ) : array(),
+		$current_etag,
+		od_get_breakpoint_max_widths(),
+		od_get_url_metrics_breakpoint_sample_size(),
+		od_get_url_metric_freshness_ttl()
+	);
 	$link_collection      = new OD_Link_Collection();
 	$tag_visitor_context  = new OD_Tag_Visitor_Context( $processor, $group_collection, $link_collection );
 	$current_tag_bookmark = 'optimization_detective_current_tag';
