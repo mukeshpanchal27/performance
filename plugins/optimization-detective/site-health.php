@@ -118,26 +118,6 @@ function od_optimization_detective_rest_api_test(): array {
 }
 
 /**
- * Periodically runs the Optimization Detective REST API health check.
- *
- * @since n.e.x.t
- */
-function od_schedule_rest_api_health_check(): void {
-	if ( ! (bool) wp_next_scheduled( 'od_rest_api_health_check_event' ) ) {
-		wp_schedule_event( time(), 'weekly', 'od_rest_api_health_check_event' );
-	}
-}
-
-/**
- * Hook for the scheduled REST API health check.
- *
- * @since n.e.x.t
- */
-function od_run_scheduled_rest_api_health_check(): void {
-	od_optimization_detective_rest_api_test();
-}
-
-/**
  * Displays an admin notice if the REST API health check fails.
  *
  * @since n.e.x.t
@@ -175,7 +155,6 @@ function od_rest_api_health_check_plugin_activation(): void {
 	if ( ! (bool) get_option( 'od_rest_api_info' ) ) {
 		add_option( 'od_rest_api_info', array() );
 	}
-	od_schedule_rest_api_health_check();
 	// Run the check immediately after Optimization Detective is activated.
 	add_action(
 		'activated_plugin',
