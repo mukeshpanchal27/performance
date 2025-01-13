@@ -88,10 +88,6 @@ function od_debug_add_admin_bar_menu_item( WP_Admin_Bar &$wp_admin_bar ): void {
 		return;
 	}
 
-	if ( ! is_admin_bar_showing() ) {
-		return;
-	}
-
 	if ( is_admin() ) {
 		return;
 	}
