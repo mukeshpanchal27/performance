@@ -127,9 +127,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		// Add hooks for the above requires.
 		require_once __DIR__ . '/hooks.php';
-
-		// Debugging helper.
-		require_once __DIR__ . '/class-optimization-detective-debug-tag-visitor.php';
-		require_once __DIR__ . '/debug.php';
 	}
 );
