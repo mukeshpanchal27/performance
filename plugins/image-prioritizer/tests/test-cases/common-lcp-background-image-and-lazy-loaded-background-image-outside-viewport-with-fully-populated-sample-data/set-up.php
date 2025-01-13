@@ -10,18 +10,18 @@ return static function ( Test_Image_Prioritizer_Helper $test_case ): void {
 	$test_case->populate_url_metrics(
 		array(
 			array(
-				'xpath' => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[1][self::DIV]',
+				'xpath' => '/HTML/BODY/DIV/*[1][self::DIV]',
 				'isLCP' => true,
 			),
 			array(
-				'xpath'              => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[3][self::DIV]',
+				'xpath'              => '/HTML/BODY/DIV/*[3][self::DIV]',
 				'isLCP'              => false,
 				'intersectionRatio'  => 0.0,
 				'intersectionRect'   => $outside_viewport_rect,
 				'boundingClientRect' => $outside_viewport_rect,
 			),
 			array(
-				'xpath'              => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[4][self::DIV]',
+				'xpath'              => '/HTML/BODY/DIV/*[4][self::DIV]',
 				'isLCP'              => false,
 				'intersectionRatio'  => 0.0,
 				'intersectionRect'   => $outside_viewport_rect,
