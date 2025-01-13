@@ -33,7 +33,11 @@ function perflab_aea_audit_enqueued_scripts(): void {
 
 			// Add any extra data (inlined) that was passed with the script.
 			$inline_size = 0;
-			if ( ! empty( $script->extra ) && ! empty( $script->extra['after'] ) ) {
+			if (
+				property_exists( $script, 'extra' ) &&
+				isset( $script->extra['after'] ) &&
+				is_array( $script->extra['after'] )
+			) {
 				foreach ( $script->extra['after'] as $extra ) {
 					$inline_size += ( is_string( $extra ) ) ? mb_strlen( $extra, '8bit' ) : 0;
 				}
@@ -76,7 +80,12 @@ function perflab_aea_audit_enqueued_styles(): void {
 			}
 
 			// Check if we already have the style's path ( part of a refactor for block styles from 5.9 ).
-			if ( ! empty( $style->extra ) && ! empty( $style->extra['path'] ) ) {
+			if (
+				property_exists( $style, 'extra' ) &&
+				isset( $style->extra['path'] ) &&
+				is_string( $style->extra['path'] ) &&
+				'' !== $style->extra['path']
+			) {
 				$path = $style->extra['path'];
 			} else { // Fallback to getting the path from the style's src.
 				$path = perflab_aea_get_path_from_resource_url( $style->src );
@@ -87,7 +96,11 @@ function perflab_aea_audit_enqueued_styles(): void {
 
 			// Add any extra data (inlined) that was passed with the style.
 			$inline_size = 0;
-			if ( ! empty( $style->extra ) && ! empty( $style->extra['after'] ) ) {
+			if (
+				property_exists( $style, 'extra' ) &&
+				isset( $style->extra['after'] ) &&
+				is_array( $style->extra['after'] )
+			) {
 				foreach ( $style->extra['after'] as $extra ) {
 					$inline_size += ( is_string( $extra ) ) ? mb_strlen( $extra, '8bit' ) : 0;
 				}
