@@ -123,7 +123,7 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	 * @var string
 	 * @link https://github.com/WordPress/performance/issues/1787
 	 */
-	const XPATH_PATTERN = '^(/([a-zA-Z0-9:_-]+|\*\[\d+\]\[self::[a-zA-Z0-9:_-]+\]))+$';
+	const XPATH_PATTERN = '^(/([a-zA-Z0-9:_-]+|\*\[\d+\]\[self::[a-zA-Z0-9:_-]+\])(\[@\w+.*?\])*)+$';
 
 	/**
 	 * Bookmark for the end of the HEAD.
@@ -152,6 +152,14 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	private $open_stack_tags = array();
 
 	/**
+	 * Stack of the attributes for open tags.
+	 *
+	 * @since n.e.x.t
+	 * @var array<array<string, string|true>>
+	 */
+	private $open_stack_attributes = array();
+
+	/**
 	 * Open stack indices.
 	 *
 	 * @since 0.4.0
@@ -168,7 +176,7 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	 * populated back into `$this->open_stack_tags` and `$this->open_stack_indices`.
 	 *
 	 * @since 0.4.0
-	 * @var array<string, array{tags: string[], indices: int[]}>
+	 * @var array<string, array{tags: string[], attributes: array<array<string, string|true>>, indices: int[]}>
 	 */
 	private $bookmarked_open_stacks = array();
 
@@ -291,8 +299,9 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 		$this->current_xpath = null; // Clear cache.
 		++$this->cursor_move_count;
 		if ( ! parent::next_token() ) {
-			$this->open_stack_tags    = array();
-			$this->open_stack_indices = array();
+			$this->open_stack_tags       = array();
+			$this->open_stack_attributes = array();
+			$this->open_stack_indices    = array();
 
 			// Mark that the end of the document was reached, meaning that get_modified_html() should now be able to append markup to the HEAD and the BODY.
 			$this->reached_end_of_document = true;
@@ -306,6 +315,7 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 
 		if ( $this->previous_tag_without_closer ) {
 			array_pop( $this->open_stack_tags );
+			array_pop( $this->open_stack_attributes );
 		}
 
 		if ( ! $this->is_tag_closer() ) {
@@ -317,12 +327,23 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 				$i = array_search( 'P', $this->open_stack_tags, true );
 				if ( false !== $i ) {
 					array_splice( $this->open_stack_tags, (int) $i );
+					array_splice( $this->open_stack_attributes, (int) $i );
 					array_splice( $this->open_stack_indices, count( $this->open_stack_tags ) + 1 );
 				}
 			}
 
 			$level                   = count( $this->open_stack_tags );
 			$this->open_stack_tags[] = $tag_name;
+
+			// Capture key attributes for each tag on the stack. This is used to further disambiguate XPaths, specifically for children of the BODY for now.
+			$attributes = array();
+			foreach ( array( 'id', 'class', 'role' ) as $attribute_name ) {
+				$attribute_value = $this->get_attribute( $attribute_name );
+				if ( null !== $attribute_value ) {
+					$attributes[ $attribute_name ] = $attribute_value;
+				}
+			}
+			$this->open_stack_attributes[] = $attributes;
 
 			if ( ! isset( $this->open_stack_indices[ $level ] ) ) {
 				$this->open_stack_indices[ $level ] = 0;
@@ -347,6 +368,7 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 			}
 
 			$popped_tag_name = array_pop( $this->open_stack_tags );
+			array_pop( $this->open_stack_attributes );
 			if ( $popped_tag_name !== $tag_name ) {
 				$this->warn(
 					__METHOD__,
@@ -464,8 +486,9 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	public function seek( $bookmark_name ): bool {
 		$result = parent::seek( $bookmark_name );
 		if ( $result ) {
-			$this->open_stack_tags    = $this->bookmarked_open_stacks[ $bookmark_name ]['tags'];
-			$this->open_stack_indices = $this->bookmarked_open_stacks[ $bookmark_name ]['indices'];
+			$this->open_stack_tags       = $this->bookmarked_open_stacks[ $bookmark_name ]['tags'];
+			$this->open_stack_attributes = $this->bookmarked_open_stacks[ $bookmark_name ]['attributes'];
+			$this->open_stack_indices    = $this->bookmarked_open_stacks[ $bookmark_name ]['indices'];
 		}
 		return $result;
 	}
@@ -483,8 +506,9 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 		$result = parent::set_bookmark( $name );
 		if ( $result ) {
 			$this->bookmarked_open_stacks[ $name ] = array(
-				'tags'    => $this->open_stack_tags,
-				'indices' => $this->open_stack_indices,
+				'tags'       => $this->open_stack_tags,
+				'attributes' => $this->open_stack_attributes,
+				'indices'    => $this->open_stack_indices,
 			);
 		}
 		return $result;
@@ -520,11 +544,11 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	 * @since 0.4.0
 	 * @since 0.9.0 Renamed from get_breadcrumbs() to get_indexed_breadcrumbs().
 	 *
-	 * @return Generator<array{string, int}> Breadcrumb.
+	 * @return Generator<array{string, int, array<string, string|true>}> Breadcrumb.
 	 */
 	private function get_indexed_breadcrumbs(): Generator {
 		foreach ( $this->open_stack_tags as $i => $breadcrumb_tag_name ) {
-			yield array( $breadcrumb_tag_name, $this->open_stack_indices[ $i ] );
+			yield array( $breadcrumb_tag_name, $this->open_stack_indices[ $i ], $this->open_stack_attributes[ $i ] );
 		}
 	}
 
@@ -574,9 +598,23 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	public function get_xpath(): string {
 		if ( null === $this->current_xpath ) {
 			$this->current_xpath = '';
-			foreach ( $this->get_indexed_breadcrumbs() as $i => list( $tag_name, $index ) ) {
-				if ( $i < 2 || ( 2 === $i && '/HTML/BODY' === $this->current_xpath ) ) {
+			foreach ( $this->get_indexed_breadcrumbs() as $i => list( $tag_name, $index, $attributes ) ) {
+				if ( $i < 2 ) {
 					$this->current_xpath .= "/$tag_name";
+				} elseif ( 2 === $i && '/HTML/BODY' === $this->current_xpath ) {
+					$segment = "/$tag_name";
+					foreach ( $attributes as $attribute_name => $attribute_value ) {
+						if ( true === $attribute_value ) {
+							$segment .= sprintf( '[@%s]', $attribute_name );
+						} else {
+							$segment .= sprintf(
+								"[@%s='%s']",
+								$attribute_name,
+								addcslashes( $attribute_value, '\'\\' ) // TODO: Verify escaping.
+							);
+						}
+					}
+					$this->current_xpath .= $segment;
 				} else {
 					$this->current_xpath .= sprintf( '/*[%d][self::%s]', $index + 1, $tag_name );
 				}
