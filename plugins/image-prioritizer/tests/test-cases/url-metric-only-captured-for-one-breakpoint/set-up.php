@@ -7,7 +7,7 @@ return static function ( Test_Image_Prioritizer_Helper $test_case ): void {
 				'viewport_width' => 400,
 				'element'        => array(
 					'isLCP' => true,
-					'xpath' => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[1][self::IMG]',
+					'xpath' => '/HTML/BODY/DIV/*[1][self::IMG]',
 				),
 			)
 		)

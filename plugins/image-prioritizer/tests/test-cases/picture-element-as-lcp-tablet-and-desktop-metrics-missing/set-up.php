@@ -22,7 +22,7 @@ return static function ( Test_Image_Prioritizer_Helper $test_case ): void {
 						'viewport_width' => $viewport_width,
 						'elements'       => array(
 							array(
-								'xpath' => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[1][self::PICTURE]/*[3][self::IMG]',
+								'xpath' => '/HTML/BODY/DIV/*[1][self::PICTURE]/*[3][self::IMG]',
 								'isLCP' => true,
 							),
 						),
