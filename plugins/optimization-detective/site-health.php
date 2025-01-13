@@ -146,6 +146,7 @@ function od_rest_api_health_check_admin_notice( string $plugin_file ): void {
 function od_rest_api_health_check_plugin_activation(): void {
 	// If the option already exists, do nothing.
 	if ( false !== get_option( 'od_rest_api_info' ) ) {
+		add_action( 'after_plugin_row_meta', 'od_rest_api_health_check_admin_notice', 30 );
 		return;
 	}
 
