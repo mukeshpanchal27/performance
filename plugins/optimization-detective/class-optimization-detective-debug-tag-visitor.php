@@ -117,53 +117,54 @@ HTML
 						}
 					}
 				}
+
+				$inp_dots_json = wp_json_encode( $inp_dots );
+
+				// TODO: Maybe only add the $inp_dots_json here and move the rest to an external script.
+				if ( array() !== ( $inp_dots ) ) {
+					$processor->append_body_html(
+						<<<HTML
+	<script>
+		let count = 0;
+		for ( const [ interactionTarget, entries ] of Object.entries( $inp_dots_json ) ) {
+			const el = document.querySelector( interactionTarget );
+			if ( ! el ) {
+				continue;
 			}
 
-			$inp_dots_json = wp_json_encode( $inp_dots );
+			count++;
 
-			// TODO: Maybe only add the $inp_dots_json here and move the rest to an external script.
-			if ( ! empty( $inp_dots ) ) {
-				$processor->append_body_html(
-					<<<HTML
-<script>
-	let count = 0;
-	for ( const [ interactionTarget, entries ] of Object.entries( $inp_dots_json ) ) {
-		const el = document.querySelector( interactionTarget );
-		if ( ! el ) {
-			continue;
+			let anchorName = el.style.anchorName;
+
+			if ( ! anchorName ) {
+				anchorName = `--od-debug-element-\${count}`;
+				el.style.anchorName = anchorName;
+			}
+
+			const anchor = document.createElement( 'button' );
+			anchor.setAttribute( 'class', 'od-debug-dot od-debug-dot-inp' );
+			anchor.setAttribute( 'popovertarget', `od-debug-popover-\${count}` );
+			anchor.setAttribute( 'popovertargetaction', 'toggle' );
+			anchor.setAttribute( 'style', `anchor-name: --od-debug-dot-\${count}; position-anchor: \${anchorName};` );
+			anchor.setAttribute( 'aria-details', `od-debug-popover-\${count}` );
+			anchor.setAttribute( 'aria-label', 'INP element' );
+
+			const tooltip = document.createElement( 'div' );
+			tooltip.setAttribute( 'id', `od-debug-popover-\${count}` );
+			tooltip.setAttribute( 'popover', '' );
+			tooltip.setAttribute( 'class', 'od-debug-popover' );
+			tooltip.setAttribute( 'style', `position-anchor: --od-debug-dot-\${count};` );
+			tooltip.textContent = `INP Element (Value: \${entries[0].value}) (Rating: \${entries[0].rating}) (Tag name: \${el.tagName})`;
+
+			document.body.append(anchor);
+			document.body.append(tooltip);
 		}
-
-		count++;
-
-		let anchorName = el.style.anchorName;
-
-		if ( ! anchorName ) {
-			anchorName = `--od-debug-element-\${count}`;
-			el.style.anchorName = anchorName;
-		}
-
-		const anchor = document.createElement( 'button' );
-		anchor.setAttribute( 'class', 'od-debug-dot od-debug-dot-inp' );
-		anchor.setAttribute( 'popovertarget', `od-debug-popover-\${count}` );
-		anchor.setAttribute( 'popovertargetaction', 'toggle' );
-		anchor.setAttribute( 'style', `anchor-name: --od-debug-dot-\${count}; position-anchor: \${anchorName};` );
-		anchor.setAttribute( 'aria-details', `od-debug-popover-\${count}` );
-		anchor.setAttribute( 'aria-label', 'INP element' );
-
-		const tooltip = document.createElement( 'div' );
-		tooltip.setAttribute( 'id', `od-debug-popover-\${count}` );
-		tooltip.setAttribute( 'popover', '' );
-		tooltip.setAttribute( 'class', 'od-debug-popover' );
-		tooltip.setAttribute( 'style', `position-anchor: --od-debug-dot-\${count};` );
-		tooltip.textContent = `INP Element (Value: \${entries[0].value}) (Rating: \${entries[0].rating}) (Tag name: \${el.tagName})`;
-
-		document.body.append(anchor);
-		document.body.append(tooltip);
-	}
-</script>
+	</script>
 HTML
-				);
+					);
+				}
 			}
+
 		}
 
 		return false;
