@@ -134,7 +134,11 @@ function od_debug_add_assets(): void {
 
 	foreach ( $group_collection as $group ) {
 		foreach ( $group as $url_metric ) {
-			foreach ( $url_metric->get( 'inpData' ) as $inp_data ) {
+			$inp_data_set = $url_metric->get( 'inpData' );
+			if ( ! is_array( $inp_data_set ) ) {
+				continue;
+			}
+			foreach ( $inp_data_set as $inp_data ) {
 				if ( isset( $inp_dots[ $inp_data['interactionTarget'] ] ) ) {
 					$inp_dots[ $inp_data['interactionTarget'] ][] = $inp_data;
 				} else {
