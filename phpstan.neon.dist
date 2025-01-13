@@ -70,6 +70,5 @@ parameters:
 			identifier: empty.notAllowed
 			paths:
 				- */tests/*
-				- plugins/dominant-color-images
 				- plugins/performance-lab
 				- plugins/webp-uploads
