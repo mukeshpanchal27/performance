@@ -474,15 +474,17 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 				<html>
 					<head></head>
 					<body>
-						<iframe src="https://example.net/"></iframe>
-						<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio">
-							<div class="wp-block-embed__wrapper">
-								<iframe title="Matt Mullenweg: State of the Word 2023" width="750" height="422" src="https://www.youtube.com/embed/c7M4mBVgP3Y?feature=oembed" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-							</div>
-							<figcaption>This is the State of the Word!</figcaption>
-						</figure>
-						<iframe src="https://example.com/"></iframe>
-						<img src="https://example.com/foo.jpg">
+						<div id="page">
+							<iframe src="https://example.net/"></iframe>
+							<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio">
+								<div class="wp-block-embed__wrapper">
+									<iframe title="Matt Mullenweg: State of the Word 2023" width="750" height="422" src="https://www.youtube.com/embed/c7M4mBVgP3Y?feature=oembed" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+								</div>
+								<figcaption>This is the State of the Word!</figcaption>
+							</figure>
+							<iframe src="https://example.com/"></iframe>
+							<img src="https://example.com/foo.jpg">
+						</div>
 					</body>
 				</html>
 				'
@@ -525,23 +527,23 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 		$expected_figure_contents = array(
 			array(
 				'tag'   => 'FIGURE',
-				'xpath' => '/*[1][self::HTML]/*[2][self::BODY]/*[2][self::FIGURE]',
-				'depth' => 3,
+				'xpath' => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[2][self::FIGURE]',
+				'depth' => 4,
 			),
 			array(
 				'tag'   => 'DIV',
-				'xpath' => '/*[1][self::HTML]/*[2][self::BODY]/*[2][self::FIGURE]/*[1][self::DIV]',
-				'depth' => 4,
-			),
-			array(
-				'tag'   => 'IFRAME',
-				'xpath' => '/*[1][self::HTML]/*[2][self::BODY]/*[2][self::FIGURE]/*[1][self::DIV]/*[1][self::IFRAME]',
+				'xpath' => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[2][self::FIGURE]/*[1][self::DIV]',
 				'depth' => 5,
 			),
 			array(
+				'tag'   => 'IFRAME',
+				'xpath' => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[2][self::FIGURE]/*[1][self::DIV]/*[1][self::IFRAME]',
+				'depth' => 6,
+			),
+			array(
 				'tag'   => 'FIGCAPTION',
-				'xpath' => '/*[1][self::HTML]/*[2][self::BODY]/*[2][self::FIGURE]/*[2][self::FIGCAPTION]',
-				'depth' => 4,
+				'xpath' => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[2][self::FIGURE]/*[2][self::FIGCAPTION]',
+				'depth' => 5,
 			),
 		);
 
