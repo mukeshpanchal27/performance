@@ -33,28 +33,28 @@ return static function ( Test_Image_Prioritizer_Helper $test_case ): void {
 						'viewport_width' => $viewport_width,
 						'elements'       => array(
 							array(
-								'xpath'              => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[1][self::IMG]',
+								'xpath'              => '/HTML/BODY/DIV/*[1][self::IMG]',
 								'isLCP'              => false,
 								'intersectionRatio'  => 0.0,
 								'intersectionRect'   => $above_viewport_rect,
 								'boundingClientRect' => $above_viewport_rect,
 							),
 							array(
-								'xpath'              => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[2][self::IMG]',
+								'xpath'              => '/HTML/BODY/DIV/*[2][self::IMG]',
 								'isLCP'              => false,
 								'intersectionRatio'  => 0.0,
 								'intersectionRect'   => $left_of_viewport_rect,
 								'boundingClientRect' => $left_of_viewport_rect,
 							),
 							array(
-								'xpath'              => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[3][self::IMG]',
+								'xpath'              => '/HTML/BODY/DIV/*[3][self::IMG]',
 								'isLCP'              => false,
 								'intersectionRatio'  => 0.0,
 								'intersectionRect'   => $right_of_viewport_rect,
 								'boundingClientRect' => $right_of_viewport_rect,
 							),
 							array(
-								'xpath'              => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[4][self::IMG]',
+								'xpath'              => '/HTML/BODY/DIV/*[4][self::IMG]',
 								'isLCP'              => false,
 								'intersectionRatio'  => 0.0,
 								'intersectionRect'   => $below_viewport_rect,
