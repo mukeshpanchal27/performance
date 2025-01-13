@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param OD_Tag_Visitor_Registry $registry Tag visitor registry.
  */
 function od_debug_register_tag_visitors( OD_Tag_Visitor_Registry $registry ): void {
-	if ( ! current_user_can( 'customize' ) && ! wp_is_development_mode( 'plugin' ) ) {
+	if ( ! current_user_can( 'customize' ) ) {
 		return;
 	}
 
@@ -84,7 +84,7 @@ add_filter( 'od_url_metric_schema_root_additional_properties', 'od_debug_add_inp
  * @param WP_Admin_Bar $wp_admin_bar The WP_Admin_Bar instance, passed by reference.
  */
 function od_debug_add_admin_bar_menu_item( WP_Admin_Bar &$wp_admin_bar ): void {
-	if ( ! current_user_can( 'customize' ) && ! wp_is_development_mode( 'plugin' ) ) {
+	if ( ! current_user_can( 'customize' ) ) {
 		return;
 	}
 
@@ -111,7 +111,7 @@ add_action( 'admin_bar_menu', 'od_debug_add_admin_bar_menu_item', 100 );
  * Adds inline JS & CSS for debugging.
  */
 function od_debug_add_assets(): void {
-	if ( ! current_user_can( 'customize' ) && ! wp_is_development_mode( 'plugin' ) ) {
+	if ( ! current_user_can( 'customize' ) ) {
 		return;
 	}
 
