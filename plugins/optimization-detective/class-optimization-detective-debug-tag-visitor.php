@@ -135,13 +135,18 @@ HTML
 
 		count++;
 
-		el.style.setProperty( 'anchor-name', `--od-debug-element-\${count};` );
+		let anchorName = el.style.anchorName;
+
+		if ( ! anchorName ) {
+			anchorName = `--od-debug-element-\${count}`;
+			el.style.anchorName = anchorName;
+		}
 
 		const anchor = document.createElement( 'button' );
 		anchor.setAttribute( 'class', 'od-debug-dot od-debug-dot-inp' );
 		anchor.setAttribute( 'popovertarget', `od-debug-popover-\${count}` );
 		anchor.setAttribute( 'popovertargetaction', 'toggle' );
-		anchor.setAttribute( 'style', `anchor-name: --od-debug-dot-\${count}; position-anchor: --od-debug-element-\${count};` );
+		anchor.setAttribute( 'style', `anchor-name: --od-debug-dot-\${count}; position-anchor: \${anchorName};` );
 		anchor.setAttribute( 'aria-details', `od-debug-popover-\${count}` );
 		anchor.setAttribute( 'aria-label', 'INP element' );
 
