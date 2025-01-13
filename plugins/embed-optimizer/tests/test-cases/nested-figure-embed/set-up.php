@@ -3,24 +3,24 @@ return static function ( Test_Embed_Optimizer_Optimization_Detective $test_case 
 	$test_case->populate_url_metrics(
 		array(
 			array(
-				'xpath'                     => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::FIGURE]/*[1][self::DIV]',
+				'xpath'                     => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[1][self::FIGURE]/*[1][self::DIV]',
 				'isLCP'                     => false,
 				'intersectionRatio'         => 1,
 				'resizedBoundingClientRect' => array_merge( $test_case->get_sample_dom_rect(), array( 'height' => 500 ) ),
 			),
 			array(
-				'xpath'             => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::FIGURE]/*[1][self::DIV]/*[1][self::VIDEO]',
+				'xpath'             => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[1][self::FIGURE]/*[1][self::DIV]/*[1][self::VIDEO]',
 				'isLCP'             => false,
 				'intersectionRatio' => 1,
 			),
 			array(
-				'xpath'                     => '/*[1][self::HTML]/*[2][self::BODY]/*[2][self::FIGURE]/*[1][self::DIV]',
+				'xpath'                     => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[2][self::FIGURE]/*[1][self::DIV]',
 				'isLCP'                     => false,
 				'intersectionRatio'         => 0,
 				'resizedBoundingClientRect' => array_merge( $test_case->get_sample_dom_rect(), array( 'height' => 654 ) ),
 			),
 			array(
-				'xpath'             => '/*[1][self::HTML]/*[2][self::BODY]/*[2][self::FIGURE]/*[1][self::DIV]/*[1][self::FIGURE]/*[2][self::VIDEO]',
+				'xpath'             => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[2][self::FIGURE]/*[1][self::DIV]/*[1][self::FIGURE]/*[2][self::VIDEO]',
 				'isLCP'             => false,
 				'intersectionRatio' => 0,
 			),

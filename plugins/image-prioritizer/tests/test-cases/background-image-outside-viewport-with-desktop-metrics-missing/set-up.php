@@ -24,7 +24,7 @@ return static function ( Test_Image_Prioritizer_Helper $test_case ): void {
 					'viewport_width' => $non_desktop_viewport_width,
 					'elements'       => array(
 						array(
-							'xpath'              => '/*[1][self::HTML]/*[2][self::BODY]/*[2][self::DIV]',
+							'xpath'              => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[2][self::DIV]',
 							'isLCP'              => false,
 							'intersectionRatio'  => 0.0,
 							'intersectionRect'   => $outside_viewport_rect,

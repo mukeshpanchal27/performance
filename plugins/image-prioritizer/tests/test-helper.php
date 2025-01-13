@@ -113,7 +113,7 @@ class Test_Image_Prioritizer_Helper extends WP_UnitTestCase {
 			// Note: The Image Prioritizer plugin removes the loading attribute, and so then Auto Sizes does not then add sizes=auto.
 			'wrongly_lazy_responsive_img'       => array(
 				'element_metrics' => array(
-					'xpath'             => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::IMG]',
+					'xpath'             => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[1][self::IMG]',
 					'isLCP'             => false,
 					'intersectionRatio' => 1,
 				),
@@ -123,7 +123,7 @@ class Test_Image_Prioritizer_Helper extends WP_UnitTestCase {
 
 			'non_responsive_image'              => array(
 				'element_metrics' => array(
-					'xpath'              => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::IMG]',
+					'xpath'              => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[1][self::IMG]',
 					'isLCP'              => false,
 					'intersectionRatio'  => 0,
 					'intersectionRect'   => $outside_viewport_rect,
@@ -135,7 +135,7 @@ class Test_Image_Prioritizer_Helper extends WP_UnitTestCase {
 
 			'auto_sizes_added'                  => array(
 				'element_metrics' => array(
-					'xpath'              => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::IMG]',
+					'xpath'              => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[1][self::IMG]',
 					'isLCP'              => false,
 					'intersectionRatio'  => 0,
 					'intersectionRect'   => $outside_viewport_rect,
@@ -147,7 +147,7 @@ class Test_Image_Prioritizer_Helper extends WP_UnitTestCase {
 
 			'auto_sizes_already_added'          => array(
 				'element_metrics' => array(
-					'xpath'              => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::IMG]',
+					'xpath'              => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[1][self::IMG]',
 					'isLCP'              => false,
 					'intersectionRatio'  => 0,
 					'intersectionRect'   => $outside_viewport_rect,
@@ -160,7 +160,7 @@ class Test_Image_Prioritizer_Helper extends WP_UnitTestCase {
 			// If Auto Sizes added the sizes=auto attribute but Image Prioritizer ended up removing it due to the image not being lazy-loaded, remove sizes=auto again.
 			'wrongly_auto_sized_responsive_img' => array(
 				'element_metrics' => array(
-					'xpath'             => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::IMG]',
+					'xpath'             => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[1][self::IMG]',
 					'isLCP'             => false,
 					'intersectionRatio' => 1,
 				),
@@ -170,7 +170,7 @@ class Test_Image_Prioritizer_Helper extends WP_UnitTestCase {
 
 			'wrongly_auto_sized_responsive_img_with_only_auto' => array(
 				'element_metrics' => array(
-					'xpath'             => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::IMG]',
+					'xpath'             => '/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[1][self::IMG]',
 					'isLCP'             => false,
 					'intersectionRatio' => 1,
 				),
@@ -191,12 +191,12 @@ class Test_Image_Prioritizer_Helper extends WP_UnitTestCase {
 	public function test_auto_sizes_end_to_end( array $element_metrics, string $buffer, string $expected ): void {
 		$this->populate_url_metrics( array( $element_metrics ) );
 
-		$html_start_doc = '<html lang="en"><head><meta charset="utf-8"><title>...</title></head><body>';
-		$html_end_doc   = '</body></html>';
+		$html_start_doc = '<html lang="en"><head><meta charset="utf-8"><title>...</title></head><body><div id="page">';
+		$html_end_doc   = '</div></body></html>';
 
 		$buffer = od_optimize_template_output_buffer( $html_start_doc . $buffer . $html_end_doc );
-		$buffer = preg_replace( '#.+?<body[^>]*>#s', '', $buffer );
-		$buffer = preg_replace( '#</body>.*$#s', '', $buffer );
+		$buffer = preg_replace( '#.+?<body[^>]*><div[^>]*>#s', '', $buffer );
+		$buffer = preg_replace( '#</div></body>.*$#s', '', $buffer );
 
 		$this->assertEquals(
 			$this->remove_initial_tabs( $expected ),

@@ -12,7 +12,7 @@ return static function ( Test_Embed_Optimizer_Optimization_Detective $test_case 
 		$elements[] = array_merge(
 			$element_data,
 			array(
-				'xpath' => "/*[1][self::HTML]/*[2][self::BODY]/*[{$i}][self::FIGURE]/*[1][self::DIV]",
+				'xpath' => "/*[1][self::HTML]/*[2][self::BODY]/*[1][self::DIV]/*[{$i}][self::FIGURE]/*[1][self::DIV]",
 			)
 		);
 	}
