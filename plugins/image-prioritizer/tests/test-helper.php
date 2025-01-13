@@ -72,15 +72,10 @@ class Test_Image_Prioritizer_Helper extends WP_UnitTestCase {
 	/**
 	 * Data provider.
 	 *
-	 * @return array<string, mixed> Data.
+	 * @return array<string, array{ directory: non-empty-string }> Test cases.
 	 */
 	public function data_provider_test_filter_tag_visitors(): array {
-		$test_cases = array();
-		foreach ( (array) glob( __DIR__ . '/test-cases/*.php' ) as $test_case ) {
-			$name                = basename( $test_case, '.php' );
-			$test_cases[ $name ] = require $test_case;
-		}
-		return $test_cases;
+		return $this->load_snapshot_test_cases( __DIR__ . '/test-cases' );
 	}
 
 	/**
@@ -93,38 +88,12 @@ class Test_Image_Prioritizer_Helper extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_provider_test_filter_tag_visitors
 	 *
-	 * @param callable        $set_up   Setup function.
-	 * @param callable|string $buffer   Content before.
-	 * @param callable|string $expected Expected content after.
+	 * @param non-empty-string $directory Test case directory.
+	 *
+	 * @noinspection PhpDocMissingThrowsInspection
 	 */
-	public function test_end_to_end( callable $set_up, $buffer, $expected ): void {
-		$set_up( $this, $this::factory() );
-
-		$buffer = is_string( $buffer ) ? $buffer : $buffer();
-		$buffer = od_optimize_template_output_buffer( $buffer );
-		$buffer = preg_replace_callback(
-			':(<script type="module">)(.+?)(</script>):s',
-			static function ( $matches ) {
-				array_shift( $matches );
-				if ( false !== strpos( $matches[1], 'import detect' ) ) {
-					$matches[1] = '/* import detect ... */';
-				} elseif ( false !== strpos( $matches[1], 'const lazyVideoObserver' ) ) {
-					$matches[1] = '/* const lazyVideoObserver ... */';
-				} elseif ( false !== strpos( $matches[1], 'const lazyBgImageObserver' ) ) {
-					$matches[1] = '/* const lazyBgImageObserver ... */';
-				}
-				return implode( '', $matches );
-			},
-			$buffer
-		);
-
-		$expected = is_string( $expected ) ? $expected : $expected();
-
-		$this->assertEquals(
-			$this->remove_initial_tabs( $expected ),
-			$this->remove_initial_tabs( $buffer ),
-			"Buffer snapshot:\n$buffer"
-		);
+	public function test_end_to_end( string $directory ): void {
+		$this->assert_snapshot_equals( $directory );
 	}
 
 	/**
