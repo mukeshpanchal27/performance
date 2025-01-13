@@ -104,14 +104,16 @@ HTML
 					foreach ( $inp_data_set as $inp_data ) {
 						if ( isset( $inp_dots[ $inp_data['interactionTarget'] ] ) ) {
 							$inp_dots[ $inp_data['interactionTarget'] ][] = array(
-								'value' => $inp_data['value'],
+								'value'  => $inp_data['value'],
 								'rating' => $inp_data['rating'],
 							);
 						} else {
-							$inp_dots[ $inp_data['interactionTarget'] ] = array( array(
-								'value' => $inp_data['value'],
-								'rating' => $inp_data['rating'],
-							) );
+							$inp_dots[ $inp_data['interactionTarget'] ] = array(
+								array(
+									'value'  => $inp_data['value'],
+									'rating' => $inp_data['rating'],
+								),
+							);
 						}
 					}
 				}
@@ -121,7 +123,8 @@ HTML
 
 			// TODO: Maybe only add the $inp_dots_json here and move the rest to an external script.
 			if ( ! empty( $inp_dots ) ) {
-				$processor->append_body_html(<<<HTML
+				$processor->append_body_html(
+					<<<HTML
 <script>
 	let count = 0;
 	for ( const [ interactionTarget, entries ] of Object.entries( $inp_dots_json ) ) {
