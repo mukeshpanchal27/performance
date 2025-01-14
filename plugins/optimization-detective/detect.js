@@ -1,8 +1,6 @@
 /**
  * @typedef {import("web-vitals").LCPMetric} LCPMetric
  * @typedef {import("web-vitals").LCPMetricWithAttribution} LCPMetricWithAttribution
- * @typedef {import("web-vitals").INPMetric} INPMetric
- * @typedef {import("web-vitals").INPMetricWithAttribution} INPMetricWithAttribution
  * @typedef {import("./types.ts").ElementData} ElementData
  * @typedef {import("./types.ts").OnTTFBFunction} OnTTFBFunction
  * @typedef {import("./types.ts").OnFCPFunction} OnFCPFunction
