@@ -154,6 +154,9 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	/**
 	 * Stack of the attributes for open tags.
 	 *
+	 * Note that currently only the third item will currently be populated (index 2), as this corresponds to tags which
+	 * are children of the `BODY` tag. This is used in {@see self::get_xpath()}.
+	 *
 	 * @since n.e.x.t
 	 * @var array<array<string, string>>
 	 */
@@ -335,29 +338,10 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 			$level                   = count( $this->open_stack_tags );
 			$this->open_stack_tags[] = $tag_name;
 
-			/*
-			 * Capture the most stable attribute which can be used to disambiguate an XPath expression when the node index is not appropriate.
-			 * This is used specifically for children of the BODY. The `id` and `role` attributes are most stable (cf. <https://g.co/gemini/share/032edd9063c1>),
-			 * although all Block Themes utilize the 'wp-site-blocks' class name in the root `DIV`.
-			 * TODO: Consider only doing this if $this->open_stack_tags[-2] === 'BODY' and $level === 2 (e.g. we're at a child of /HTML/BODY) since this is the only place we need this.
-			 */
+			// For children of the BODY, capture disambiguating comments. See the get_xpath() method for where this data is used.
 			$attributes = array();
-			foreach ( array( 'id', 'role', 'class' ) as $attribute_name ) {
-				$attribute_value = $this->get_attribute( $attribute_name );
-				if ( null === $attribute_value ) {
-					continue;
-				}
-				if ( true === $attribute_value ) {
-					// In XPath, a boolean attribute in HTML like `<video controls>` is the same as `<video controls="">`. Both are matched by `//video[@controls=""]`.
-					$attribute_value = '';
-				} elseif ( 1 !== preg_match( '/^[a-zA-Z0-9_.\s:-]*$/', $attribute_value ) ) {
-					// Skip attribute values which contain uncommon characters, especially single/double quote marks and
-					// brackets, which could cause headaches when constructing/deconstructing XPath attribute predicates.
-					continue;
-				}
-
-				$attributes[ $attribute_name ] = $attribute_value;
-				break; // Stop when we've found one.
+			if ( isset( $this->open_stack_tags[1] ) && 'BODY' === $this->open_stack_tags[1] && 2 === $level ) {
+				$attributes = $this->get_disambiguating_attributes();
 			}
 			$this->open_stack_attributes[] = $attributes;
 
@@ -566,6 +550,41 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 		foreach ( $this->open_stack_tags as $i => $breadcrumb_tag_name ) {
 			yield array( $breadcrumb_tag_name, $this->open_stack_indices[ $i ], $this->open_stack_attributes[ $i ] );
 		}
+	}
+
+	/**
+	 * Gets disambiguating attributes.
+	 *
+	 * This returns the most stable attribute which can be used to disambiguate an XPath expression when the node index
+	 * is not appropriate. This is used specifically for children of the `BODY`. The `id` and `role` attributes are most
+	 * stable followed by the `class` attribute (cf. <https://g.co/gemini/share/032edd9063c1>), although all Block
+	 * Themes utilize the 'wp-site-blocks' class name in the root `DIV`. Only one attribute is currently returned,
+	 * although potentially more could be returned if additional disambiguation is needed in the future.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array<string, string> Disambiguating attributes.
+	 */
+	private function get_disambiguating_attributes(): array {
+		$attributes = array();
+		foreach ( array( 'id', 'role', 'class' ) as $attribute_name ) {
+			$attribute_value = $this->get_attribute( $attribute_name );
+			if ( null === $attribute_value ) {
+				continue;
+			}
+			if ( true === $attribute_value ) {
+				// In XPath, a boolean attribute in HTML like `<video controls>` is the same as `<video controls="">`. Both are matched by `//video[@controls=""]`.
+				$attribute_value = '';
+			} elseif ( 1 !== preg_match( '/^[a-zA-Z0-9_.\s:-]*$/', $attribute_value ) ) {
+				// Skip attribute values which contain uncommon characters, especially single/double quote marks and
+				// brackets, which could cause headaches when constructing/deconstructing XPath attribute predicates.
+				continue;
+			}
+
+			$attributes[ $attribute_name ] = $attribute_value;
+			break; // Stop when we've found one.
+		}
+		return $attributes;
 	}
 
 	/**
