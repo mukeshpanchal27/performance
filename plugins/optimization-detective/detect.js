@@ -498,6 +498,7 @@ export default async function detect( {
 	await new Promise( ( resolve ) => {
 		onLCP(
 			/**
+			 * Handles an LCP metric being reported.
 			 *
 			 * @param {LCPMetric|LCPMetricWithAttribution} metric
 			 */
