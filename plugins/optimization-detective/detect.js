@@ -519,25 +519,6 @@ export default async function detect( {
 	// Stop observing.
 	disconnectIntersectionObserver();
 
-	const inpData = [];
-
-	onINP(
-		/**
-		 *
-		 * @param {INPMetric|INPMetricWithAttribution} metric
-		 */
-		( metric ) => {
-			if ( 'attribution' in metric ) {
-				// TODO: Store xpath instead?
-				inpData.push( {
-					value: metric.value,
-					rating: metric.rating,
-					interactionTarget: metric.attribution.interactionTarget,
-				} );
-			}
-		}
-	);
-
 	if ( isDebug ) {
 		log( 'Detection is stopping.' );
 	}
@@ -549,7 +530,6 @@ export default async function detect( {
 			height: win.innerHeight,
 		},
 		elements: [],
-		inpData: [],
 	};
 
 	const lcpMetric = lcpMetricCandidates.at( -1 );
@@ -608,8 +588,6 @@ export default async function detect( {
 			{ once: true }
 		);
 	} );
-
-	urlMetric.inpData = inpData;
 
 	// Only proceed with submitting the URL Metric if viewport stayed the same size. Changing the viewport size (e.g. due
 	// to resizing a window or changing the orientation of a device) will result in unexpected metrics being collected.
