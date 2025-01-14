@@ -23,7 +23,7 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 	 */
 	public function data_provider_sample_documents(): array {
 		return array(
-			'well-formed-html'   => array(
+			'well-formed-html'                       => array(
 				'document'          => '
 					<!DOCTYPE html>
 					<html>
@@ -66,7 +66,7 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 					'/HTML/BODY/DIV[@id=\'page\']/*[4][self::FOOTER]' => array( 'HTML', 'BODY', 'DIV', 'FOOTER' ),
 				),
 			),
-			'foreign-elements'   => array(
+			'foreign-elements'                       => array(
 				'document'          => '
 					<html>
 						<head></head>
@@ -107,7 +107,7 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 					'/HTML/BODY/DIV[@id=\'page\']/*[2][self::MATH]/*[3][self::MN]' => array( 'HTML', 'BODY', 'DIV', 'MATH', 'MN' ),
 				),
 			),
-			'closing-void-tag'   => array(
+			'closing-void-tag'                       => array(
 				'document'          => '
 					<html>
 						<head></head>
@@ -131,7 +131,7 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 					'/HTML/BODY/DIV[@id=\'page\']/*[3][self::SPAN]' => array( 'HTML', 'BODY', 'DIV', 'SPAN' ),
 				),
 			),
-			'void-tags'          => array(
+			'void-tags'                              => array(
 				'document'          => '
 					<html>
 						<head></head>
@@ -193,7 +193,7 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 					'/HTML/BODY/DIV[@id=\'page\']/*[19][self::DIV]/*[1][self::SPAN]/*[1][self::EM]' => array( 'HTML', 'BODY', 'DIV', 'DIV', 'SPAN', 'EM' ),
 				),
 			),
-			'optional-closing-p' => array(
+			'optional-closing-p'                     => array(
 				'document'          => '
 					<html>
 						<head></head>
@@ -309,6 +309,100 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 					'/HTML/BODY/DIV[@id=\'page\']/*[61][self::TABLE]' => array( 'HTML', 'BODY', 'DIV', 'TABLE' ),
 					'/HTML/BODY/DIV[@id=\'page\']/*[62][self::P]' => array( 'HTML', 'BODY', 'DIV', 'P' ),
 					'/HTML/BODY/DIV[@id=\'page\']/*[63][self::UL]' => array( 'HTML', 'BODY', 'DIV', 'UL' ),
+				),
+			),
+			'document-with-multiple-div-id-children' => array(
+				'document'          => '
+					<!DOCTYPE html>
+					<html>
+						<head>...</head>
+						<body>
+							<div id="wpadminbar" role="navigation" aria-label="Main menu">
+								<img src="https://secure.gravatar.com/avatar/be3221a6fac131657111728b4d912a877ec158b123d5db3afef3bd8a59784ece?s=52&d=mm&r=g" width="26" height="26" alt="">
+							</div>
+							<div id="header" role="banner" class="page-header">
+								<img src="https://example.com/header-logo.png" width="1000" height="600" alt="">
+							</div>
+							<div id="primary" class="content-area">
+								<img src="https://example.com/content.png" width="1000" height="600" alt="">
+							</div>
+							<div id="secondary" class="widget-area">
+								<img src="https://example.com/widgets.png" width="1000" height="600" alt="">
+							</div>
+							<div id="colophon" role="contentinfo" class="site-footer">
+								<img src="https://example.com/footer-logo.png" width="1000" height="600" alt="">
+							</div>
+						</body>
+					</html>
+				',
+				'open_tags'         => array( 'HTML', 'HEAD', 'BODY', 'DIV', 'IMG', 'DIV', 'IMG', 'DIV', 'IMG', 'DIV', 'IMG', 'DIV', 'IMG' ),
+				'xpath_breadcrumbs' => array(
+					'/HTML'                              => array( 'HTML' ),
+					'/HTML/HEAD'                         => array( 'HTML', 'HEAD' ),
+					'/HTML/BODY'                         => array( 'HTML', 'BODY' ),
+					'/HTML/BODY/DIV[@id=\'wpadminbar\']' => array( 'HTML', 'BODY', 'DIV' ),
+					'/HTML/BODY/DIV[@id=\'wpadminbar\']/*[1][self::IMG]' => array( 'HTML', 'BODY', 'DIV', 'IMG' ),
+					'/HTML/BODY/DIV[@id=\'header\']'     => array( 'HTML', 'BODY', 'DIV' ),
+					'/HTML/BODY/DIV[@id=\'header\']/*[1][self::IMG]' => array( 'HTML', 'BODY', 'DIV', 'IMG' ),
+					'/HTML/BODY/DIV[@id=\'primary\']'    => array( 'HTML', 'BODY', 'DIV' ),
+					'/HTML/BODY/DIV[@id=\'primary\']/*[1][self::IMG]' => array( 'HTML', 'BODY', 'DIV', 'IMG' ),
+					'/HTML/BODY/DIV[@id=\'secondary\']'  => array( 'HTML', 'BODY', 'DIV' ),
+					'/HTML/BODY/DIV[@id=\'secondary\']/*[1][self::IMG]' => array( 'HTML', 'BODY', 'DIV', 'IMG' ),
+					'/HTML/BODY/DIV[@id=\'colophon\']'   => array( 'HTML', 'BODY', 'DIV' ),
+					'/HTML/BODY/DIV[@id=\'colophon\']/*[1][self::IMG]' => array( 'HTML', 'BODY', 'DIV', 'IMG' ),
+				),
+			),
+			'document-with-multiple-div-varying-attributes-children' => array(
+				'document'          => '
+					<!DOCTYPE html>
+					<html>
+						<head>...</head>
+						<body>
+							<div id="wpadminbar" role="navigation" aria-label="Main menu">
+								<img src="https://secure.gravatar.com/avatar/be3221a6fac131657111728b4d912a877ec158b123d5db3afef3bd8a59784ece?s=52&d=mm&r=g" width="26" height="26" alt="">
+							</div>
+							<div role="banner" class="page-header">
+								<img src="https://example.com/header-logo.png" width="1000" height="600" alt="">
+							</div>
+							<div class="content-area main">
+								<img src="https://example.com/content.png" width="1000" height="600" alt="">
+							</div>
+							<div id="page-sections[widgets]" class="widget-area"><!-- Note: the ID will be used here because it contains brackets. -->
+								<img src="https://example.com/widgets.png" width="1000" height="600" alt="">
+							</div>
+							<div id="John Smith\'s &quot;Blog&quot;" role="contentinfo \\o/" class="site-footer"><!-- The ID is not used because it contains quote characters. The role attribute is not used because it contains unexpected chars. -->
+								<img src="https://example.com/footer-logo.png" width="1000" height="600" alt="">
+							</div>
+							<div class>
+								<img src="about:blank">
+								Someone forgot to put a value on the class attribute! So it is treated as a boolean with no value.
+							</div>
+							<div role="" class="role-less">
+								<img src="about:blank">
+								A missing role attribute.
+							</div>
+						</body>
+					</html>
+				',
+				'open_tags'         => array( 'HTML', 'HEAD', 'BODY', 'DIV', 'IMG', 'DIV', 'IMG', 'DIV', 'IMG', 'DIV', 'IMG', 'DIV', 'IMG', 'DIV', 'IMG', 'DIV', 'IMG' ),
+				'xpath_breadcrumbs' => array(
+					'/HTML'                              => array( 'HTML' ),
+					'/HTML/HEAD'                         => array( 'HTML', 'HEAD' ),
+					'/HTML/BODY'                         => array( 'HTML', 'BODY' ),
+					'/HTML/BODY/DIV[@id=\'wpadminbar\']' => array( 'HTML', 'BODY', 'DIV' ),
+					'/HTML/BODY/DIV[@id=\'wpadminbar\']/*[1][self::IMG]' => array( 'HTML', 'BODY', 'DIV', 'IMG' ),
+					'/HTML/BODY/DIV[@role=\'banner\']'   => array( 'HTML', 'BODY', 'DIV' ),
+					'/HTML/BODY/DIV[@role=\'banner\']/*[1][self::IMG]' => array( 'HTML', 'BODY', 'DIV', 'IMG' ),
+					'/HTML/BODY/DIV[@class=\'content-area main\']' => array( 'HTML', 'BODY', 'DIV' ),
+					'/HTML/BODY/DIV[@class=\'content-area main\']/*[1][self::IMG]' => array( 'HTML', 'BODY', 'DIV', 'IMG' ),
+					'/HTML/BODY/DIV[@class=\'widget-area\']' => array( 'HTML', 'BODY', 'DIV' ),
+					'/HTML/BODY/DIV[@class=\'widget-area\']/*[1][self::IMG]' => array( 'HTML', 'BODY', 'DIV', 'IMG' ),
+					'/HTML/BODY/DIV[@class=\'site-footer\']' => array( 'HTML', 'BODY', 'DIV' ),
+					'/HTML/BODY/DIV[@class=\'site-footer\']/*[1][self::IMG]' => array( 'HTML', 'BODY', 'DIV', 'IMG' ),
+					'/HTML/BODY/DIV[@class=\'\']'        => array( 'HTML', 'BODY', 'DIV' ),
+					'/HTML/BODY/DIV[@class=\'\']/*[1][self::IMG]' => array( 'HTML', 'BODY', 'DIV', 'IMG' ),
+					'/HTML/BODY/DIV[@role=\'\']'         => array( 'HTML', 'BODY', 'DIV' ),
+					'/HTML/BODY/DIV[@role=\'\']/*[1][self::IMG]' => array( 'HTML', 'BODY', 'DIV', 'IMG' ),
 				),
 			),
 		);

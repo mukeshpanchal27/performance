@@ -123,7 +123,7 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	 * @var string
 	 * @link https://github.com/WordPress/performance/issues/1787
 	 */
-	const XPATH_PATTERN = '^(/([a-zA-Z0-9:_-]+|\*\[\d+\]\[self::[a-zA-Z0-9:_-]+\])(\[@\w+.*?\])*)+$';
+	const XPATH_PATTERN = '^(/([a-zA-Z0-9:_-]+|\*\[\d+\]\[self::[a-zA-Z0-9:_-]+\])(\[@(id|role|class)=\'[a-zA-Z0-9_.\s:-]*\'\])?)+$';
 
 	/**
 	 * Bookmark for the end of the HEAD.
@@ -155,7 +155,7 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	 * Stack of the attributes for open tags.
 	 *
 	 * @since n.e.x.t
-	 * @var array<array<string, string|true>>
+	 * @var array<array<string, string>>
 	 */
 	private $open_stack_attributes = array();
 
@@ -176,7 +176,7 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	 * populated back into `$this->open_stack_tags` and `$this->open_stack_indices`.
 	 *
 	 * @since 0.4.0
-	 * @var array<string, array{tags: string[], attributes: array<array<string, string|true>>, indices: int[]}>
+	 * @var array<string, array{tags: string[], attributes: array<array<string, string>>, indices: int[]}>
 	 */
 	private $bookmarked_open_stacks = array();
 
@@ -335,13 +335,29 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 			$level                   = count( $this->open_stack_tags );
 			$this->open_stack_tags[] = $tag_name;
 
-			// Capture key attributes for each tag on the stack. This is used to further disambiguate XPaths, specifically for children of the BODY for now.
+			/*
+			 * Capture the most stable attribute which can be used to disambiguate an XPath expression when the node index is not appropriate.
+			 * This is used specifically for children of the BODY. The `id` and `role` attributes are most stable (cf. <https://g.co/gemini/share/032edd9063c1>),
+			 * although all Block Themes utilize the 'wp-site-blocks' class name in the root `DIV`.
+			 * TODO: Consider only doing this if $this->open_stack_tags[-2] === 'BODY' and $level === 2 (e.g. we're at a child of /HTML/BODY) since this is the only place we need this.
+			 */
 			$attributes = array();
-			foreach ( array( 'id', 'class', 'role' ) as $attribute_name ) {
+			foreach ( array( 'id', 'role', 'class' ) as $attribute_name ) {
 				$attribute_value = $this->get_attribute( $attribute_name );
-				if ( null !== $attribute_value ) {
-					$attributes[ $attribute_name ] = $attribute_value;
+				if ( null === $attribute_value ) {
+					continue;
 				}
+				if ( true === $attribute_value ) {
+					// In XPath, a boolean attribute in HTML like `<video controls>` is the same as `<video controls="">`. Both are matched by `//video[@controls=""]`.
+					$attribute_value = '';
+				} elseif ( 1 !== preg_match( '/^[a-zA-Z0-9_.\s:-]*$/', $attribute_value ) ) {
+					// Skip attribute values which contain uncommon characters, especially single/double quote marks and
+					// brackets, which could cause headaches when constructing/deconstructing XPath attribute predicates.
+					continue;
+				}
+
+				$attributes[ $attribute_name ] = $attribute_value;
+				break; // Stop when we've found one.
 			}
 			$this->open_stack_attributes[] = $attributes;
 
@@ -544,7 +560,7 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	 * @since 0.4.0
 	 * @since 0.9.0 Renamed from get_breadcrumbs() to get_indexed_breadcrumbs().
 	 *
-	 * @return Generator<array{string, int, array<string, string|true>}> Breadcrumb.
+	 * @return Generator<array{string, int, array<string, string>}> Breadcrumb.
 	 */
 	private function get_indexed_breadcrumbs(): Generator {
 		foreach ( $this->open_stack_tags as $i => $breadcrumb_tag_name ) {
@@ -604,15 +620,11 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 				} elseif ( 2 === $i && '/HTML/BODY' === $this->current_xpath ) {
 					$segment = "/$tag_name";
 					foreach ( $attributes as $attribute_name => $attribute_value ) {
-						if ( true === $attribute_value ) {
-							$segment .= sprintf( '[@%s]', $attribute_name );
-						} else {
-							$segment .= sprintf(
-								"[@%s='%s']",
-								$attribute_name,
-								addcslashes( $attribute_value, '\'\\' ) // TODO: Verify escaping.
-							);
-						}
+						$segment .= sprintf(
+							"[@%s='%s']",
+							$attribute_name,
+							$attribute_value // Note: $attribute_value has already been validated to only contain safe characters /^[a-zA-Z0-9_.\s:-]*/ which do not need escaping.
+						);
 					}
 					$this->current_xpath .= $segment;
 				} else {
