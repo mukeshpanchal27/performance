@@ -69,19 +69,19 @@ function od_optimization_detective_rest_api_test(): array {
 			'available'     => false,
 		);
 	} else {
-		$status_code     = wp_remote_retrieve_response_code( $response );
-		$data            = json_decode( wp_remote_retrieve_body( $response ), true );
-		$expected_params = array( 'slug', 'current_etag', 'hmac', 'url', 'viewport', 'elements' );
-		$info            = array(
-			'status_code' => $status_code,
-			'available'   => false,
+		$status_code = wp_remote_retrieve_response_code( $response );
+		$data        = json_decode( wp_remote_retrieve_body( $response ), true );
+		$info        = array(
+			'status_code'   => $status_code,
+			'available'     => false,
+			'error_message' => '',
 		);
 
 		if (
-			400 === $status_code
-			&& isset( $data['data']['params'] )
-			&& is_array( $data['data']['params'] )
-			&& count( $expected_params ) === count( array_intersect( $data['data']['params'], $expected_params ) )
+			400 === $status_code &&
+			isset( $data['data']['params'] ) &&
+			is_array( $data['data']['params'] ) &&
+			count( $data['data']['params'] ) > 0
 		) {
 			// The REST API endpoint is available.
 			$info['available'] = true;
@@ -126,7 +126,8 @@ function od_rest_api_health_check_admin_notice( string $plugin_file ): void {
 	if (
 		isset( $rest_api_info['available'] ) &&
 		false === $rest_api_info['available'] &&
-		isset( $rest_api_info['error_message'] )
+		isset( $rest_api_info['error_message'] ) &&
+		'' !== $rest_api_info['error_message']
 	) {
 		wp_admin_notice(
 			esc_html( $rest_api_info['error_message'] ),
@@ -158,7 +159,8 @@ function od_rest_api_health_check_plugin_activation(): void {
 	if (
 		isset( $rest_api_info['available'] ) &&
 		false === $rest_api_info['available'] &&
-		isset( $rest_api_info['error_message'] )
+		isset( $rest_api_info['error_message'] ) &&
+		'' !== $rest_api_info['error_message']
 	) {
 		wp_admin_notice(
 			esc_html( $rest_api_info['error_message'] ),
