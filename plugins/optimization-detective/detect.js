@@ -516,7 +516,6 @@ export default async function detect( {
 
 	// Stop observing.
 	disconnectIntersectionObserver();
-
 	if ( isDebug ) {
 		log( 'Detection is stopping.' );
 	}
