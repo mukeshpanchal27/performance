@@ -59,7 +59,7 @@ Filters whether to use the web-vitals.js build with attribution.
 
 When using the attribution build of web-vitals, the metric object passed to report callbacks registered via
 `onTTFB`, `onFCP`, `onLCP`, `onCLS`, and `onINP` will include an additional [attribution property](https://github.com/GoogleChrome/web-vitals#attribution).
-For details, please refer to the [web-vitals documentation](https://github.com/GoogleChrome/web-vitals documentation).
+For details, please refer to the [web-vitals documentation](https://github.com/GoogleChrome/web-vitals).
 
 For example, to opt in to using the attribution build:
 
