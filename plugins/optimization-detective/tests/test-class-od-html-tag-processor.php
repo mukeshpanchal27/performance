@@ -316,9 +316,9 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 					<!DOCTYPE html>
 					<html>
 						<head>...</head>
-						<body>
+						<body class="home blog">
 							<div id="wpadminbar" role="navigation" aria-label="Main menu">
-								<img src="https://secure.gravatar.com/avatar/be3221a6fac131657111728b4d912a877ec158b123d5db3afef3bd8a59784ece?s=52&d=mm&r=g" width="26" height="26" alt="">
+								<img id="gravatar" src="https://secure.gravatar.com/avatar/be3221a6fac131657111728b4d912a877ec158b123d5db3afef3bd8a59784ece?s=52&d=mm&r=g" width="26" height="26" alt="">
 							</div>
 							<div id="header" role="banner" class="page-header">
 								<img src="https://example.com/header-logo.png" width="1000" height="600" alt="">
@@ -330,7 +330,7 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 								<img src="https://example.com/widgets.png" width="1000" height="600" alt="">
 							</div>
 							<div id="colophon" role="contentinfo" class="site-footer">
-								<img src="https://example.com/footer-logo.png" width="1000" height="600" alt="">
+								<img role="img" src="https://example.com/footer-logo.png" width="1000" height="600" alt="">
 							</div>
 						</body>
 					</html>
