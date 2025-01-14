@@ -36,7 +36,7 @@ function od_optimization_detective_add_rest_api_test( array $tests ): array {
  */
 function od_optimization_detective_rest_api_test(): array {
 	$result = array(
-		'label'       => __( 'The REST API endpoint is functional.', 'optimization-detective' ),
+		'label'       => __( 'The Optimization Detective REST API endpoint is functional.', 'optimization-detective' ),
 		'status'      => 'good',
 		'badge'       => array(
 			'label' => __( 'Optimization Detective', 'optimization-detective' ),
@@ -44,7 +44,7 @@ function od_optimization_detective_rest_api_test(): array {
 		),
 		'description' => sprintf(
 			'<p>%s</p>',
-			__( 'Your site can send and receive URL metrics via the REST API endpoint.', 'optimization-detective' )
+			__( 'Your site can send and receive URL metrics via the Optimization Detective REST API endpoint.', 'optimization-detective' )
 		),
 		'actions'     => '',
 		'test'        => 'optimization_detective_rest_api',
@@ -61,8 +61,8 @@ function od_optimization_detective_rest_api_test(): array {
 
 	if ( is_wp_error( $response ) ) {
 		$result['status']      = 'recommended';
-		$result['label']       = __( 'Error accessing the REST API endpoint', 'optimization-detective' );
-		$result['description'] = esc_html__( 'There was an issue reaching the REST API endpoint. This might be due to server settings or the REST API being disabled.', 'optimization-detective' );
+		$result['label']       = __( 'Error accessing the Optimization Detective REST API endpoint', 'optimization-detective' );
+		$result['description'] = esc_html__( 'There was an issue reaching the Optimization Detective REST API endpoint. This might be due to server settings or the REST API being disabled.', 'optimization-detective' );
 		$info                  = array(
 			'error_message' => $result['description'],
 			'error_code'    => $response->get_error_code(),
@@ -87,16 +87,16 @@ function od_optimization_detective_rest_api_test(): array {
 			$info['available'] = true;
 		} elseif ( 401 === $status_code ) {
 			$result['status']      = 'recommended';
-			$result['label']       = __( 'Authorization should not be required to access the REST API endpoint.', 'optimization-detective' );
-			$result['description'] = esc_html__( 'To collect URL metrics, the REST API endpoint should be accessible without requiring authorization.', 'optimization-detective' );
+			$result['label']       = __( 'Authorization should not be required to access the Optimization Detective REST API endpoint.', 'optimization-detective' );
+			$result['description'] = esc_html__( 'To collect URL metrics, the Optimization Detective REST API endpoint should be accessible without requiring authorization.', 'optimization-detective' );
 		} elseif ( 403 === $status_code ) {
 			$result['status']      = 'recommended';
-			$result['label']       = __( 'The REST API endpoint should not be forbidden.', 'optimization-detective' );
-			$result['description'] = esc_html__( 'The REST API endpoint is blocked. Please review your server or security settings.', 'optimization-detective' );
+			$result['label']       = __( 'The Optimization Detective REST API endpoint should not be forbidden.', 'optimization-detective' );
+			$result['description'] = esc_html__( 'The Optimization Detective REST API endpoint is blocked. Please review your server or security settings.', 'optimization-detective' );
 		} else {
 			$result['status']      = 'recommended';
-			$result['label']       = __( 'Error accessing the REST API endpoint', 'optimization-detective' );
-			$result['description'] = esc_html__( 'There was an issue reaching the REST API endpoint. This might be due to server settings or the REST API being disabled.', 'optimization-detective' );
+			$result['label']       = __( 'Error accessing the Optimization Detective REST API endpoint', 'optimization-detective' );
+			$result['description'] = esc_html__( 'There was an issue reaching the Optimization Detective REST API endpoint. This might be due to server settings or the REST API being disabled.', 'optimization-detective' );
 		}
 		$info['error_message'] = $result['description'];
 	}
