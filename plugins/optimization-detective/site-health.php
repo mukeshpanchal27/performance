@@ -91,8 +91,8 @@ function od_optimization_detective_rest_api_test(): array {
 			$result['description'] = esc_html__( 'To collect URL metrics, the Optimization Detective REST API endpoint should be accessible without requiring authorization.', 'optimization-detective' );
 		} elseif ( 403 === $status_code ) {
 			$result['status']      = 'recommended';
-			$result['label']       = __( 'The Optimization Detective REST API endpoint should not be forbidden.', 'optimization-detective' );
-			$result['description'] = esc_html__( 'The Optimization Detective REST API endpoint is blocked. Please review your server or security settings.', 'optimization-detective' );
+			$result['label']       = __( 'Access to the Optimization Detective REST API endpoint was denied.', 'optimization-detective' );
+			$result['description'] = esc_html__( 'Access was denied because the user does not have the necessary capabilities. Please check user roles and capabilities, as all users should have access to the Optimization Detective REST API endpoint.', 'optimization-detective' );
 		} else {
 			$result['status']      = 'recommended';
 			$result['label']       = __( 'Error accessing the Optimization Detective REST API endpoint', 'optimization-detective' );
@@ -111,7 +111,32 @@ function od_optimization_detective_rest_api_test(): array {
 }
 
 /**
- * Displays an admin notice if the REST API health check fails.
+ * Renders an admin notice if the REST API health check fails.
+ *
+ * @since n.e.x.t
+ *
+ * @param array<string> $additional_classes Additional classes to add to the notice.
+ */
+function od_render_rest_api_health_check_notice( array $additional_classes ): void {
+	$rest_api_info = get_option( 'od_rest_api_info', array() );
+	if (
+		isset( $rest_api_info['available'] ) &&
+		false === $rest_api_info['available'] &&
+		isset( $rest_api_info['error_message'] ) &&
+		'' !== $rest_api_info['error_message']
+	) {
+		wp_admin_notice(
+			esc_html( $rest_api_info['error_message'] ),
+			array(
+				'type'               => 'warning',
+				'additional_classes' => $additional_classes,
+			)
+		);
+	}
+}
+
+/**
+ * Displays an admin notice on the plugin row if the REST API health check fails.
  *
  * @since n.e.x.t
  *
@@ -121,22 +146,7 @@ function od_rest_api_health_check_admin_notice( string $plugin_file ): void {
 	if ( 'optimization-detective/load.php' !== $plugin_file ) {
 		return;
 	}
-
-	$rest_api_info = get_option( 'od_rest_api_info', array() );
-	if (
-		isset( $rest_api_info['available'] ) &&
-		false === $rest_api_info['available'] &&
-		isset( $rest_api_info['error_message'] ) &&
-		'' !== $rest_api_info['error_message']
-	) {
-		wp_admin_notice(
-			esc_html( $rest_api_info['error_message'] ),
-			array(
-				'type'               => 'warning',
-				'additional_classes' => array( 'inline', 'notice-alt' ),
-			)
-		);
-	}
+	od_render_rest_api_health_check_notice( array( 'inline', 'notice-alt' ) );
 }
 
 /**
@@ -145,7 +155,7 @@ function od_rest_api_health_check_admin_notice( string $plugin_file ): void {
  * @since n.e.x.t
  */
 function od_rest_api_health_check_plugin_activation(): void {
-	// If the option already exists, do nothing.
+	// If the option already exists, do nothing except attach our plugin-row notice.
 	if ( false !== get_option( 'od_rest_api_info' ) ) {
 		add_action( 'after_plugin_row_meta', 'od_rest_api_health_check_admin_notice', 30 );
 		return;
@@ -153,21 +163,5 @@ function od_rest_api_health_check_plugin_activation(): void {
 
 	// This will populate the od_rest_api_info option so that the function won't execute on the next page load.
 	od_optimization_detective_rest_api_test();
-
-	// Get the updated option.
-	$rest_api_info = get_option( 'od_rest_api_info', array() );
-	if (
-		isset( $rest_api_info['available'] ) &&
-		false === $rest_api_info['available'] &&
-		isset( $rest_api_info['error_message'] ) &&
-		'' !== $rest_api_info['error_message']
-	) {
-		wp_admin_notice(
-			esc_html( $rest_api_info['error_message'] ),
-			array(
-				'type'               => 'warning',
-				'additional_classes' => array( 'notice-alt' ),
-			)
-		);
-	}
+	od_render_rest_api_health_check_notice( array( 'notice-alt' ) );
 }
