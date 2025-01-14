@@ -381,10 +381,14 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 								<img src="about:blank">
 								A missing role attribute.
 							</div>
+							<div>
+								<img src="about:blank">
+								No attribute on the DIV at all. This would be quite unusual.
+							</div>
 						</body>
 					</html>
 				',
-				'open_tags'         => array( 'HTML', 'HEAD', 'BODY', 'DIV', 'IMG', 'DIV', 'IMG', 'DIV', 'IMG', 'DIV', 'IMG', 'DIV', 'IMG', 'DIV', 'IMG', 'DIV', 'IMG' ),
+				'open_tags'         => array( 'HTML', 'HEAD', 'BODY', 'DIV', 'IMG', 'DIV', 'IMG', 'DIV', 'IMG', 'DIV', 'IMG', 'DIV', 'IMG', 'DIV', 'IMG', 'DIV', 'IMG', 'DIV', 'IMG' ),
 				'xpath_breadcrumbs' => array(
 					'/HTML'                              => array( 'HTML' ),
 					'/HTML/HEAD'                         => array( 'HTML', 'HEAD' ),
@@ -403,6 +407,8 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 					'/HTML/BODY/DIV[@class=\'\']/*[1][self::IMG]' => array( 'HTML', 'BODY', 'DIV', 'IMG' ),
 					'/HTML/BODY/DIV[@role=\'\']'         => array( 'HTML', 'BODY', 'DIV' ),
 					'/HTML/BODY/DIV[@role=\'\']/*[1][self::IMG]' => array( 'HTML', 'BODY', 'DIV', 'IMG' ),
+					'/HTML/BODY/DIV'                     => array( 'HTML', 'BODY', 'DIV' ),
+					'/HTML/BODY/DIV/*[1][self::IMG]'     => array( 'HTML', 'BODY', 'DIV', 'IMG' ),
 				),
 			),
 		);
