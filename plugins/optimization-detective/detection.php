@@ -74,6 +74,17 @@ function od_get_detection_script( string $slug, OD_URL_Metric_Group_Collection $
 	/**
 	 * Filters whether to use the web-vitals.js build with attribution.
 	 *
+	 * When using the attribution build of web-vitals, the metric object passed to report callbacks registered via
+	 * `onTTFB`, `onFCP`, `onLCP`, `onCLS`, and `onINP` will include an additional {@link https://github.com/GoogleChrome/web-vitals#attribution attribution property}.
+	 * For details, please refer to the {@link https://github.com/GoogleChrome/web-vitals web-vitals documentation}.
+	 *
+	 * For example, to opt in to using the attribution build:
+	 *
+	 *     add_filter( 'od_use_web_vitals_attribution_build', '__return_true' );
+	 *
+	 * Note that the attribution build is slightly larger than the standard build, so this is why it is not used by default.
+	 * The additional attribution data is made available to client-side extension script modules registered via the `od_extension_module_urls` filter.
+	 *
 	 * @since n.e.x.t
 	 *
 	 * @param bool $use_attribution_build Whether to use the attribution build.
