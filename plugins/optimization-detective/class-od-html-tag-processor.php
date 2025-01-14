@@ -101,22 +101,22 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	 * The pattern for matching a tag /[a-zA-Z0-9:_-]+/ used here is informed by the characters found in tag names in
 	 * HTTP Archive as {@link https://docs.google.com/spreadsheets/d/1grkd2_1xSV3jvNK6ucRQ0OL1HmGTsScHuwA8GZuRLHU/edit?gid=2057119066#gid=2057119066 seen}
 	 * in Web Almanac 2022, with the only exception being the very malformed tag name `script="async"`. Note that XPaths
-	 * begin with `/HTML/BODY` followed by an index-free reference to an element which is a direct child of the BODY,
-	 * for example `/HTML/BODY/DIV`. Below this point, all tags must then have indices to disambiguate the XPaths among
-	 * siblings. For example: `/HTML/BODY/DIV/*[2][self::MAIN]/*[1][self::FIGURE]/*[2][self::IMG]`. There is little need
-	 * for there to be an index added to the `DIV` directly under the `BODY` because WordPress themes almost always use
-	 * a wrapper element: Block Themes always wrap the page in a `DIV.wp-site-blocks` element, and classic themes either
-	 * wrap the content in a `DIV#page` or else use `HEADER`, `MAIN`, and `FOOTER`.
+	 * begin with `/HTML/BODY` followed by an index-free reference to an element which is a direct child of the BODY but
+	 * with a disambiguating attribute predicate added, for example `/HTML/BODY/DIV[@id="page"]`. Below this point, all
+	 * tags must then have indices to disambiguate the XPaths among siblings. For example:
+	 * `/HTML/BODY/DIV[@id="page"]/*[2][self::MAIN]/*[1][self::FIGURE]/*[2][self::IMG]`.
 	 *
-	 * The benefit of omitting the node index from direct children of the BODY allows for variations in content output
+	 * The benefit of omitting the node index from direct children of the BODY allows for variation in the content output
 	 * at `wp_body_open()` without impacting the computed XPaths for subsequent tags. Omitting the node index at this
-	 * level, however, does incur a slight risk of duplicate XPaths being computed. For example, if a theme has a
+	 * level, however, does introduce the risk of duplicate XPaths being computed. For example, if a theme has a
 	 * `<div id="header" role="banner">` and a `<div id="footer" role="contentinfo">` which are both direct descendants
 	 * of `BODY`, then it is possible for an XPath like `/HTML/BODY/DIV/*[1][self::IMG]` to be duplicated if both of
-	 * these `DIV` elements has an `IMG` as the first child. The conflict could arise for any tags of the same name in
-	 * the same relative position, which does not seem likely. Additionally, as noted above, themes almost always wrap
-	 * the page content in an overall `DIV` or else they use semantic HTML tags like `HEADER` and `FOOTER`, so the risk
-	 * is low.
+	 * these `DIV` elements has an `IMG` as the first child. This is also an issue in sites using the Image block
+	 * because it outputs a `DIV.wp-lightbox-overlay.zoom` in `wp_footer`, resulting in there being a real possibility
+	 * for XPaths to not be unique in the page. Therefore, en lieu of node index being added to children of `BODY`,
+	 * a disambiguating attribute predicate is added for the element's `id`, `role`, or `class` attribute. These three
+	 * attributes are the most stable across page loads, especially at the root of the document (where there is no Post
+	 * Loop using `post_class()`).
 	 *
 	 * @since 0.4.0
 	 * @see self::get_xpath()
@@ -623,8 +623,8 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	 *
 	 * It would be nicer if this were like `.../DIV[1]/DIV[2]` but in XPath the position() here refers to the
 	 * index of the preceding node set. So it has to rather be written `.../*[1][self::DIV]/*[2][self::DIV]`.
-	 * Note that the first three levels lack any node index, for example `/HTML/BODY/DIV` for the reasons
-	 * explained in {@see self::XPATH_PATTERN}.
+	 * Note that the first three levels lack any node index whereas the third level includes a disambiguating
+	 * attribute predicate (e.g. `/HTML/BODY/DIV[@id="page"]`) for the reasons explained in {@see self::XPATH_PATTERN}.
 	 *
 	 * @since 0.4.0
 	 *
