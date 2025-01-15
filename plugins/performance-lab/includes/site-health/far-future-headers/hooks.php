@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function perflab_ffh_add_test( array $tests ): array {
 	$tests['direct']['far_future_headers'] = array(
-		'label' => __( 'Far-Future Caching Headers', 'performance-lab' ),
+		'label' => __( 'Effective Caching Headers', 'performance-lab' ),
 		'test'  => 'perflab_ffh_assets_test',
 	);
 	return $tests;

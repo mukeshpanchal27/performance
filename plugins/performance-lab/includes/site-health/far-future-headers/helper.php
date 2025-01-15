@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function perflab_ffh_assets_test(): array {
 	$result = array(
-		'label'       => __( 'Your site serves static assets with far-future expiration headers', 'performance-lab' ),
+		'label'       => __( 'Your site serves static assets with an effective caching strategy', 'performance-lab' ),
 		'status'      => 'good',
 		'badge'       => array(
 			'label' => __( 'Performance', 'performance-lab' ),
@@ -59,7 +59,7 @@ function perflab_ffh_assets_test(): array {
 
 	if ( 'good' !== $results['final_status'] ) {
 		$result['status'] = $results['final_status'];
-		$result['label']  = __( 'Your site does not serve static assets with recommended far-future expiration headers', 'performance-lab' );
+		$result['label']  = __( 'Your site does not serve static assets with an effective caching strategy', 'performance-lab' );
 
 		if ( count( $results['details'] ) > 0 ) {
 			$result['actions'] = sprintf(
@@ -68,12 +68,11 @@ function perflab_ffh_assets_test(): array {
 				perflab_ffh_get_extensions_table( $results['details'] ),
 				esc_html__( 'Note: "Conditionally cached" means that the browser can re-validate the resource using ETag or Last-Modified headers. This results in fewer full downloads but still requires the browser to make requests, unlike far-future expiration headers that allow the browser to fully rely on its local cache for a longer duration.', 'performance-lab' )
 			);
-		} else {
-			$result['actions'] = sprintf(
-				'<p>%s</p>',
-				esc_html__( 'Far-future Cache-Control or Expires headers can be added or adjusted with a small configuration change by your hosting provider.', 'performance-lab' )
-			);
 		}
+		$result['actions'] .= sprintf(
+			'<p>%s</p>',
+			esc_html__( 'Far-future Cache-Control or Expires headers can be added or adjusted with a small configuration change by your hosting provider.', 'performance-lab' )
+		);
 	}
 
 	return $result;
