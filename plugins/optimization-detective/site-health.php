@@ -17,10 +17,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @access private
  * @todo Add coverage.
  *
- * @param array{direct: array<string, array{label: string, test: string}>} $tests Site Health Tests.
+ * @param array{direct: array<string, array{label: string, test: string}>}|mixed $tests Site Health Tests.
  * @return array{direct: array<string, array{label: string, test: string}>} Amended tests.
  */
-function od_add_rest_api_availability_test( array $tests ): array {
+function od_add_rest_api_availability_test( $tests ): array {
+	if ( ! is_array( $tests ) ) {
+		$tests = array();
+	}
 	$tests['direct']['optimization_detective_rest_api'] = array(
 		'label' => __( 'Optimization Detective REST API Endpoint Availability', 'optimization-detective' ),
 		'test'  => 'od_optimization_detective_rest_api_test',
@@ -191,9 +194,9 @@ function od_get_rest_api_health_check_response( bool $use_cached ) {
  * @access private
  * @todo Add coverage.
  *
- * @param bool $in_plugin_row Whether the notice is to be printed in the plugin row. Default false.
+ * @param bool $in_plugin_row Whether the notice is to be printed in the plugin row.
  */
-function od_maybe_render_rest_api_health_check_admin_notice( bool $in_plugin_row = false ): void {
+function od_maybe_render_rest_api_health_check_admin_notice( bool $in_plugin_row ): void {
 	if ( ! od_is_rest_api_unavailable() ) {
 		return;
 	}
@@ -284,7 +287,7 @@ function od_maybe_run_rest_api_health_check(): void {
 		add_action(
 			'admin_notices',
 			static function (): void {
-				od_maybe_render_rest_api_health_check_admin_notice();
+				od_maybe_render_rest_api_health_check_admin_notice( false );
 			}
 		);
 	}
