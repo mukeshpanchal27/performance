@@ -61,6 +61,11 @@ function od_generate_media_query( ?int $minimum_viewport_width, ?int $maximum_vi
  * @since 0.1.0
  */
 function od_render_generator_meta_tag(): void {
+	// Omit the generator tag if the REST API is unavailable since in this case Optimization Detective is not generating anything on the page.
+	if ( od_is_rest_api_unavailable() ) {
+		return;
+	}
+
 	// Use the plugin slug as it is immutable.
 	echo '<meta name="generator" content="optimization-detective ' . esc_attr( OPTIMIZATION_DETECTIVE_VERSION ) . '">' . "\n";
 }
