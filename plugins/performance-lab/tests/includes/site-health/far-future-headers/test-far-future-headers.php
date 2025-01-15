@@ -30,6 +30,8 @@ class Test_Far_Future_Headers extends WP_UnitTestCase {
 
 	/**
 	 * Test that when all assets have valid far-future headers, the status is "good".
+	 *
+	 * @covers ::perflab_ffh_assets_test
 	 */
 	public function test_all_assets_valid_far_future_headers(): void {
 		// Mock responses: all assets have a max-age > 1 year (threshold).
@@ -47,6 +49,8 @@ class Test_Far_Future_Headers extends WP_UnitTestCase {
 
 	/**
 	 * Test that when an asset has no far-future headers but has conditional caching (ETag/Last-Modified), status is 'recommended'.
+	 *
+	 * @covers ::perflab_ffh_assets_test
 	 */
 	public function test_assets_conditionally_cached(): void {
 		// For conditional caching scenario, setting etag/last-modified headers.
@@ -71,6 +75,8 @@ class Test_Far_Future_Headers extends WP_UnitTestCase {
 
 	/**
 	 * Test that different status messages are returned based on the test results.
+	 *
+	 * @covers ::perflab_ffh_check_assets
 	 */
 	public function test_status_messages(): void {
 		$this->mocked_responses = array(
@@ -99,6 +105,8 @@ class Test_Far_Future_Headers extends WP_UnitTestCase {
 
 	/**
 	 * Test that the filter `perflab_ffh_assets_to_check` and `perflab_far_future_headers_threshold` are working as expected.
+	 *
+	 * @covers ::perflab_ffh_check_assets
 	 */
 	public function test_filters(): void {
 		add_filter(
@@ -138,6 +146,20 @@ class Test_Far_Future_Headers extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'max-age below threshold (actual:', $result['details'][0]['reason'] );
 		$this->assertStringContainsString( 'expires below threshold (actual:', $result['details'][1]['reason'] );
 		$this->assertStringContainsString( 'max-age below threshold (actual:', $result['details'][2]['reason'] );
+	}
+
+	/**
+	 * Test that when no assets are passed, the status is "good".
+	 *
+	 * @covers ::perflab_ffh_check_assets
+	 */
+	public function test_when_no_assets(): void {
+		$this->mocked_responses = array();
+
+		$result = perflab_ffh_check_assets( array() );
+
+		$this->assertEquals( 'good', $result['final_status'] );
+		$this->assertEmpty( $result['details'] );
 	}
 
 	/**
