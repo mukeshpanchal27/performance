@@ -29,6 +29,8 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 
 	/**
 	 * Test that the site health check is `good` when the REST API is available.
+	 *
+	 * @covers ::od_optimization_detective_rest_api_test
 	 */
 	public function test_rest_api_available(): void {
 		$this->mocked_responses = array(
@@ -53,6 +55,8 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 
 	/**
 	 * Test behavior when REST API returns an unauthorized error.
+	 *
+	 * @covers ::od_optimization_detective_rest_api_test
 	 */
 	public function test_rest_api_unauthorized(): void {
 		$this->mocked_responses = array(
@@ -71,7 +75,9 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test behavior when REST API returns an forbidden error.
+	 * Test behavior when REST API returns a forbidden error.
+	 *
+	 * @covers ::od_optimization_detective_rest_api_test
 	 */
 	public function test_rest_api_forbidden(): void {
 		$this->mocked_responses = array(
