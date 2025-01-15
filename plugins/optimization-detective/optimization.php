@@ -78,11 +78,11 @@ function od_buffer_output( $passthrough ) {
  * @access private
  */
 function od_maybe_add_template_output_buffer_filter(): void {
-	$od_rest_api_info = get_option( 'od_rest_api_info' );
 	if (
 		! od_can_optimize_response() ||
-		isset( $_GET['optimization_detective_disabled'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		( isset( $od_rest_api_info['available'] ) && ! (bool) $od_rest_api_info['available'] )
+		od_is_rest_api_unavailable() ||
+		isset( $_GET['optimization_detective_disabled'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
 	) {
 		return;
 	}

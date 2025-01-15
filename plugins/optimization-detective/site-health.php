@@ -280,7 +280,7 @@ function od_maybe_run_rest_api_health_check(): void {
 		return;
 	}
 
-	// This will populate the od_rest_api_info option so that the function won't execute on the next page load.
+	// This will populate the od_rest_api_unavailable option so that the function won't execute on the next page load.
 	if ( 'good' !== od_test_rest_api_availability()['status'] ) {
 
 		// Show any notice in the main admin notices area for the first page load (e.g. after plugin activation).

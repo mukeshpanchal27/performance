@@ -145,37 +145,74 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test od_maybe_add_template_output_buffer_filter().
+	 * Data provider.
 	 *
-	 * @covers ::od_maybe_add_template_output_buffer_filter
+	 * @return array<string, mixed>
 	 */
-	public function test_od_maybe_add_template_output_buffer_filter(): void {
-		$this->assertFalse( has_filter( 'od_template_output_buffer' ) );
-
-		add_filter( 'od_can_optimize_response', '__return_false', 1 );
-		od_maybe_add_template_output_buffer_filter();
-		$this->assertFalse( od_can_optimize_response() );
-		$this->assertFalse( has_filter( 'od_template_output_buffer' ) );
-
-		add_filter( 'od_can_optimize_response', '__return_true', 2 );
-		$this->go_to( home_url( '/' ) );
-		$this->assertTrue( od_can_optimize_response() );
-		od_maybe_add_template_output_buffer_filter();
-		$this->assertTrue( has_filter( 'od_template_output_buffer' ) );
+	public function data_provider_test_od_maybe_add_template_output_buffer_filter(): array {
+		return array(
+			'home_enabled'                          => array(
+				'set_up'              => static function (): string {
+					return home_url( '/' );
+				},
+				'expected_has_filter' => true,
+			),
+			'home_disabled_by_filter'               => array(
+				'set_up'              => static function (): string {
+					add_filter( 'od_can_optimize_response', '__return_false' );
+					return home_url( '/' );
+				},
+				'expected_has_filter' => false,
+			),
+			'search_disabled'                       => array(
+				'set_up'              => static function (): string {
+					return home_url( '/?s=foo' );
+				},
+				'expected_has_filter' => false,
+			),
+			'search_enabled_by_filter'              => array(
+				'set_up'              => static function (): string {
+					add_filter( 'od_can_optimize_response', '__return_true' );
+					return home_url( '/?s=foo' );
+				},
+				'expected_has_filter' => true,
+			),
+			'home_disabled_by_get_param'            => array(
+				'set_up'              => static function (): string {
+					return home_url( '/?optimization_detective_disabled=1' );
+				},
+				'expected_has_filter' => false,
+			),
+			'home_disabled_by_rest_api_unavailable' => array(
+				'set_up'              => static function (): string {
+					update_option( 'od_rest_api_unavailable', '1' );
+					return home_url( '/' );
+				},
+				'expected_has_filter' => false,
+			),
+		);
 	}
+
 	/**
 	 * Test od_maybe_add_template_output_buffer_filter().
 	 *
+	 * @dataProvider data_provider_test_od_maybe_add_template_output_buffer_filter
+	 *
 	 * @covers ::od_maybe_add_template_output_buffer_filter
+	 * @covers ::od_can_optimize_response
+	 * @covers ::od_is_rest_api_unavailable
 	 */
-	public function test_od_maybe_add_template_output_buffer_filter_with_query_var_to_disable(): void {
-		$this->assertFalse( has_filter( 'od_template_output_buffer' ) );
+	public function test_od_maybe_add_template_output_buffer_filter( Closure $set_up, bool $expected_has_filter ): void {
+		// There needs to be a post so that there is a post in the loop so that od_get_cache_purge_post_id() returns a post ID.
+		// Otherwise, od_can_optimize_response() will return false unless forced by a filter.
+		self::factory()->post->create();
 
-		add_filter( 'od_can_optimize_response', '__return_true' );
-		$this->go_to( home_url( '/?optimization_detective_disabled=1' ) );
-		$this->assertTrue( od_can_optimize_response() );
+		$url = $set_up();
+		$this->go_to( $url );
+		remove_all_filters( 'od_template_output_buffer' ); // In case go_to() caused them to be added.
+
 		od_maybe_add_template_output_buffer_filter();
-		$this->assertFalse( has_filter( 'od_template_output_buffer' ) );
+		$this->assertSame( $expected_has_filter, has_filter( 'od_template_output_buffer' ) );
 	}
 
 	/**
