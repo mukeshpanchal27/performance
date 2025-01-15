@@ -8,25 +8,6 @@
 class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 
 	/**
-	 * Holds mocked response headers for different test scenarios.
-	 *
-	 * @var array<string, array<string, mixed>>
-	 */
-	protected $mocked_responses = array();
-
-	/**
-	 * Setup each test.
-	 */
-	public function setUp(): void {
-		parent::setUp();
-
-		// Clear any filters or mocks.
-		remove_all_filters( 'pre_http_request' );
-
-		// Add the filter to mock HTTP requests.
-		add_filter( 'pre_http_request', array( $this, 'mock_http_requests' ), 10, 3 );
-	}
-	/**
 	 * Test that we presume the REST API is accessible before we are able to perform the Site Health check.
 	 *
 	 * @covers ::od_is_rest_api_inaccessible
@@ -37,96 +18,76 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that the site health check is `good` when the REST API is available.
+	 * Data provider.
 	 *
-	 * @covers ::od_optimization_detective_rest_api_test
-	 * @covers ::od_construct_site_health_result
-	 * @covers ::od_get_rest_api_health_check_response
-	 * @covers ::od_is_rest_api_inaccessible
+	 * @return array<string, mixed>
 	 */
-	public function test_rest_api_available(): void {
-		$this->mocked_responses = array(
-			get_rest_url( null, OD_REST_API_NAMESPACE . OD_URL_METRICS_ROUTE ) => $this->build_mock_response(
-				400,
-				'Bad Request',
-				array(
-					'data' => array(
-						'params' => array( 'slug', 'current_etag', 'hmac', 'url', 'viewport', 'elements' ),
-					),
-				)
-			),
-		);
-
-		$result = od_optimization_detective_rest_api_test();
-		$this->assertSame( '0', get_option( 'od_rest_api_inaccessible', false ) );
-		$this->assertSame( 'good', $result['status'] );
-		$this->assertFalse( od_is_rest_api_inaccessible() );
-	}
-
-	/**
-	 * Test behavior when REST API returns an unauthorized error.
-	 *
-	 * @covers ::od_optimization_detective_rest_api_test
-	 * @covers ::od_construct_site_health_result
-	 * @covers ::od_get_rest_api_health_check_response
-	 * @covers ::od_is_rest_api_inaccessible
-	 */
-	public function test_rest_api_unauthorized(): void {
-		$this->mocked_responses = array(
-			get_rest_url( null, OD_REST_API_NAMESPACE . OD_URL_METRICS_ROUTE ) => $this->build_mock_response(
-				401,
-				'Unauthorized'
-			),
-		);
-
-		$result = od_optimization_detective_rest_api_test();
-		$this->assertSame( '1', get_option( 'od_rest_api_inaccessible', false ) );
-		$this->assertSame( 'recommended', $result['status'] );
-		$this->assertTrue( od_is_rest_api_inaccessible() );
-	}
-
-	/**
-	 * Test behavior when REST API returns a forbidden error.
-	 *
-	 * @covers ::od_optimization_detective_rest_api_test
-	 * @covers ::od_construct_site_health_result
-	 * @covers ::od_get_rest_api_health_check_response
-	 * @covers ::od_is_rest_api_inaccessible
-	 */
-	public function test_rest_api_forbidden(): void {
-		$this->mocked_responses = array(
-			get_rest_url( null, OD_REST_API_NAMESPACE . OD_URL_METRICS_ROUTE ) => $this->build_mock_response(
-				403,
-				'Forbidden'
-			),
-		);
-
-		$result = od_optimization_detective_rest_api_test();
-		$this->assertSame( '1', get_option( 'od_rest_api_inaccessible', false ) );
-		$this->assertSame( 'recommended', $result['status'] );
-		$this->assertTrue( od_is_rest_api_inaccessible() );
-	}
-
-	/**
-	 * Mock HTTP requests for assets to simulate different responses.
-	 *
-	 * @param bool                 $response A preemptive return value of an HTTP request. Default false.
-	 * @param array<string, mixed> $args     Request arguments.
-	 * @param string               $url      The request URL.
-	 * @return array<string, mixed> Mocked response.
-	 */
-	public function mock_http_requests( bool $response, array $args, string $url ): array {
-		if ( isset( $this->mocked_responses[ $url ] ) ) {
-			return $this->mocked_responses[ $url ];
-		}
-
-		// If no specific mock set, default to a generic success response.
+	public function data_provider_test_rest_api_availability(): array {
 		return array(
-			'response' => array(
-				'code'    => 200,
-				'message' => 'OK',
+			'available'    => array(
+				'mocked_response'      => $this->build_mock_response(
+					400,
+					'Bad Request',
+					array(
+						'data' => array(
+							'params' => array( 'slug', 'current_etag', 'hmac', 'url', 'viewport', 'elements' ),
+						),
+					)
+				),
+				'expected_option'      => '0',
+				'expected_status'      => 'good',
+				'expected_unavailable' => false,
+			),
+			'unauthorized' => array(
+				'mocked_response'      => $this->build_mock_response(
+					401,
+					'Unauthorized'
+				),
+				'expected_option'      => '1',
+				'expected_status'      => 'recommended',
+				'expected_unavailable' => true,
+			),
+			'forbidden'    => array(
+				'mocked_response'      => $this->build_mock_response(
+					403,
+					'Forbidden'
+				),
+				'expected_option'      => '1',
+				'expected_status'      => 'recommended',
+				'expected_unavailable' => true,
 			),
 		);
+	}
+
+	/**
+	 * Test various conditions for the REST API being available.
+	 *
+	 * @covers ::od_optimization_detective_rest_api_test
+	 * @covers ::od_construct_site_health_result
+	 * @covers ::od_get_rest_api_health_check_response
+	 * @covers ::od_is_rest_api_inaccessible
+	 *
+	 * @dataProvider data_provider_test_rest_api_availability
+	 *
+	 * @phpstan-param array<string, mixed> $mocked_response
+	 */
+	public function test_rest_api_availability( array $mocked_response, string $expected_option, string $expected_status, bool $expected_unavailable ): void {
+		add_filter(
+			'pre_http_request',
+			static function ( $pre, array $args, string $url ) use ( $mocked_response ) {
+				if ( rest_url( OD_REST_API_NAMESPACE . OD_URL_METRICS_ROUTE ) === $url ) {
+					return $mocked_response;
+				}
+				return $pre;
+			},
+			10,
+			3
+		);
+
+		$result = od_optimization_detective_rest_api_test();
+		$this->assertSame( $expected_option, get_option( 'od_rest_api_inaccessible', '' ) );
+		$this->assertSame( $expected_status, $result['status'] );
+		$this->assertSame( $expected_unavailable, od_is_rest_api_inaccessible() );
 	}
 
 	/**
