@@ -14,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Initializes extensions for Optimization Detective.
  *
  * @since 0.7.0
+ * @access private
  */
 function od_initialize_extensions(): void {
 	/**
@@ -29,10 +30,14 @@ function od_initialize_extensions(): void {
 /**
  * Generates a media query for the provided minimum and maximum viewport widths.
  *
+ * This helper function is available for extensions to leverage when manually printing STYLE rules via
+ * {@see OD_HTML_Tag_Processor::append_head_html()} or {@see OD_HTML_Tag_Processor::append_body_html()}
+ *
  * @since 0.7.0
  *
  * @param int|null $minimum_viewport_width Minimum viewport width.
  * @param int|null $maximum_viewport_width Maximum viewport width.
+ *
  * @return non-empty-string|null Media query, or null if the min/max were both unspecified or invalid.
  */
 function od_generate_media_query( ?int $minimum_viewport_width, ?int $maximum_viewport_width ): ?string {
@@ -59,6 +64,7 @@ function od_generate_media_query( ?int $minimum_viewport_width, ?int $maximum_vi
  * See {@see 'wp_head'}.
  *
  * @since 0.1.0
+ * @access private
  */
 function od_render_generator_meta_tag(): void {
 	// Use the plugin slug as it is immutable.
@@ -76,6 +82,7 @@ function od_render_generator_meta_tag(): void {
  * Gets the path to a script or stylesheet.
  *
  * @since 0.9.0
+ * @access private
  *
  * @param string      $src_path Source path, relative to plugin root.
  * @param string|null $min_path Minified path. If not supplied, then '.min' is injected before the file extension in the source path.
