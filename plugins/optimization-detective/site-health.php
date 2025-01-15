@@ -192,7 +192,7 @@ function od_get_rest_api_health_check_response( bool $use_cached ) {
  *
  * @param array<string> $additional_classes Additional classes to add to the notice.
  */
-function od_render_rest_api_health_check_notice( array $additional_classes = array() ): void {
+function od_maybe_render_rest_api_health_check_admin_notice( array $additional_classes = array() ): void {
 	if ( ! od_is_rest_api_unavailable() ) {
 		return;
 	}
@@ -229,11 +229,11 @@ function od_render_rest_api_health_check_notice( array $additional_classes = arr
  *
  * @param string $plugin_file Plugin file.
  */
-function od_rest_api_health_check_admin_notice( string $plugin_file ): void {
+function od_render_rest_api_health_check_admin_notice_in_plugin_row( string $plugin_file ): void {
 	if ( 'optimization-detective/load.php' !== $plugin_file ) {
 		return;
 	}
-	od_render_rest_api_health_check_notice( array( 'inline', 'notice-alt' ) );
+	od_maybe_render_rest_api_health_check_admin_notice( array( 'inline', 'notice-alt' ) );
 }
 
 /**
@@ -244,7 +244,7 @@ function od_rest_api_health_check_admin_notice( string $plugin_file ): void {
  * that an error message can be displayed after performing that plugin activation request. Note that a plugin activation
  * hook cannot be used for this purpose due to not being compatible with multisite. While the site health notice is
  * shown at the `admin_notices` action once, the notice will only be displayed inline with the plugin row thereafter
- * via {@see od_rest_api_health_check_admin_notice()}.
+ * via {@see od_render_rest_api_health_check_admin_notice_in_plugin_row()}.
  *
  * @since n.e.x.t
  * @access private
@@ -257,13 +257,14 @@ function od_maybe_run_rest_api_health_check(): void {
 	}
 
 	// This will populate the od_rest_api_info option so that the function won't execute on the next page load.
-	od_optimization_detective_rest_api_test();
+	if ( 'good' !== od_optimization_detective_rest_api_test()['status'] ) {
 
-	// Show any notice in the main admin notices area for the first page load (e.g. after plugin activation).
-	add_action(
-		'admin_notices',
-		static function (): void {
-			od_render_rest_api_health_check_notice();
-		}
-	);
+		// Show any notice in the main admin notices area for the first page load (e.g. after plugin activation).
+		add_action(
+			'admin_notices',
+			static function (): void {
+				od_maybe_render_rest_api_health_check_admin_notice();
+			}
+		);
+	}
 }
