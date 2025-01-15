@@ -20,7 +20,6 @@ $od_delete_site_data = static function (): void {
 
 	// Clear out site health check data.
 	delete_option( 'od_rest_api_inaccessible' );
-	wp_unschedule_hook( 'od_rest_api_health_check_event' );
 	delete_transient( 'od_rest_api_health_check_response' );
 };
 
