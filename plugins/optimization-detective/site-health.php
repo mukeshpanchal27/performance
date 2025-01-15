@@ -49,12 +49,12 @@ function od_optimization_detective_rest_api_test(): array {
  * Checks whether the Optimization Detective REST API endpoint is unavailable.
  *
  * This merely checks the database option what was previously computed in the Site Health test as done in {@see od_optimization_detective_rest_api_test()}.
- * This is to avoid checking for REST API accessibility during a frontend request. Note that when the plugin is first
+ * This is to avoid checking for REST API availability during a frontend request. Note that when the plugin is first
  * installed, the 'od_rest_api_unavailable' option will not be in the database, as the check has not been performed
  * yet. Once Site Health's weekly check happens or when a user accesses the admin so that the admin_init action fires,
  * then at this point the check will be performed at {@see od_maybe_run_rest_api_health_check()}. In practice, this will
  * happen immediately after the user activates a plugin since the user is redirected back to the plugin list table in
- * the admin. The reason for storing the negative unavailable state as opposed to the positive accessible state is that
+ * the admin. The reason for storing the negative unavailable state as opposed to the positive available state is that
  * when an option does not exist then `get_option()` returns `false` which is the same falsy value as the stored `'0'`.
  *
  * @since n.e.x.t
@@ -80,14 +80,14 @@ function od_construct_site_health_result( $response ): array {
 	$common_description_html = '<p>' . wp_kses(
 		sprintf(
 			/* translators: %s is the REST API endpoint */
-			__( 'To collect URL Metrics from visitors the REST API must be accessible to unauthenticated users. Specifically, visitors must be able to perform a <code>POST</code> request to the <code>%s</code> endpoint.', 'optimization-detective' ),
+			__( 'To collect URL Metrics from visitors the REST API must be available to unauthenticated users. Specifically, visitors must be able to perform a <code>POST</code> request to the <code>%s</code> endpoint.', 'optimization-detective' ),
 			'/' . OD_REST_API_NAMESPACE . OD_URL_METRICS_ROUTE
 		),
 		array( 'code' => array() )
 	) . '</p>';
 
 	$result = array(
-		'label'       => __( 'Optimization Detective\'s REST API endpoint is accessible', 'optimization-detective' ),
+		'label'       => __( 'Optimization Detective\'s REST API endpoint is available', 'optimization-detective' ),
 		'status'      => 'good',
 		'badge'       => array(
 			'label' => __( 'Optimization Detective', 'optimization-detective' ),
@@ -142,7 +142,7 @@ function od_construct_site_health_result( $response ): array {
 }
 
 /**
- * Gets the response to an Optimization Detective REST API store request to confirm it is accessible to unauthenticated requests.
+ * Gets the response to an Optimization Detective REST API store request to confirm it is available to unauthenticated requests.
  *
  * @since n.e.x.t
  *
@@ -191,9 +191,9 @@ function od_get_rest_api_health_check_response( bool $use_cached ) {
  * @access private
  * @todo Add coverage.
  *
- * @param array<string> $additional_classes Additional classes to add to the notice.
+ * @param bool $in_plugin_row Whether the notice is to be printed in the plugin row. Default false.
  */
-function od_maybe_render_rest_api_health_check_admin_notice( array $additional_classes = array() ): void {
+function od_maybe_render_rest_api_health_check_admin_notice( bool $in_plugin_row = false ): void {
 	if ( ! od_is_rest_api_unavailable() ) {
 		return;
 	}
@@ -205,17 +205,37 @@ function od_maybe_render_rest_api_health_check_admin_notice( array $additional_c
 		return;
 	}
 
+	$message = sprintf(
+		$in_plugin_row
+			? '<summary style="margin: 0.5em 0">%s %s</summary>'
+			: '<p><strong>%s %s</strong></p>',
+		esc_html__( 'Warning:', 'optimization-detective' ),
+		esc_html( $result['label'] )
+	);
+
+	$message .= wp_kses( $result['description'], array_fill_keys( array( 'p', 'code' ), array() ) );
+
+	if ( current_user_can( 'view_site_health_checks' ) ) {
+		$site_health_message = wp_kses(
+			sprintf(
+				/* translators: %s is the URL to the Site Health admin screen */
+				__( 'Please visit <a href="%s">Site Health</a> to re-check this once you believe you have resolved the issue.', 'optimization-detective' ),
+				esc_url( admin_url( 'site-health.php' ) )
+			),
+			array( 'a' => array( 'href' => array() ) )
+		);
+		$message .= "<p><em>$site_health_message</em></p>";
+	}
+
+	if ( $in_plugin_row ) {
+		$message = "<details>$message</details>";
+	}
+
 	wp_admin_notice(
-		sprintf(
-			'<details><summary>%s %s</summary>%s %s</details>',
-			esc_html__( 'Warning:', 'optimization-detective' ),
-			esc_html( $result['label'] ),
-			wp_kses( $result['description'], array_fill_keys( array( 'p', 'code' ), array() ) ),
-			'<p>' . esc_html__( 'Please visit Site Health to re-check this once you believe you have resolved the issue.', 'optimization-detective' ) . '</p>'
-		),
+		$message,
 		array(
 			'type'               => 'warning',
-			'additional_classes' => $additional_classes,
+			'additional_classes' => $in_plugin_row ? array( 'inline', 'notice-alt' ) : array(),
 			'paragraph_wrap'     => false,
 		)
 	);
@@ -234,7 +254,7 @@ function od_render_rest_api_health_check_admin_notice_in_plugin_row( string $plu
 	if ( 'optimization-detective/load.php' !== $plugin_file ) {
 		return;
 	}
-	od_maybe_render_rest_api_health_check_admin_notice( array( 'inline', 'notice-alt' ) );
+	od_maybe_render_rest_api_health_check_admin_notice( true );
 }
 
 /**
