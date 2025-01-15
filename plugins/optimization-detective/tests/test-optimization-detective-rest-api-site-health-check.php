@@ -26,11 +26,23 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 		// Add the filter to mock HTTP requests.
 		add_filter( 'pre_http_request', array( $this, 'mock_http_requests' ), 10, 3 );
 	}
+	/**
+	 * Test that we presume the REST API is accessible before we are able to perform the Site Health check.
+	 *
+	 * @covers ::od_is_rest_api_inaccessible
+	 */
+	public function test_rest_api_assumed_accessible(): void {
+		$this->assertFalse( get_option( 'od_rest_api_inaccessible', false ) );
+		$this->assertFalse( od_is_rest_api_inaccessible() );
+	}
 
 	/**
 	 * Test that the site health check is `good` when the REST API is available.
 	 *
 	 * @covers ::od_optimization_detective_rest_api_test
+	 * @covers ::od_construct_site_health_result
+	 * @covers ::od_get_rest_api_health_check_response
+	 * @covers ::od_is_rest_api_inaccessible
 	 */
 	public function test_rest_api_available(): void {
 		$this->mocked_responses = array(
@@ -45,18 +57,19 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 			),
 		);
 
-		$result           = od_optimization_detective_rest_api_test();
-		$od_rest_api_info = get_option( 'od_rest_api_info', array() );
-
+		$result = od_optimization_detective_rest_api_test();
+		$this->assertSame( '0', get_option( 'od_rest_api_inaccessible', false ) );
 		$this->assertSame( 'good', $result['status'] );
-		$this->assertSame( 400, wp_remote_retrieve_response_code( $od_rest_api_info['response'] ) );
-		$this->assertTrue( $od_rest_api_info['available'] );
+		$this->assertFalse( od_is_rest_api_inaccessible() );
 	}
 
 	/**
 	 * Test behavior when REST API returns an unauthorized error.
 	 *
 	 * @covers ::od_optimization_detective_rest_api_test
+	 * @covers ::od_construct_site_health_result
+	 * @covers ::od_get_rest_api_health_check_response
+	 * @covers ::od_is_rest_api_inaccessible
 	 */
 	public function test_rest_api_unauthorized(): void {
 		$this->mocked_responses = array(
@@ -66,18 +79,19 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 			),
 		);
 
-		$result           = od_optimization_detective_rest_api_test();
-		$od_rest_api_info = get_option( 'od_rest_api_info', array() );
-
+		$result = od_optimization_detective_rest_api_test();
+		$this->assertSame( '1', get_option( 'od_rest_api_inaccessible', false ) );
 		$this->assertSame( 'recommended', $result['status'] );
-		$this->assertSame( 401, wp_remote_retrieve_response_code( $od_rest_api_info['response'] ) );
-		$this->assertFalse( $od_rest_api_info['available'] );
+		$this->assertTrue( od_is_rest_api_inaccessible() );
 	}
 
 	/**
 	 * Test behavior when REST API returns a forbidden error.
 	 *
 	 * @covers ::od_optimization_detective_rest_api_test
+	 * @covers ::od_construct_site_health_result
+	 * @covers ::od_get_rest_api_health_check_response
+	 * @covers ::od_is_rest_api_inaccessible
 	 */
 	public function test_rest_api_forbidden(): void {
 		$this->mocked_responses = array(
@@ -87,12 +101,10 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 			),
 		);
 
-		$result           = od_optimization_detective_rest_api_test();
-		$od_rest_api_info = get_option( 'od_rest_api_info', array() );
-
+		$result = od_optimization_detective_rest_api_test();
+		$this->assertSame( '1', get_option( 'od_rest_api_inaccessible', false ) );
 		$this->assertSame( 'recommended', $result['status'] );
-		$this->assertSame( 403, wp_remote_retrieve_response_code( $od_rest_api_info['response'] ) );
-		$this->assertFalse( $od_rest_api_info['available'] );
+		$this->assertTrue( od_is_rest_api_inaccessible() );
 	}
 
 	/**

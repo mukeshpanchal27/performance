@@ -19,8 +19,9 @@ $od_delete_site_data = static function (): void {
 	wp_unschedule_hook( OD_URL_Metrics_Post_Type::GC_CRON_EVENT_NAME );
 
 	// Clear out site health check data.
-	delete_option( 'od_rest_api_info' );
+	delete_option( 'od_rest_api_inaccessible' );
 	wp_unschedule_hook( 'od_rest_api_health_check_event' );
+	delete_transient( 'od_rest_api_health_check_response' );
 };
 
 $od_delete_site_data();
