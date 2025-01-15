@@ -38,32 +38,32 @@ function od_optimization_detective_add_rest_api_test( array $tests ): array {
  * @return array{label: string, status: string, badge: array{label: string, color: string}, description: string, actions: string, test: string} Result.
  */
 function od_optimization_detective_rest_api_test(): array {
-	$response        = od_get_rest_api_health_check_response( false );
-	$result          = od_construct_site_health_result( $response );
-	$is_inaccessible = 'good' !== $result['status'];
-	update_option( 'od_rest_api_inaccessible', $is_inaccessible ? '1' : '0' );
+	$response       = od_get_rest_api_health_check_response( false );
+	$result         = od_construct_site_health_result( $response );
+	$is_unavailable = 'good' !== $result['status'];
+	update_option( 'od_rest_api_unavailable', $is_unavailable ? '1' : '0' );
 	return $result;
 }
 
 /**
- * Checks whether the Optimization Detective REST API endpoint is inaccessible.
+ * Checks whether the Optimization Detective REST API endpoint is unavailable.
  *
  * This merely checks the database option what was previously computed in the Site Health test as done in {@see od_optimization_detective_rest_api_test()}.
  * This is to avoid checking for REST API accessibility during a frontend request. Note that when the plugin is first
- * installed, the 'od_rest_api_inaccessible' option will not be in the database, as the check has not been performed
+ * installed, the 'od_rest_api_unavailable' option will not be in the database, as the check has not been performed
  * yet. Once Site Health's weekly check happens or when a user accesses the admin so that the admin_init action fires,
  * then at this point the check will be performed at {@see od_maybe_run_rest_api_health_check()}. In practice, this will
  * happen immediately after the user activates a plugin since the user is redirected back to the plugin list table in
- * the admin. The reason for storing the negative inaccessible state as opposed to the positive accessible state is that
+ * the admin. The reason for storing the negative unavailable state as opposed to the positive accessible state is that
  * when an option does not exist then `get_option()` returns `false` which is the same falsy value as the stored `'0'`.
  *
  * @since n.e.x.t
  * @access private
  *
- * @return bool Whether inaccessible.
+ * @return bool Whether unavailable.
  */
-function od_is_rest_api_inaccessible(): bool {
-	return 1 === (int) get_option( 'od_rest_api_inaccessible', '0' );
+function od_is_rest_api_unavailable(): bool {
+	return 1 === (int) get_option( 'od_rest_api_unavailable', '0' );
 }
 
 /**
@@ -98,7 +98,7 @@ function od_construct_site_health_result( $response ): array {
 		'test'        => 'optimization_detective_rest_api',
 	);
 
-	$error_label            = __( 'Optimization Detective\'s REST API endpoint is inaccessible', 'optimization-detective' );
+	$error_label            = __( 'Optimization Detective\'s REST API endpoint is unavailable', 'optimization-detective' );
 	$error_description_html = '<p>' . esc_html__( 'You may have a plugin active or server configuration which restricts access to logged-in users. Unauthenticated access must be restored in order for Optimization Detective to work.', 'optimization-detective' ) . '</p>';
 
 	if ( is_wp_error( $response ) ) {
@@ -125,7 +125,7 @@ function od_construct_site_health_result( $response ): array {
 		);
 		if ( ! $is_expected ) {
 			$result['status']      = 'recommended';
-			$result['label']       = __( 'The Optimization Detective REST API endpoint is inaccessible to logged-out users', 'optimization-detective' );
+			$result['label']       = __( 'The Optimization Detective REST API endpoint is unavailable to logged-out users', 'optimization-detective' );
 			$result['description'] = $common_description_html . $error_description_html . '<p>' . wp_kses(
 				sprintf(
 					/* translators: %d is the HTTP status code, %s is the status header description */
@@ -193,7 +193,7 @@ function od_get_rest_api_health_check_response( bool $use_cached ) {
  * @param array<string> $additional_classes Additional classes to add to the notice.
  */
 function od_render_rest_api_health_check_notice( array $additional_classes = array() ): void {
-	if ( ! od_is_rest_api_inaccessible() ) {
+	if ( ! od_is_rest_api_unavailable() ) {
 		return;
 	}
 
@@ -252,7 +252,7 @@ function od_rest_api_health_check_admin_notice( string $plugin_file ): void {
  */
 function od_maybe_run_rest_api_health_check(): void {
 	// If the option already exists, then the REST API health check has already been performed.
-	if ( false !== get_option( 'od_rest_api_inaccessible' ) ) {
+	if ( false !== get_option( 'od_rest_api_unavailable' ) ) {
 		return;
 	}
 

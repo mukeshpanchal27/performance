@@ -10,11 +10,11 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 	/**
 	 * Test that we presume the REST API is accessible before we are able to perform the Site Health check.
 	 *
-	 * @covers ::od_is_rest_api_inaccessible
+	 * @covers ::od_is_rest_api_unavailable
 	 */
 	public function test_rest_api_assumed_accessible(): void {
-		$this->assertFalse( get_option( 'od_rest_api_inaccessible', false ) );
-		$this->assertFalse( od_is_rest_api_inaccessible() );
+		$this->assertFalse( get_option( 'od_rest_api_unavailable', false ) );
+		$this->assertFalse( od_is_rest_api_unavailable() );
 	}
 
 	/**
@@ -65,7 +65,7 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 	 * @covers ::od_optimization_detective_rest_api_test
 	 * @covers ::od_construct_site_health_result
 	 * @covers ::od_get_rest_api_health_check_response
-	 * @covers ::od_is_rest_api_inaccessible
+	 * @covers ::od_is_rest_api_unavailable
 	 *
 	 * @dataProvider data_provider_test_rest_api_availability
 	 *
@@ -85,9 +85,9 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 		);
 
 		$result = od_optimization_detective_rest_api_test();
-		$this->assertSame( $expected_option, get_option( 'od_rest_api_inaccessible', '' ) );
+		$this->assertSame( $expected_option, get_option( 'od_rest_api_unavailable', '' ) );
 		$this->assertSame( $expected_status, $result['status'] );
-		$this->assertSame( $expected_unavailable, od_is_rest_api_inaccessible() );
+		$this->assertSame( $expected_unavailable, od_is_rest_api_unavailable() );
 	}
 
 	/**
