@@ -14,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Adds tests to site health.
  *
  * @since n.e.x.t
+ * @access private
  *
  * @param array{direct: array<string, array{label: string, test: string}>} $tests Site Health Tests.
  * @return array{direct: array<string, array{label: string, test: string}>} Amended tests.

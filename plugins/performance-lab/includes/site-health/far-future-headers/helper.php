@@ -14,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Callback for the far-future caching test.
  *
  * @since n.e.x.t
+ * @access private
  *
  * @return array{label: string, status: string, badge: array{label: string, color: string}, description: string, actions: string, test: string} Result.
  */
@@ -82,6 +83,7 @@ function perflab_ffh_assets_test(): array {
  * Checks if far-future expiration headers are enabled for a list of assets.
  *
  * @since n.e.x.t
+ * @access private
  *
  * @param  string[] $assets List of asset URLs to check.
  * @return array{final_status: string, details: array{filename: string, reason: string}[]} Final status and details.
@@ -160,6 +162,7 @@ function perflab_ffh_check_assets( array $assets ): array {
  * Checks if far-future expiration headers are enabled.
  *
  * @since n.e.x.t
+ * @access private
  *
  * @param WpOrg\Requests\Utility\CaseInsensitiveDictionary|array<string, string|array<string>> $headers Response headers.
  * @return array{passed: bool, reason: string}|false Detailed result. If passed=false, reason explains why it failed and false if no headers found.
@@ -253,6 +256,7 @@ function perflab_ffh_check_headers( $headers ) {
  * Attempt a conditional request with ETag/Last-Modified.
  *
  * @since n.e.x.t
+ * @access private
  *
  * @param string                                                                               $url     The asset URL.
  * @param WpOrg\Requests\Utility\CaseInsensitiveDictionary|array<string, string|array<string>> $headers The initial response headers.
@@ -290,6 +294,7 @@ function perflab_ffh_try_conditional_request( string $url, $headers ): bool {
  * Generate a table listing files that need far-future headers, including reasons.
  *
  * @since n.e.x.t
+ * @access private
  *
  * @param array<array{filename: string, reason: string}> $fail_details Array of arrays with 'filename' and 'reason'.
  * @return string HTML formatted table.
