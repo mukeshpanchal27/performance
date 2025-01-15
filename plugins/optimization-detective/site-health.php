@@ -35,17 +35,23 @@ function od_optimization_detective_add_rest_api_test( array $tests ): array {
  * @return array{label: string, status: string, badge: array{label: string, color: string}, description: string, actions: string, test: string} Result.
  */
 function od_optimization_detective_rest_api_test(): array {
+	$common_description_html = '<p>' . wp_kses(
+		sprintf(
+			/* translators: %s is the REST API endpoint */
+			__( 'To collect URL Metrics from visitors the REST API must be accessible to unauthenticated users. Specifically, visitors must be able to perform a <code>POST</code> request to the <code>%s</code> endpoint.', 'optimization-detective' ),
+			'/' . OD_REST_API_NAMESPACE . OD_URL_METRICS_ROUTE
+		),
+		array( 'code' => array() )
+	) . '</p>';
+
 	$result = array(
-		'label'       => __( 'The Optimization Detective REST API endpoint is functional.', 'optimization-detective' ),
+		'label'       => __( 'Optimization Detective\'s REST API endpoint is accessible', 'optimization-detective' ),
 		'status'      => 'good',
 		'badge'       => array(
 			'label' => __( 'Optimization Detective', 'optimization-detective' ),
 			'color' => 'blue',
 		),
-		'description' => sprintf(
-			'<p>%s</p>',
-			__( 'Your site can send and receive URL metrics via the Optimization Detective REST API endpoint.', 'optimization-detective' )
-		),
+		'description' => $common_description_html . '<p><strong>' . esc_html__( 'This appears to be working properly.', 'optimization-detective' ) . '</strong></p>',
 		'actions'     => '',
 		'test'        => 'optimization_detective_rest_api',
 	);
@@ -59,11 +65,23 @@ function od_optimization_detective_rest_api_test(): array {
 		)
 	);
 
+	$error_label            = __( 'Optimization Detective\'s REST API endpoint is inaccessible', 'optimization-detective' );
+	$error_description_html = '<p>' . esc_html__( 'You may have a plugin active or server configuration which restricts access to logged-in users. Unauthenticated access must be restored in order for Optimization Detective to work.', 'optimization-detective' ) . '</p>';
+
 	if ( is_wp_error( $response ) ) {
 		$result['status']      = 'recommended';
-		$result['label']       = __( 'Error accessing the Optimization Detective REST API endpoint', 'optimization-detective' );
-		$result['description'] = esc_html__( 'There was an issue reaching the Optimization Detective REST API endpoint. This might be due to server settings or the REST API being disabled.', 'optimization-detective' );
-		$info                  = array(
+		$result['label']       = $error_label;
+		$result['description'] = $common_description_html . $error_description_html . '<p>' . wp_kses(
+			sprintf(
+				/* translators: 1: the error code, 2: the error message */
+				__( 'The REST API responded with the error code <code>%1$s</code> and this error message: %2$s.', 'optimization-detective' ),
+				esc_html( (string) $response->get_error_code() ),
+				esc_html( rtrim( $response->get_error_message(), '.' ) )
+			),
+			array( 'code' => array() )
+		) . '</p>';
+
+		$info = array(
 			'error_message' => $result['description'],
 			'error_code'    => $response->get_error_code(),
 			'available'     => false,
@@ -71,11 +89,6 @@ function od_optimization_detective_rest_api_test(): array {
 	} else {
 		$status_code = wp_remote_retrieve_response_code( $response );
 		$data        = json_decode( wp_remote_retrieve_body( $response ), true );
-		$info        = array(
-			'status_code'   => $status_code,
-			'available'     => false,
-			'error_message' => '',
-		);
 
 		if (
 			400 === $status_code &&
@@ -84,27 +97,31 @@ function od_optimization_detective_rest_api_test(): array {
 			count( $data['data']['params'] ) > 0
 		) {
 			// The REST API endpoint is available.
-			$info['available'] = true;
-		} elseif ( 401 === $status_code ) {
-			$result['status']      = 'recommended';
-			$result['label']       = __( 'Authorization should not be required to access the Optimization Detective REST API endpoint.', 'optimization-detective' );
-			$result['description'] = esc_html__( 'To collect URL metrics, the Optimization Detective REST API endpoint should be accessible without requiring authorization.', 'optimization-detective' );
-		} elseif ( 403 === $status_code ) {
-			$result['status']      = 'recommended';
-			$result['label']       = __( 'Access to the Optimization Detective REST API endpoint was denied.', 'optimization-detective' );
-			$result['description'] = esc_html__( 'Access was denied because the user does not have the necessary capabilities. Please check user roles and capabilities, as all users should have access to the Optimization Detective REST API endpoint.', 'optimization-detective' );
+			$info = array(
+				'status_code'   => $status_code,
+				'available'     => true,
+				'error_message' => '',
+			);
 		} else {
 			$result['status']      = 'recommended';
-			$result['label']       = __( 'Error accessing the Optimization Detective REST API endpoint', 'optimization-detective' );
-			$result['description'] = esc_html__( 'There was an issue reaching the Optimization Detective REST API endpoint. This might be due to server settings or the REST API being disabled.', 'optimization-detective' );
-		}
-		$info['error_message'] = $result['description'];
-	}
+			$result['label']       = __( 'The Optimization Detective REST API endpoint is inaccessible to logged-out users', 'optimization-detective' );
+			$result['description'] = $common_description_html . $error_description_html . '<p>' . wp_kses(
+				sprintf(
+					/* translators: %d is the HTTP status code, %s is the status header description */
+					__( 'The REST API returned with an HTTP status of <code>%1$d %2$s</code>.', 'optimization-detective' ),
+					$status_code,
+					get_status_header_desc( (int) $status_code )
+				),
+				array( 'code' => array() )
+			) . '</p>';
 
-	$result['description'] = sprintf(
-		'<p>%s</p>',
-		$result['description']
-	);
+			$info = array(
+				'status_code'   => $status_code,
+				'available'     => false,
+				'error_message' => $result['description'],
+			);
+		}
+	}
 
 	update_option( 'od_rest_api_info', $info );
 	return $result;
@@ -126,7 +143,7 @@ function od_render_rest_api_health_check_notice( array $additional_classes = arr
 		'' !== $rest_api_info['error_message']
 	) {
 		wp_admin_notice(
-			esc_html( $rest_api_info['error_message'] ),
+			wp_kses( $rest_api_info['error_message'], array_fill_keys( array( 'p', 'code' ), array() ) ),
 			array(
 				'type'               => 'warning',
 				'additional_classes' => $additional_classes,
