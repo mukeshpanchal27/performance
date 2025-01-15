@@ -62,8 +62,8 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 	/**
 	 * Test various conditions for the REST API being available.
 	 *
-	 * @covers ::od_optimization_detective_rest_api_test
-	 * @covers ::od_construct_site_health_result
+	 * @covers ::od_test_rest_api_availability
+	 * @covers ::od_compose_site_health_result
 	 * @covers ::od_get_rest_api_health_check_response
 	 * @covers ::od_is_rest_api_unavailable
 	 *
@@ -84,7 +84,7 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 			3
 		);
 
-		$result = od_optimization_detective_rest_api_test();
+		$result = od_test_rest_api_availability();
 		$this->assertSame( $expected_option, get_option( 'od_rest_api_unavailable', '' ) );
 		$this->assertSame( $expected_status, $result['status'] );
 		$this->assertSame( $expected_unavailable, od_is_rest_api_unavailable() );

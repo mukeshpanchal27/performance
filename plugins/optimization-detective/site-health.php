@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param array{direct: array<string, array{label: string, test: string}>} $tests Site Health Tests.
  * @return array{direct: array<string, array{label: string, test: string}>} Amended tests.
  */
-function od_optimization_detective_add_rest_api_test( array $tests ): array {
+function od_add_rest_api_availability_test( array $tests ): array {
 	$tests['direct']['optimization_detective_rest_api'] = array(
 		'label' => __( 'Optimization Detective REST API Endpoint Availability', 'optimization-detective' ),
 		'test'  => 'od_optimization_detective_rest_api_test',
@@ -37,9 +37,9 @@ function od_optimization_detective_add_rest_api_test( array $tests ): array {
  *
  * @return array{label: string, status: string, badge: array{label: string, color: string}, description: string, actions: string, test: string} Result.
  */
-function od_optimization_detective_rest_api_test(): array {
+function od_test_rest_api_availability(): array {
 	$response       = od_get_rest_api_health_check_response( false );
-	$result         = od_construct_site_health_result( $response );
+	$result         = od_compose_site_health_result( $response );
 	$is_unavailable = 'good' !== $result['status'];
 	update_option( 'od_rest_api_unavailable', $is_unavailable ? '1' : '0' );
 	return $result;
@@ -48,7 +48,7 @@ function od_optimization_detective_rest_api_test(): array {
 /**
  * Checks whether the Optimization Detective REST API endpoint is unavailable.
  *
- * This merely checks the database option what was previously computed in the Site Health test as done in {@see od_optimization_detective_rest_api_test()}.
+ * This merely checks the database option what was previously computed in the Site Health test as done in {@see od_test_rest_api_availability()}.
  * This is to avoid checking for REST API availability during a frontend request. Note that when the plugin is first
  * installed, the 'od_rest_api_unavailable' option will not be in the database, as the check has not been performed
  * yet. Once Site Health's weekly check happens or when a user accesses the admin so that the admin_init action fires,
@@ -76,7 +76,7 @@ function od_is_rest_api_unavailable(): bool {
  *
  * @return array{label: string, status: string, badge: array{label: string, color: string}, description: string, actions: string, test: string} Result.
  */
-function od_construct_site_health_result( $response ): array {
+function od_compose_site_health_result( $response ): array {
 	$common_description_html = '<p>' . wp_kses(
 		sprintf(
 			/* translators: %s is the REST API endpoint */
@@ -199,7 +199,7 @@ function od_maybe_render_rest_api_health_check_admin_notice( bool $in_plugin_row
 	}
 
 	$response = od_get_rest_api_health_check_response( true );
-	$result   = od_construct_site_health_result( $response );
+	$result   = od_compose_site_health_result( $response );
 	if ( 'good' === $result['status'] ) {
 		// There's a slight chance the DB option is stale in the initial if statement.
 		return;
@@ -278,7 +278,7 @@ function od_maybe_run_rest_api_health_check(): void {
 	}
 
 	// This will populate the od_rest_api_info option so that the function won't execute on the next page load.
-	if ( 'good' !== od_optimization_detective_rest_api_test()['status'] ) {
+	if ( 'good' !== od_test_rest_api_availability()['status'] ) {
 
 		// Show any notice in the main admin notices area for the first page load (e.g. after plugin activation).
 		add_action(
