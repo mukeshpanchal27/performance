@@ -269,7 +269,7 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 					$this->go_to( home_url( '/' ) );
 					$this->assertIsInt( od_get_cache_purge_post_id() );
 				},
-				'expected' => false,
+				'expected' => true,
 			),
 		);
 	}
@@ -291,15 +291,10 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 	/**
 	 * Data provider.
 	 *
-	 * @return array<string, mixed> Data.
+	 * @return array<string, array{ directory: non-empty-string }> Test cases.
 	 */
 	public function data_provider_test_od_optimize_template_output_buffer(): array {
-		$test_cases = array();
-		foreach ( (array) glob( __DIR__ . '/test-cases/*.php' ) as $test_case ) {
-			$name                = basename( $test_case, '.php' );
-			$test_cases[ $name ] = require $test_case;
-		}
-		return $test_cases;
+		return $this->load_snapshot_test_cases( __DIR__ . '/test-cases' );
 	}
 
 	/**
@@ -309,10 +304,12 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 	 * @covers ::od_is_response_html_content_type
 	 *
 	 * @dataProvider data_provider_test_od_optimize_template_output_buffer
+	 *
+	 * @param non-empty-string $directory Test case directory.
+	 *
+	 * @noinspection PhpDocMissingThrowsInspection
 	 */
-	public function test_od_optimize_template_output_buffer( Closure $set_up, string $buffer, string $expected ): void {
-		$set_up( $this );
-
+	public function test_od_optimize_template_output_buffer( string $directory ): void {
 		add_action(
 			'od_register_tag_visitors',
 			function ( OD_Tag_Visitor_Registry $tag_visitor_registry ): void {
@@ -345,16 +342,6 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 			}
 		);
 
-		$buffer = preg_replace(
-			':<script type="module">.+?</script>:s',
-			'<script type="module">/* import detect ... */</script>',
-			od_optimize_template_output_buffer( $buffer )
-		);
-
-		$this->assertEquals(
-			$this->remove_initial_tabs( $expected ),
-			$this->remove_initial_tabs( $buffer ),
-			"Buffer snapshot:\n$buffer"
-		);
+		$this->assert_snapshot_equals( $directory );
 	}
 }
