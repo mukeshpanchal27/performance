@@ -114,11 +114,12 @@ function od_construct_site_health_result( $response ): array {
 			array( 'code' => array() )
 		) . '</p>';
 	} else {
-		$status_code = wp_remote_retrieve_response_code( $response );
-		$data        = json_decode( wp_remote_retrieve_body( $response ), true );
+		$code    = wp_remote_retrieve_response_code( $response );
+		$message = wp_remote_retrieve_response_message( $response );
+		$data    = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		$is_expected = (
-			400 === $status_code &&
+			400 === $code &&
 			isset( $data['data']['params'] ) &&
 			is_array( $data['data']['params'] ) &&
 			count( $data['data']['params'] ) > 0
@@ -130,8 +131,8 @@ function od_construct_site_health_result( $response ): array {
 				sprintf(
 					/* translators: %d is the HTTP status code, %s is the status header description */
 					__( 'The REST API returned with an HTTP status of <code>%1$d %2$s</code>.', 'optimization-detective' ),
-					$status_code,
-					get_status_header_desc( (int) $status_code )
+					$code,
+					esc_html( $message )
 				),
 				array( 'code' => array() )
 			) . '</p>';
