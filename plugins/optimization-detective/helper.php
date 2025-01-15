@@ -37,7 +37,6 @@ function od_initialize_extensions(): void {
  *
  * @param int|null $minimum_viewport_width Minimum viewport width.
  * @param int|null $maximum_viewport_width Maximum viewport width.
- *
  * @return non-empty-string|null Media query, or null if the min/max were both unspecified or invalid.
  */
 function od_generate_media_query( ?int $minimum_viewport_width, ?int $maximum_viewport_width ): ?string {

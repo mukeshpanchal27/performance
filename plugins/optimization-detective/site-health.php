@@ -76,7 +76,6 @@ function od_is_rest_api_unavailable(): bool {
  * @access private
  *
  * @param array<string, mixed>|WP_Error $response REST API response.
- *
  * @return array{label: string, status: string, badge: array{label: string, color: string}, description: string, actions: string, test: string} Result.
  */
 function od_compose_site_health_result( $response ): array {
@@ -148,6 +147,7 @@ function od_compose_site_health_result( $response ): array {
  * Gets the response to an Optimization Detective REST API store request to confirm it is available to unauthenticated requests.
  *
  * @since n.e.x.t
+ * @access private
  *
  * @param bool $use_cached Whether to use a previous response cached in a transient.
  * @return array{ response: array{ code: int, message: string }, body: string }|WP_Error Response.
