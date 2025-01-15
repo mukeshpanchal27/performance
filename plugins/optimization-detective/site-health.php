@@ -14,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Adds the Optimization Detective REST API check to site health tests.
  *
  * @since n.e.x.t
+ * @access private
  *
  * @param array{direct: array<string, array{label: string, test: string}>} $tests Site Health Tests.
  * @return array{direct: array<string, array{label: string, test: string}>} Amended tests.
@@ -31,10 +32,40 @@ function od_optimization_detective_add_rest_api_test( array $tests ): array {
  * Tests availability of the Optimization Detective REST API endpoint.
  *
  * @since n.e.x.t
+ * @access private
  *
  * @return array{label: string, status: string, badge: array{label: string, color: string}, description: string, actions: string, test: string} Result.
  */
 function od_optimization_detective_rest_api_test(): array {
+	$rest_url = get_rest_url( null, OD_REST_API_NAMESPACE . OD_URL_METRICS_ROUTE );
+	$response = wp_remote_post(
+		$rest_url,
+		array(
+			'headers'   => array( 'Content-Type' => 'application/json' ),
+			'sslverify' => false,
+		)
+	);
+	$result   = od_construct_site_health_result( $response );
+	$info     = array(
+		'available' => 'good' === $result['status'],
+		'response'  => $response,
+	);
+
+	update_option( 'od_rest_api_info', $info );
+	return $result;
+}
+
+/**
+ * Tests availability of the Optimization Detective REST API endpoint.
+ *
+ * @since n.e.x.t
+ * @access private
+ *
+ * @param array<string, mixed>|WP_Error $response REST API response.
+ *
+ * @return array{label: string, status: string, badge: array{label: string, color: string}, description: string, actions: string, test: string} Result.
+ */
+function od_construct_site_health_result( $response ): array {
 	$common_description_html = '<p>' . wp_kses(
 		sprintf(
 			/* translators: %s is the REST API endpoint */
@@ -56,15 +87,6 @@ function od_optimization_detective_rest_api_test(): array {
 		'test'        => 'optimization_detective_rest_api',
 	);
 
-	$rest_url = get_rest_url( null, OD_REST_API_NAMESPACE . OD_URL_METRICS_ROUTE );
-	$response = wp_remote_post(
-		$rest_url,
-		array(
-			'headers'   => array( 'Content-Type' => 'application/json' ),
-			'sslverify' => false,
-		)
-	);
-
 	$error_label            = __( 'Optimization Detective\'s REST API endpoint is inaccessible', 'optimization-detective' );
 	$error_description_html = '<p>' . esc_html__( 'You may have a plugin active or server configuration which restricts access to logged-in users. Unauthenticated access must be restored in order for Optimization Detective to work.', 'optimization-detective' ) . '</p>';
 
@@ -80,29 +102,17 @@ function od_optimization_detective_rest_api_test(): array {
 			),
 			array( 'code' => array() )
 		) . '</p>';
-
-		$info = array(
-			'error_message' => $result['description'],
-			'error_code'    => $response->get_error_code(),
-			'available'     => false,
-		);
 	} else {
 		$status_code = wp_remote_retrieve_response_code( $response );
 		$data        = json_decode( wp_remote_retrieve_body( $response ), true );
 
-		if (
+		$is_expected = (
 			400 === $status_code &&
 			isset( $data['data']['params'] ) &&
 			is_array( $data['data']['params'] ) &&
 			count( $data['data']['params'] ) > 0
-		) {
-			// The REST API endpoint is available.
-			$info = array(
-				'status_code'   => $status_code,
-				'available'     => true,
-				'error_message' => '',
-			);
-		} else {
+		);
+		if ( ! $is_expected ) {
 			$result['status']      = 'recommended';
 			$result['label']       = __( 'The Optimization Detective REST API endpoint is inaccessible to logged-out users', 'optimization-detective' );
 			$result['description'] = $common_description_html . $error_description_html . '<p>' . wp_kses(
@@ -114,16 +124,8 @@ function od_optimization_detective_rest_api_test(): array {
 				),
 				array( 'code' => array() )
 			) . '</p>';
-
-			$info = array(
-				'status_code'   => $status_code,
-				'available'     => false,
-				'error_message' => $result['description'],
-			);
 		}
 	}
-
-	update_option( 'od_rest_api_info', $info );
 	return $result;
 }
 
@@ -131,22 +133,31 @@ function od_optimization_detective_rest_api_test(): array {
  * Renders an admin notice if the REST API health check fails.
  *
  * @since n.e.x.t
+ * @access private
  *
  * @param array<string> $additional_classes Additional classes to add to the notice.
  */
 function od_render_rest_api_health_check_notice( array $additional_classes = array() ): void {
 	$rest_api_info = get_option( 'od_rest_api_info', array() );
 	if (
-		isset( $rest_api_info['available'] ) &&
+		isset( $rest_api_info['available'], $rest_api_info['response'] ) &&
 		false === $rest_api_info['available'] &&
-		isset( $rest_api_info['error_message'] ) &&
-		'' !== $rest_api_info['error_message']
+		( is_array( $rest_api_info['response'] ) || is_wp_error( $rest_api_info['response'] ) )
 	) {
+		$result = od_construct_site_health_result( $rest_api_info['response'] );
+
 		wp_admin_notice(
-			wp_kses( $rest_api_info['error_message'], array_fill_keys( array( 'p', 'code' ), array() ) ),
+			sprintf(
+				'<details><summary>%s %s</summary>%s %s</details>',
+				esc_html__( 'Warning:', 'optimization-detective' ),
+				esc_html( $result['label'] ),
+				wp_kses( $result['description'], array_fill_keys( array( 'p', 'code' ), array() ) ),
+				'<p>' . esc_html__( 'Please visit Site Health to re-check this once you believe you have resolved the issue.', 'optimization-detective' ) . '</p>'
+			),
 			array(
 				'type'               => 'warning',
 				'additional_classes' => $additional_classes,
+				'paragraph_wrap'     => false,
 			)
 		);
 	}
@@ -156,6 +167,7 @@ function od_render_rest_api_health_check_notice( array $additional_classes = arr
  * Displays an admin notice on the plugin row if the REST API health check fails.
  *
  * @since n.e.x.t
+ * @access private
  *
  * @param string $plugin_file Plugin file.
  */
@@ -177,6 +189,7 @@ function od_rest_api_health_check_admin_notice( string $plugin_file ): void {
  * via {@see od_rest_api_health_check_admin_notice()}.
  *
  * @since n.e.x.t
+ * @access private
  */
 function od_maybe_run_rest_api_health_check(): void {
 	// If the option already exists, then the REST API health check has already been performed.

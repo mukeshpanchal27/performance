@@ -47,8 +47,8 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 		$od_rest_api_info = get_option( 'od_rest_api_info', array() );
 
 		$this->assertSame( 'good', $result['status'] );
-		$this->assertSame( 400, isset( $od_rest_api_info['status_code'] ) ? $od_rest_api_info['status_code'] : '' );
-		$this->assertTrue( isset( $od_rest_api_info['available'] ) ? $od_rest_api_info['available'] : false );
+		$this->assertSame( 400, wp_remote_retrieve_response_code( $od_rest_api_info['response'] ) );
+		$this->assertTrue( $od_rest_api_info['available'] );
 	}
 
 	/**
@@ -66,8 +66,8 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 		$od_rest_api_info = get_option( 'od_rest_api_info', array() );
 
 		$this->assertSame( 'recommended', $result['status'] );
-		$this->assertSame( 401, isset( $od_rest_api_info['status_code'] ) ? $od_rest_api_info['status_code'] : '' );
-		$this->assertFalse( isset( $od_rest_api_info['available'] ) ? $od_rest_api_info['available'] : true );
+		$this->assertSame( 401, wp_remote_retrieve_response_code( $od_rest_api_info['response'] ) );
+		$this->assertFalse( $od_rest_api_info['available'] );
 	}
 
 	/**
@@ -85,8 +85,8 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 		$od_rest_api_info = get_option( 'od_rest_api_info', array() );
 
 		$this->assertSame( 'recommended', $result['status'] );
-		$this->assertSame( 403, isset( $od_rest_api_info['status_code'] ) ? $od_rest_api_info['status_code'] : '' );
-		$this->assertFalse( isset( $od_rest_api_info['available'] ) ? $od_rest_api_info['available'] : true );
+		$this->assertSame( 403, wp_remote_retrieve_response_code( $od_rest_api_info['response'] ) );
+		$this->assertFalse( $od_rest_api_info['available'] );
 	}
 
 	/**
