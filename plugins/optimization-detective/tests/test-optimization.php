@@ -188,13 +188,26 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 			'home_as_anonymous'                    => array(
 				'set_up'   => function (): void {
 					$this->go_to( home_url( '/' ) );
+					$this->assertIsInt( od_get_cache_purge_post_id() );
 				},
 				'expected' => true,
+			),
+			'home_but_no_posts'                    => array(
+				'set_up'   => function (): void {
+					$posts = get_posts();
+					foreach ( $posts as $post ) {
+						wp_delete_post( $post->ID, true );
+					}
+					$this->go_to( home_url( '/' ) );
+					$this->assertNull( od_get_cache_purge_post_id() );
+				},
+				'expected' => false, // This is because od_get_cache_purge_post_id() will return false.
 			),
 			'home_filtered_as_anonymous'           => array(
 				'set_up'   => function (): void {
 					$this->go_to( home_url( '/' ) );
 					add_filter( 'od_can_optimize_response', '__return_false' );
+					$this->assertIsInt( od_get_cache_purge_post_id() );
 				},
 				'expected' => false,
 			),
@@ -203,6 +216,7 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 					$posts = get_posts();
 					$this->assertInstanceOf( WP_Post::class, $posts[0] );
 					$this->go_to( get_permalink( $posts[0] ) );
+					$this->assertIsInt( od_get_cache_purge_post_id() );
 				},
 				'expected' => true,
 			),
@@ -210,6 +224,7 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 				'set_up'   => function (): void {
 					self::factory()->post->create( array( 'post_title' => 'Hello' ) );
 					$this->go_to( home_url( '?s=Hello' ) );
+					$this->assertIsInt( od_get_cache_purge_post_id() );
 				},
 				'expected' => false,
 			),
@@ -220,6 +235,7 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 					require_once ABSPATH . 'wp-includes/class-wp-customize-manager.php';
 					$wp_customize = new WP_Customize_Manager();
 					$wp_customize->start_previewing_theme();
+					$this->assertIsInt( od_get_cache_purge_post_id() );
 				},
 				'expected' => false,
 			),
@@ -227,6 +243,7 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 				'set_up'   => function (): void {
 					$this->go_to( home_url( '/' ) );
 					$_SERVER['REQUEST_METHOD'] = 'POST';
+					$this->assertIsInt( od_get_cache_purge_post_id() );
 				},
 				'expected' => false,
 			),
@@ -234,6 +251,7 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 				'set_up'   => function (): void {
 					wp_set_current_user( self::factory()->user->create( array( 'role' => 'subscriber' ) ) );
 					$this->go_to( home_url( '/' ) );
+					$this->assertIsInt( od_get_cache_purge_post_id() );
 				},
 				'expected' => true,
 			),
@@ -241,6 +259,7 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 				'set_up'   => function (): void {
 					$user_id = self::factory()->user->create( array( 'role' => 'author' ) );
 					$this->go_to( get_author_posts_url( $user_id ) );
+					$this->assertNull( od_get_cache_purge_post_id() );
 				},
 				'expected' => false,
 			),
@@ -248,6 +267,7 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 				'set_up'   => function (): void {
 					wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 					$this->go_to( home_url( '/' ) );
+					$this->assertIsInt( od_get_cache_purge_post_id() );
 				},
 				'expected' => false,
 			),
