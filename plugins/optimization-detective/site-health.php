@@ -155,9 +155,9 @@ function od_get_rest_api_health_check_response( bool $use_cached ) {
 		(
 			is_array( $response )
 			&&
-			isset( $response['response']['status'], $response['response']['message'], $response['body'] )
+			isset( $response['response']['code'], $response['response']['message'], $response['body'] )
 			&&
-			is_int( $response['response']['status'] )
+			is_int( $response['response']['code'] )
 			&&
 			is_string( $response['response']['message'] )
 			&&
