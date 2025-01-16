@@ -92,6 +92,12 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 				'expected_status'      => 'recommended',
 				'expected_unavailable' => true,
 			),
+			'error'        => array(
+				'mocked_response'      => new WP_Error( 'bad', 'Something terrible has happened' ),
+				'expected_option'      => '1',
+				'expected_status'      => 'recommended',
+				'expected_unavailable' => true,
+			),
 		);
 	}
 
@@ -105,12 +111,17 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_provider_test_rest_api_availability
 	 *
-	 * @phpstan-param array<string, mixed> $mocked_response
+	 * @phpstan-param array<string, mixed>|WP_Error $mocked_response
 	 */
-	public function test_rest_api_availability( array $mocked_response, string $expected_option, string $expected_status, bool $expected_unavailable ): void {
+	public function test_rest_api_availability( $mocked_response, string $expected_option, string $expected_status, bool $expected_unavailable ): void {
 		$this->filter_rest_api_response( $mocked_response );
 
 		$result = od_test_rest_api_availability();
+		$this->assertArrayHasKey( 'label', $result );
+		$this->assertArrayHasKey( 'status', $result );
+		$this->assertArrayHasKey( 'badge', $result );
+		$this->assertArrayHasKey( 'description', $result );
+		$this->assertArrayHasKey( 'test', $result );
 		$this->assertSame( $expected_option, get_option( 'od_rest_api_unavailable', '' ) );
 		$this->assertSame( $expected_status, $result['status'] );
 		$this->assertSame( $expected_unavailable, od_is_rest_api_unavailable() );
@@ -274,9 +285,9 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 	/**
 	 * Filters REST API response with mock.
 	 *
-	 * @param array<string, mixed> $mocked_response Mocked response.
+	 * @param array<string, mixed>|WP_Error $mocked_response Mocked response.
 	 */
-	protected function filter_rest_api_response( array $mocked_response ): void {
+	protected function filter_rest_api_response( $mocked_response ): void {
 		remove_all_filters( 'pre_http_request' );
 		add_filter(
 			'pre_http_request',
