@@ -1,11 +1,11 @@
 <?php
 /**
- * Tests for Optimization Detective REST API site health check.
+ * Tests for optimization-detective plugin site-health.php.
  *
  * @package optimization-detective
  */
 
-class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
+class Test_OD_Site_Health extends WP_UnitTestCase {
 
 	const EXPECTED_MOCKED_RESPONSE_ARGS = array(
 		400,
