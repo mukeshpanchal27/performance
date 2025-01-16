@@ -5,7 +5,7 @@
  * @package performance-lab
  */
 
-define( 'TESTS_PLUGIN_DIR', dirname( __DIR__ ) );
+define( 'TESTS_PLUGIN_DIR', dirname( __DIR__, 2 ) );
 
 // Determine correct location for plugins directory to use.
 if ( false !== getenv( 'WP_PLUGIN_DIR' ) ) {
@@ -128,7 +128,7 @@ tests_add_filter(
 );
 
 // Require helper classes.
-require_once __DIR__ . '/class-optimization-detective-test-helpers.php';
+require_once __DIR__ . '/../../tests/class-optimization-detective-test-helpers.php';
 
 // Start up the WP testing environment.
 require $_test_root . '/includes/bootstrap.php';
