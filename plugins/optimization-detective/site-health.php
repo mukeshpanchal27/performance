@@ -46,7 +46,11 @@ function od_test_rest_api_availability(): array {
 	$response       = od_get_rest_api_health_check_response( false );
 	$result         = od_compose_site_health_result( $response );
 	$is_unavailable = 'good' !== $result['status'];
-	update_option( 'od_rest_api_unavailable', $is_unavailable ? '1' : '0' );
+	update_option(
+		'od_rest_api_unavailable',
+		$is_unavailable ? '1' : '0',
+		true // Intentionally autoloaded since used on every frontend request.
+	);
 	return $result;
 }
 

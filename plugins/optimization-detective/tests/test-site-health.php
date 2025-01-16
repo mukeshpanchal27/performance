@@ -157,6 +157,7 @@ class Test_OD_Site_Health extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'description', $result );
 		$this->assertArrayHasKey( 'test', $result );
 		$this->assertSame( $expected_option, get_option( 'od_rest_api_unavailable', '' ) );
+		$this->assertArrayHasKey( 'od_rest_api_unavailable', wp_load_alloptions(), 'Expected option to be autoloaded.' );
 		$this->assertSame( $expected_status, $result['status'] );
 		$this->assertSame( $expected_unavailable, od_is_rest_api_unavailable() );
 	}
