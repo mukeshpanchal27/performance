@@ -163,7 +163,9 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 	 * @covers ::od_maybe_render_rest_api_health_check_admin_notice
 	 */
 	public function test_od_maybe_render_rest_api_health_check_admin_notice_rest_api_not_available( bool $in_plugin_row ): void {
-		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		grant_super_admin( $user_id ); // Since Site Health is only available to super admins.
+		wp_set_current_user( $user_id );
 
 		$this->filter_rest_api_response( $this->build_mock_response( ...self::UNAUTHORISED_MOCKED_RESPONSE_ARGS ) );
 		od_test_rest_api_availability();
