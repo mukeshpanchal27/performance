@@ -167,6 +167,60 @@ class Test_OD_Site_Health extends WP_UnitTestCase {
 	 *
 	 * @return array<string, mixed>
 	 */
+	public function data_provider_test_od_get_rest_api_health_check_response(): array {
+		return array(
+			'available'    => array(
+				'mocked_response' => $this->build_mock_response( ...self::EXPECTED_MOCKED_RESPONSE_ARGS ),
+			),
+			'unauthorized' => array(
+				'mocked_response' => $this->build_mock_response( ...self::UNAUTHORISED_MOCKED_RESPONSE_ARGS ),
+			),
+			'error'        => array(
+				'mocked_response' => new WP_Error( 'bad' ),
+			),
+		);
+	}
+
+	/**
+	 * @covers ::od_get_rest_api_health_check_response
+	 *
+	 * @dataProvider data_provider_test_od_get_rest_api_health_check_response
+	 *
+	 * @param array<string, mixed>|WP_Error $mocked_response Mocked response.
+	 */
+	public function test_od_get_rest_api_health_check_response( $mocked_response ): void {
+		$transient_key   = 'od_rest_api_health_check_response';
+		$filter_observer = $this->filter_rest_api_response( $mocked_response );
+		delete_transient( $transient_key );
+		$this->assertSame( 0, $filter_observer->counter );
+
+		$response = od_get_rest_api_health_check_response( false );
+		$this->assertEquals( $mocked_response, get_transient( $transient_key ) );
+		$this->assertEquals( $mocked_response, $response );
+		$this->assertSame( 1, $filter_observer->counter );
+
+		$response = od_get_rest_api_health_check_response( false );
+		$this->assertEquals( $mocked_response, get_transient( $transient_key ) );
+		$this->assertEquals( $mocked_response, $response );
+		$this->assertSame( 2, $filter_observer->counter );
+
+		$response = od_get_rest_api_health_check_response( true );
+		$this->assertEquals( $mocked_response, get_transient( $transient_key ) );
+		$this->assertEquals( $mocked_response, $response );
+		$this->assertSame( 2, $filter_observer->counter );
+
+		delete_transient( $transient_key );
+		$response = od_get_rest_api_health_check_response( true );
+		$this->assertEquals( $mocked_response, get_transient( $transient_key ) );
+		$this->assertEquals( $mocked_response, $response );
+		$this->assertSame( 3, $filter_observer->counter );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array<string, mixed>
+	 */
 	public function data_provider_in_plugin_row(): array {
 		return array(
 			'in_admin_notices' => array(
@@ -305,19 +359,28 @@ class Test_OD_Site_Health extends WP_UnitTestCase {
 		$set_up();
 		od_maybe_run_rest_api_health_check();
 		$this->assertSame( $expected, (bool) has_action( 'admin_notices' ) );
+		$admin_notices_output = get_echo( 'do_action', array( 'admin_notices' ) );
+		if ( $expected ) {
+			$this->assertStringContainsString( '<div class="notice notice-warning">', $admin_notices_output );
+		} else {
+			$this->assertStringNotContainsString( '<div class="notice notice-warning">', $admin_notices_output );
+		}
 	}
 
 	/**
 	 * Filters REST API response with mock.
 	 *
 	 * @param array<string, mixed>|WP_Error $mocked_response Mocked response.
+	 * @return object{ counter: int } Value which contains a counter for the number of times the filter applied.
 	 */
-	protected function filter_rest_api_response( $mocked_response ): void {
+	protected function filter_rest_api_response( $mocked_response ): object {
+		$observer = (object) array( 'counter' => 0 );
 		remove_all_filters( 'pre_http_request' );
 		add_filter(
 			'pre_http_request',
-			static function ( $pre, array $args, string $url ) use ( $mocked_response ) {
+			static function ( $pre, array $args, string $url ) use ( $mocked_response, $observer ) {
 				if ( rest_url( OD_REST_API_NAMESPACE . OD_URL_METRICS_ROUTE ) === $url ) {
+					$observer->counter++;
 					return $mocked_response;
 				}
 				return $pre;
@@ -325,6 +388,7 @@ class Test_OD_Site_Health extends WP_UnitTestCase {
 			10,
 			3
 		);
+		return $observer;
 	}
 
 	/**
