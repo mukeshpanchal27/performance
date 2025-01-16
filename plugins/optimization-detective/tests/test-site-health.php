@@ -30,11 +30,19 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 	const UNAUTHORISED_MOCKED_RESPONSE_ARGS = array(
 		401,
 		'Unauthorized',
+		array(
+			'code' => 'unauthorized_without_message',
+		),
 	);
 
 	const FORBIDDEN_MOCKED_RESPONSE_ARGS = array(
 		403,
 		'Forbidden',
+		array(
+			'code'    => 'rest_login_required',
+			'message' => 'REST API restricted to authenticated users.',
+			'data'    => array( 'status' => 401 ),
+		),
 	);
 
 	/**
@@ -88,25 +96,37 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 	 */
 	public function data_provider_test_rest_api_availability(): array {
 		return array(
-			'available'    => array(
+			'available'       => array(
 				'mocked_response'      => $this->build_mock_response( ...self::EXPECTED_MOCKED_RESPONSE_ARGS ),
 				'expected_option'      => '0',
 				'expected_status'      => 'good',
 				'expected_unavailable' => false,
 			),
-			'unauthorized' => array(
+			'unauthorized'    => array(
 				'mocked_response'      => $this->build_mock_response( ...self::UNAUTHORISED_MOCKED_RESPONSE_ARGS ),
 				'expected_option'      => '1',
 				'expected_status'      => 'critical',
 				'expected_unavailable' => true,
 			),
-			'forbidden'    => array(
+			'forbidden'       => array(
 				'mocked_response'      => $this->build_mock_response( ...self::FORBIDDEN_MOCKED_RESPONSE_ARGS ),
 				'expected_option'      => '1',
 				'expected_status'      => 'critical',
 				'expected_unavailable' => true,
 			),
-			'error'        => array(
+			'nginx_forbidden' => array(
+				'mocked_response'      => array(
+					'response' => array(
+						'code'    => 403,
+						'message' => 'Forbidden',
+					),
+					'body'     => "<html>\n<head><title>403 Forbidden</title></head>\n<body>\n<center><h1>403 Forbidden</h1></center>\n<hr><center>nginx</center>\n</body>\n</html>",
+				),
+				'expected_option'      => '1',
+				'expected_status'      => 'critical',
+				'expected_unavailable' => true,
+			),
+			'error'           => array(
 				'mocked_response'      => new WP_Error( 'bad', 'Something terrible has happened' ),
 				'expected_option'      => '1',
 				'expected_status'      => 'critical',
@@ -198,12 +218,8 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 		$notice = get_echo( 'od_maybe_render_rest_api_health_check_admin_notice', array( $in_plugin_row ) );
 		$this->assertStringContainsString( '<div class="notice notice-warning', $notice );
 		if ( $in_plugin_row ) {
-			$this->assertStringContainsString( '<details>', $notice );
-			$this->assertStringContainsString( '</summary>', $notice );
 			$this->assertStringNotContainsString( '<p><strong>', $notice );
 		} else {
-			$this->assertStringNotContainsString( '<details>', $notice );
-			$this->assertStringNotContainsString( '</summary>', $notice );
 			$this->assertStringContainsString( '<p><strong>', $notice );
 		}
 		$this->assertTrue( current_user_can( 'view_site_health_checks' ) );

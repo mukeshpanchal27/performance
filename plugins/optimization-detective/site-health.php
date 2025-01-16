@@ -143,6 +143,10 @@ function od_compose_site_health_result( $response ): array {
 				array( 'code' => array() )
 			) . '</p>';
 
+			if ( isset( $data['message'] ) && is_string( $data['message'] ) ) {
+				$result['description'] .= '<blockquote>' . esc_html( $data['message'] ) . '</blockquote>';
+			}
+
 			$result['description'] .= '<details><summary>' . esc_html__( 'Raw response:', 'optimization-detective' ) . '</summary><pre style="white-space: pre-wrap">' . esc_html( $body ) . '</pre></details>';
 		}
 	}
@@ -221,7 +225,7 @@ function od_maybe_render_rest_api_health_check_admin_notice( bool $in_plugin_row
 		esc_html( $result['label'] )
 	);
 
-	$message .= wp_kses( $result['description'], array_fill_keys( array( 'p', 'code' ), array() ) );
+	$message .= $result['description']; // This has already gone through Kses.
 
 	if ( current_user_can( 'view_site_health_checks' ) ) {
 		$site_health_message = wp_kses(
