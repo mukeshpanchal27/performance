@@ -87,19 +87,19 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 			'unauthorized' => array(
 				'mocked_response'      => $this->build_mock_response( ...self::UNAUTHORISED_MOCKED_RESPONSE_ARGS ),
 				'expected_option'      => '1',
-				'expected_status'      => 'recommended',
+				'expected_status'      => 'critical',
 				'expected_unavailable' => true,
 			),
 			'forbidden'    => array(
 				'mocked_response'      => $this->build_mock_response( ...self::FORBIDDEN_MOCKED_RESPONSE_ARGS ),
 				'expected_option'      => '1',
-				'expected_status'      => 'recommended',
+				'expected_status'      => 'critical',
 				'expected_unavailable' => true,
 			),
 			'error'        => array(
 				'mocked_response'      => new WP_Error( 'bad', 'Something terrible has happened' ),
 				'expected_option'      => '1',
-				'expected_status'      => 'recommended',
+				'expected_status'      => 'critical',
 				'expected_unavailable' => true,
 			),
 		);

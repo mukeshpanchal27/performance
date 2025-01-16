@@ -106,17 +106,16 @@ function od_compose_site_health_result( $response ): array {
 	$error_description_html = '<p>' . esc_html__( 'You may have a plugin active or server configuration which restricts access to logged-in users. Unauthenticated access must be restored in order for Optimization Detective to work.', 'optimization-detective' ) . '</p>';
 
 	if ( is_wp_error( $response ) ) {
-		$result['status']      = 'recommended';
+		$result['status']      = 'critical';
 		$result['label']       = $error_label;
 		$result['description'] = $common_description_html . $error_description_html . '<p>' . wp_kses(
 			sprintf(
-				/* translators: 1: the error code, 2: the error message */
-				__( 'The REST API responded with the error code <code>%1$s</code> and this error message: %2$s.', 'optimization-detective' ),
-				esc_html( (string) $response->get_error_code() ),
-				esc_html( rtrim( $response->get_error_message(), '.' ) )
+				/* translators: %s is the error code */
+				__( 'The REST API responded with the error code <code>%s</code> and the following error message:', 'optimization-detective' ),
+				esc_html( (string) $response->get_error_code() )
 			),
 			array( 'code' => array() )
-		) . '</p>';
+		) . '</p><blockquote>' . esc_html( $response->get_error_message() ) . '</blockquote>';
 	} else {
 		$code    = wp_remote_retrieve_response_code( $response );
 		$message = wp_remote_retrieve_response_message( $response );
@@ -129,7 +128,7 @@ function od_compose_site_health_result( $response ): array {
 			count( $data['data']['params'] ) > 0
 		);
 		if ( ! $is_expected ) {
-			$result['status']      = 'recommended';
+			$result['status']      = 'critical';
 			$result['label']       = __( 'The Optimization Detective REST API endpoint is unavailable to logged-out users', 'optimization-detective' );
 			$result['description'] = $common_description_html . $error_description_html . '<p>' . wp_kses(
 				sprintf(
