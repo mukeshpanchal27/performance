@@ -127,8 +127,5 @@ tests_add_filter(
 	}
 );
 
-// Require helper classes.
-require_once __DIR__ . '/../../tests/class-optimization-detective-test-helpers.php';
-
 // Start up the WP testing environment.
 require $_test_root . '/includes/bootstrap.php';
