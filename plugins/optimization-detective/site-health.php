@@ -119,13 +119,16 @@ function od_compose_site_health_result( $response ): array {
 	} else {
 		$code    = wp_remote_retrieve_response_code( $response );
 		$message = wp_remote_retrieve_response_message( $response );
-		$data    = json_decode( wp_remote_retrieve_body( $response ), true );
+		$body    = wp_remote_retrieve_body( $response );
+		$data    = json_decode( $body, true );
 
-		$is_expected = (
+		$required_args = array( 'slug', 'current_etag', 'hmac', 'url', 'viewport', 'elements' );
+		$is_expected   = (
 			400 === $code &&
-			isset( $data['data']['params'] ) &&
+			isset( $data['code'], $data['data']['params'] ) &&
+			'rest_missing_callback_param' === $data['code'] &&
 			is_array( $data['data']['params'] ) &&
-			count( $data['data']['params'] ) > 0
+			count( array_intersect( $data['data']['params'], $required_args ) ) === count( $required_args )
 		);
 		if ( ! $is_expected ) {
 			$result['status']      = 'critical';
@@ -139,6 +142,8 @@ function od_compose_site_health_result( $response ): array {
 				),
 				array( 'code' => array() )
 			) . '</p>';
+
+			$result['description'] .= '<details><summary>' . esc_html__( 'Raw response:', 'optimization-detective' ) . '</summary><pre style="white-space: pre-wrap">' . esc_html( $body ) . '</pre></details>';
 		}
 	}
 	return $result;

@@ -34,11 +34,14 @@ const OD_URL_METRICS_ROUTE = '/url-metrics:store';
  *
  * @since 0.1.0
  * @access private
+ *
+ * @see od_compose_site_health_result()
  */
 function od_register_endpoint(): void {
 
 	// The slug and cache_purge_post_id args are further validated via the validate_callback for the 'hmac' parameter,
 	// they are provided as input with the 'url' argument to create the HMAC by the server.
+	// The following args are referenced in od_compose_site_health_result().
 	$args = array(
 		'slug'                => array(
 			'type'        => 'string',

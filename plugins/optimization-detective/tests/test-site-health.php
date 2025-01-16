@@ -11,8 +11,18 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 		400,
 		'Bad Request',
 		array(
-			'data' => array(
-				'params' => array( 'slug', 'current_etag', 'hmac', 'url', 'viewport', 'elements' ),
+			'code'    => 'rest_missing_callback_param',
+			'message' => 'Missing parameter(s): slug, current_etag, hmac, url, viewport, elements',
+			'data'    => array(
+				'status' => 400,
+				'params' => array(
+					'slug',
+					'current_etag',
+					'hmac',
+					'url',
+					'viewport',
+					'elements',
+				),
 			),
 		),
 	);
