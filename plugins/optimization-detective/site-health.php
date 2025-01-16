@@ -15,7 +15,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since n.e.x.t
  * @access private
- * @todo Add coverage.
  *
  * @param array{direct: array<string, array{label: string, test: string}>}|mixed $tests Site Health Tests.
  * @return array{direct: array<string, array{label: string, test: string}>} Amended tests.
@@ -192,7 +191,6 @@ function od_get_rest_api_health_check_response( bool $use_cached ) {
  *
  * @since n.e.x.t
  * @access private
- * @todo Add coverage.
  *
  * @param bool $in_plugin_row Whether the notice is to be printed in the plugin row.
  */
@@ -249,12 +247,11 @@ function od_maybe_render_rest_api_health_check_admin_notice( bool $in_plugin_row
  *
  * @since n.e.x.t
  * @access private
- * @todo Add coverage.
  *
  * @param string $plugin_file Plugin file.
  */
 function od_render_rest_api_health_check_admin_notice_in_plugin_row( string $plugin_file ): void {
-	if ( 'optimization-detective/load.php' !== $plugin_file ) {
+	if ( 'optimization-detective/load.php' !== $plugin_file ) { // TODO: What if a different plugin slug is used?
 		return;
 	}
 	od_maybe_render_rest_api_health_check_admin_notice( true );
@@ -272,7 +269,6 @@ function od_render_rest_api_health_check_admin_notice_in_plugin_row( string $plu
  *
  * @since n.e.x.t
  * @access private
- * @todo Add coverage.
  */
 function od_maybe_run_rest_api_health_check(): void {
 	// If the option already exists, then the REST API health check has already been performed.
@@ -282,7 +278,6 @@ function od_maybe_run_rest_api_health_check(): void {
 
 	// This will populate the od_rest_api_unavailable option so that the function won't execute on the next page load.
 	if ( 'good' !== od_test_rest_api_availability()['status'] ) {
-
 		// Show any notice in the main admin notices area for the first page load (e.g. after plugin activation).
 		add_action(
 			'admin_notices',

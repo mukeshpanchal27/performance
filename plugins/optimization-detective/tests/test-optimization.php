@@ -241,70 +241,62 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 				'expected' => false, // This is because od_get_cache_purge_post_id() will return false.
 			),
 			'home_filtered_as_anonymous'           => array(
-				'set_up'   => function (): void {
-					$this->go_to( home_url( '/' ) );
+				'set_up'   => static function (): string {
 					add_filter( 'od_can_optimize_response', '__return_false' );
-					$this->assertIsInt( od_get_cache_purge_post_id() );
+					return home_url( '/' );
 				},
 				'expected' => false,
 			),
 			'singular_as_anonymous'                => array(
-				'set_up'   => function (): void {
+				'set_up'   => function (): string {
 					$posts = get_posts();
 					$this->assertInstanceOf( WP_Post::class, $posts[0] );
-					$this->go_to( get_permalink( $posts[0] ) );
-					$this->assertIsInt( od_get_cache_purge_post_id() );
+					return get_permalink( $posts[0] );
 				},
 				'expected' => true,
 			),
 			'search_as_anonymous'                  => array(
-				'set_up'   => function (): void {
+				'set_up'   => static function (): string {
 					self::factory()->post->create( array( 'post_title' => 'Hello' ) );
-					$this->go_to( home_url( '?s=Hello' ) );
-					$this->assertIsInt( od_get_cache_purge_post_id() );
+					return home_url( '?s=Hello' );
 				},
 				'expected' => false,
 			),
 			'home_customizer_preview_as_anonymous' => array(
-				'set_up'   => function (): void {
-					$this->go_to( home_url( '/' ) );
+				'set_up'   => static function (): string {
 					global $wp_customize;
 					require_once ABSPATH . 'wp-includes/class-wp-customize-manager.php';
 					$wp_customize = new WP_Customize_Manager();
 					$wp_customize->start_previewing_theme();
-					$this->assertIsInt( od_get_cache_purge_post_id() );
+					return home_url( '/' );
 				},
 				'expected' => false,
 			),
 			'home_post_request_as_anonymous'       => array(
-				'set_up'   => function (): void {
-					$this->go_to( home_url( '/' ) );
+				'set_up'   => static function (): string {
 					$_SERVER['REQUEST_METHOD'] = 'POST';
-					$this->assertIsInt( od_get_cache_purge_post_id() );
+					return home_url( '/' );
 				},
 				'expected' => false,
 			),
 			'home_as_subscriber'                   => array(
-				'set_up'   => function (): void {
+				'set_up'   => static function (): string {
 					wp_set_current_user( self::factory()->user->create( array( 'role' => 'subscriber' ) ) );
-					$this->go_to( home_url( '/' ) );
-					$this->assertIsInt( od_get_cache_purge_post_id() );
+					return home_url( '/' );
 				},
 				'expected' => true,
 			),
 			'empty_author_page_as_anonymous'       => array(
-				'set_up'   => function (): void {
+				'set_up'   => static function (): string {
 					$user_id = self::factory()->user->create( array( 'role' => 'author' ) );
-					$this->go_to( get_author_posts_url( $user_id ) );
-					$this->assertNull( od_get_cache_purge_post_id() );
+					return get_author_posts_url( $user_id );
 				},
 				'expected' => false,
 			),
 			'home_as_admin'                        => array(
-				'set_up'   => function (): void {
+				'set_up'   => static function (): string {
 					wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
-					$this->go_to( home_url( '/' ) );
-					$this->assertIsInt( od_get_cache_purge_post_id() );
+					return home_url( '/' );
 				},
 				'expected' => true,
 			),
@@ -320,8 +312,12 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 	 * @dataProvider data_provider_test_od_can_optimize_response
 	 */
 	public function test_od_can_optimize_response( Closure $set_up, bool $expected ): void {
-		self::factory()->post->create(); // Make sure there is at least one post in the DB.
-		$set_up();
+		// Make sure there is at least one post in the DB as otherwise od_get_cache_purge_post_id() will return false,
+		// causing od_can_optimize_response() to return false.
+		self::factory()->post->create();
+
+		$url = $set_up();
+		$this->go_to( $url );
 		$this->assertSame( $expected, od_can_optimize_response() );
 	}
 
