@@ -25,7 +25,10 @@ function od_add_rest_api_availability_test( $tests ): array {
 	}
 	$tests['direct']['optimization_detective_rest_api'] = array(
 		'label' => __( 'Optimization Detective REST API Endpoint Availability', 'optimization-detective' ),
-		'test'  => 'od_optimization_detective_rest_api_test',
+		'test'  => static function () {
+			// Note: A closure is used here to improve symbol discovery for the sake of potential refactoring.
+			return od_test_rest_api_availability();
+		},
 	);
 
 	return $tests;

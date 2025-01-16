@@ -49,6 +49,10 @@ class Test_OD_REST_API_Site_Health_Check extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'optimization_detective_rest_api', $tests['direct'] );
 		$this->assertArrayHasKey( 'label', $tests['direct']['optimization_detective_rest_api'] );
 		$this->assertArrayHasKey( 'test', $tests['direct']['optimization_detective_rest_api'] );
+		$this->assertTrue( is_callable( $tests['direct']['optimization_detective_rest_api']['test'] ) );
+		$this->filter_rest_api_response( $this->build_mock_response( ...self::EXPECTED_MOCKED_RESPONSE_ARGS ) );
+		$result = call_user_func( $tests['direct']['optimization_detective_rest_api']['test'] );
+		$this->assertSame( 'good', $result['status'] );
 
 		$tests = od_add_rest_api_availability_test(
 			new WP_Error()
