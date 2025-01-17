@@ -167,22 +167,8 @@ function od_compose_site_health_result( $response ): array {
  */
 function od_get_rest_api_health_check_response( bool $use_cached ) {
 	$transient_key = 'od_rest_api_health_check_response';
-	$response      = $use_cached ? get_transient( $transient_key ) : null;
-	if (
-		(
-			is_array( $response )
-			&&
-			isset( $response['response']['code'], $response['response']['message'], $response['body'] )
-			&&
-			is_int( $response['response']['code'] )
-			&&
-			is_string( $response['response']['message'] )
-			&&
-			is_string( $response['body'] )
-		)
-		||
-		is_wp_error( $response )
-	) {
+	$response      = $use_cached ? get_transient( $transient_key ) : false;
+	if ( false !== $response ) {
 		return $response;
 	}
 	$rest_url = get_rest_url( null, OD_REST_API_NAMESPACE . OD_URL_METRICS_ROUTE );
