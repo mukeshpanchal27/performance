@@ -126,13 +126,12 @@ function od_compose_site_health_result( $response ): array {
 		$body    = wp_remote_retrieve_body( $response );
 		$data    = json_decode( $body, true );
 
-		$required_args = array( 'slug', 'current_etag', 'hmac', 'url', 'viewport', 'elements' );
-		$is_expected   = (
+		$is_expected = (
 			400 === $code &&
 			isset( $data['code'], $data['data']['params'] ) &&
 			'rest_missing_callback_param' === $data['code'] &&
 			is_array( $data['data']['params'] ) &&
-			count( array_intersect( $data['data']['params'], $required_args ) ) === count( $required_args )
+			count( $data['data']['params'] ) > 0
 		);
 		if ( ! $is_expected ) {
 			$result['status']      = 'critical';
