@@ -95,7 +95,7 @@ function od_compose_site_health_result( $response ): array {
 	) . '</p>';
 
 	$result = array(
-		'label'       => __( 'Optimization Detective\'s REST API endpoint is available', 'optimization-detective' ),
+		'label'       => __( 'The Optimization Detective REST API endpoint is available', 'optimization-detective' ),
 		'status'      => 'good',
 		'badge'       => array(
 			'label' => __( 'Optimization Detective', 'optimization-detective' ),
@@ -106,7 +106,7 @@ function od_compose_site_health_result( $response ): array {
 		'test'        => 'optimization_detective_rest_api',
 	);
 
-	$error_label            = __( 'Optimization Detective\'s REST API endpoint is unavailable', 'optimization-detective' );
+	$error_label            = __( 'The Optimization Detective REST API endpoint is unavailable', 'optimization-detective' );
 	$error_description_html = '<p>' . esc_html__( 'You may have a plugin active or server configuration which restricts access to logged-in users. Unauthenticated access must be restored in order for Optimization Detective to work.', 'optimization-detective' ) . '</p>';
 
 	if ( is_wp_error( $response ) ) {
