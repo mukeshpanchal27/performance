@@ -110,7 +110,7 @@ function od_compose_site_health_result( $response ): array {
 	$error_description_html = '<p>' . esc_html__( 'You may have a plugin active or server configuration which restricts access to logged-in users. Unauthenticated access must be restored in order for Optimization Detective to work.', 'optimization-detective' ) . '</p>';
 
 	if ( is_wp_error( $response ) ) {
-		$result['status']      = 'critical';
+		$result['status']      = 'recommended';
 		$result['label']       = $error_label;
 		$result['description'] = $common_description_html . $error_description_html . '<p>' . wp_kses(
 			sprintf(
@@ -134,8 +134,12 @@ function od_compose_site_health_result( $response ): array {
 			count( $data['data']['params'] ) > 0
 		);
 		if ( ! $is_expected ) {
-			$result['status']      = 'critical';
-			$result['label']       = __( 'The Optimization Detective REST API endpoint is unavailable to logged-out users', 'optimization-detective' );
+			$result['status'] = 'recommended';
+			if ( 401 === $code ) {
+				$result['label'] = __( 'The Optimization Detective REST API endpoint is unavailable to logged-out users', 'optimization-detective' );
+			} else {
+				$result['label'] = $error_label;
+			}
 			$result['description'] = $common_description_html . $error_description_html . '<p>' . wp_kses(
 				sprintf(
 					/* translators: %d is the HTTP status code, %s is the status header description */

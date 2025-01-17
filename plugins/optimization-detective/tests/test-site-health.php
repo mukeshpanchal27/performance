@@ -105,13 +105,13 @@ class Test_OD_Site_Health extends WP_UnitTestCase {
 			'unauthorized'    => array(
 				'mocked_response'      => $this->build_mock_response( ...self::UNAUTHORISED_MOCKED_RESPONSE_ARGS ),
 				'expected_option'      => '1',
-				'expected_status'      => 'critical',
+				'expected_status'      => 'recommended',
 				'expected_unavailable' => true,
 			),
 			'forbidden'       => array(
 				'mocked_response'      => $this->build_mock_response( ...self::FORBIDDEN_MOCKED_RESPONSE_ARGS ),
 				'expected_option'      => '1',
-				'expected_status'      => 'critical',
+				'expected_status'      => 'recommended',
 				'expected_unavailable' => true,
 			),
 			'nginx_forbidden' => array(
@@ -123,13 +123,13 @@ class Test_OD_Site_Health extends WP_UnitTestCase {
 					'body'     => "<html>\n<head><title>403 Forbidden</title></head>\n<body>\n<center><h1>403 Forbidden</h1></center>\n<hr><center>nginx</center>\n</body>\n</html>",
 				),
 				'expected_option'      => '1',
-				'expected_status'      => 'critical',
+				'expected_status'      => 'recommended',
 				'expected_unavailable' => true,
 			),
 			'error'           => array(
 				'mocked_response'      => new WP_Error( 'bad', 'Something terrible has happened' ),
 				'expected_option'      => '1',
-				'expected_status'      => 'critical',
+				'expected_status'      => 'recommended',
 				'expected_unavailable' => true,
 			),
 		);
