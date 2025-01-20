@@ -121,13 +121,13 @@ function perflab_ffh_check_assets( array $assets ): array {
 		}
 
 		$check = perflab_ffh_check_headers( $headers );
-		if ( isset( $check['passed'] ) && $check['passed'] ) {
+		if ( $check['passed'] ) {
 			// This asset passed far-future headers test, no action needed.
 			continue;
 		}
 
 		// If not passed, decide whether to try conditional request.
-		if ( false === $check ) {
+		if ( $check['missing_max_age'] ) {
 			// Only if no far-future headers at all, we try conditional request.
 			$conditional_pass = perflab_ffh_try_conditional_request( $asset, $headers );
 			$final_status     = 'recommended';
@@ -165,9 +165,9 @@ function perflab_ffh_check_assets( array $assets ): array {
  * @access private
  *
  * @param WpOrg\Requests\Utility\CaseInsensitiveDictionary|array<string, string|array<string>> $headers Response headers.
- * @return array{passed: bool, reason: string}|false Detailed result. If passed=false, reason explains why it failed and false if no headers found.
+ * @return array{passed: bool, reason: string, missing_max_age: bool} Detailed result of the check.
  */
-function perflab_ffh_check_headers( $headers ) {
+function perflab_ffh_check_headers( $headers ): array {
 	/**
 	 * Filters the threshold for far-future headers.
 	 *
@@ -195,8 +195,9 @@ function perflab_ffh_check_headers( $headers ) {
 	// If max-age meets or exceeds the threshold, we consider it good.
 	if ( $max_age >= $threshold ) {
 		return array(
-			'passed' => true,
-			'reason' => '',
+			'passed'          => true,
+			'reason'          => '',
+			'missing_max_age' => false,
 		);
 	}
 
@@ -207,47 +208,55 @@ function perflab_ffh_check_headers( $headers ) {
 		if ( $remaining_time >= $threshold ) {
 			// Good - Expires far in the future.
 			return array(
-				'passed' => true,
-				'reason' => '',
+				'passed'          => true,
+				'reason'          => '',
+				'missing_max_age' => false,
 			);
 		}
 
 		// Expires header exists but not far enough in the future.
 		if ( $max_age > 0 ) {
 			return array(
-				'passed' => false,
-				'reason' => sprintf(
+				'passed'          => false,
+				'reason'          => sprintf(
 					/* translators: 1: actual max-age value in seconds, 2: threshold in seconds */
 					__( 'max-age below threshold (actual: %1$s seconds, threshold: %2$s seconds)', 'performance-lab' ),
 					number_format_i18n( $max_age ),
 					number_format_i18n( $threshold )
 				),
+				'missing_max_age' => false,
 			);
 		}
 		return array(
-			'passed' => false,
-			'reason' => sprintf(
+			'passed'          => false,
+			'reason'          => sprintf(
 				/* translators: 1: actual Expires header value in seconds, 2: threshold in seconds */
 				__( 'expires below threshold (actual: %1$s seconds, threshold: %2$s seconds)', 'performance-lab' ),
 				number_format_i18n( $remaining_time ),
 				number_format_i18n( $threshold )
 			),
+			'missing_max_age' => false,
 		);
 	}
 
 	// No max-age or expires found at all or max-age < threshold and no expires.
 	if ( 0 === $max_age ) {
-		return false;
+		return array(
+			'passed'          => false,
+			'reason'          => '',
+			'missing_max_age' => true,
+		);
 	} else {
 		// max-age was present but below threshold and no expires.
 		return array(
-			'passed' => false,
-			'reason' => sprintf(
+			'passed'          => false,
+			'reason'          => sprintf(
 				/* translators: 1: actual max-age value in seconds, 2: threshold in seconds */
 				__( 'max-age below threshold (actual: %1$s seconds, threshold: %2$s seconds)', 'performance-lab' ),
 				number_format_i18n( $max_age ),
 				number_format_i18n( $threshold )
 			),
+			'missing_max_age' => false,
 		);
 	}
 }
@@ -263,8 +272,8 @@ function perflab_ffh_check_headers( $headers ) {
  * @return bool True if a 304 response was received.
  */
 function perflab_ffh_try_conditional_request( string $url, $headers ): bool {
-	$etag          = isset( $headers['etag'] ) ? $headers['etag'] : '';
-	$last_modified = isset( $headers['last-modified'] ) ? $headers['last-modified'] : '';
+	$etag          = $headers['etag'] ?? '';
+	$last_modified = $headers['last-modified'] ?? '';
 
 	$conditional_headers = array();
 	if ( '' !== $etag ) {
