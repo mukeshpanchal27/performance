@@ -41,7 +41,7 @@ class Test_Cache_Control_Headers extends WP_UnitTestCase {
 		$tests = perflab_cch_add_cache_control_test( $tests );
 		$this->assertArrayHasKey( 'perflab_cch_cache_control', $tests['direct'] );
 		$this->assertEquals( 'Cache settings may impact site performance', $tests['direct']['perflab_cch_cache_control']['label'] );
-		$this->assertEquals( 'perflab_cch_add_check_cache_control_test', $tests['direct']['perflab_cch_cache_control']['test'] );
+		$this->assertEquals( 'perflab_cch_check_cache_control_test', $tests['direct']['perflab_cch_cache_control']['test'] );
 	}
 
 	/**
