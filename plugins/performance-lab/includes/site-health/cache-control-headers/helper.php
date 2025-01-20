@@ -1,6 +1,6 @@
 <?php
 /**
- * Helper functions used for Enqueued Assets Health Check.
+ * Helper functions used for Cache-Control headers site health check.
  *
  * @package performance-lab
  * @since n.e.x.t
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @return array{label: string, status: string, badge: array{label: string, color: string}, description: string, actions: string, test: string} Result.
  */
-function perflab_cch_add_check_cache_control_test(): array {
+function perflab_cch_check_cache_control_test(): array {
 	$result = array(
 		'label'       => __( 'Cache settings are optimal for site performance.', 'performance-lab' ),
 		'status'      => 'good',
@@ -26,7 +26,7 @@ function perflab_cch_add_check_cache_control_test(): array {
 			'label' => __( 'Performance', 'performance-lab' ),
 			'color' => 'blue',
 		),
-		'description' => '<p>' . esc_html__( 'Your site’s cache settings are configured correctly, helping to improve its performance.', 'performance-lab' ) . '</p>',
+		'description' => '<p>' . esc_html__( 'Your site cache settings are configured correctly, helping to improve its performance.', 'performance-lab' ) . '</p>',
 		'actions'     => '',
 		'test'        => 'perflab_cch_cache_control_header_check',
 	);

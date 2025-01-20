@@ -1,6 +1,6 @@
 <?php
 /**
- * Hook callbacks used for Cache-Control headers.
+ * Hook callbacks used for cache-control headers.
  *
  * @package performance-lab
  * @since n.e.x.t
@@ -21,8 +21,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function perflab_cch_add_cache_control_test( array $tests ): array {
 	$tests['direct']['perflab_cch_cache_control'] = array(
-		'label' => __( 'Use of Cache-Control no-store/no-cache/max-age=0 for unauthenticated homepage', 'performance-lab' ),
-		'test'  => 'perflab_cch_add_check_cache_control_test',
+		'label' => __( 'Cache settings may impact site performance', 'performance-lab' ),
+		'test'  => 'perflab_cch_check_cache_control_test',
 	);
 	return $tests;
 }
