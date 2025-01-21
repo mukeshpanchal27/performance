@@ -20,13 +20,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function perflab_cch_check_cache_control_test(): array {
 	$result = array(
-		'label'       => __( 'Cache settings are optimal for site performance.', 'performance-lab' ),
+		'label'       => __( 'The Cache-Control response header for pages ensures fast back/forward navigation.', 'performance-lab' ),
 		'status'      => 'good',
 		'badge'       => array(
 			'label' => __( 'Performance', 'performance-lab' ),
 			'color' => 'blue',
 		),
-		'description' => '<p>' . esc_html__( 'Your site cache settings are configured correctly, helping to improve its performance.', 'performance-lab' ) . '</p>',
+		'description' => '<p>' . esc_html__( 'If the Cache-Control response header includes directives like no-store, no-cache, or max-age=0 then it can prevent instant back/forward navigations (using the browser bfcache). Your site is configured properly.', 'performance-lab' ) . '</p>',
 		'actions'     => '',
 		'test'        => 'perflab_cch_cache_control_header_check',
 	);
@@ -45,7 +45,7 @@ function perflab_cch_check_cache_control_test(): array {
 		$result['description'] = '<p>' . wp_kses(
 			sprintf(
 				/* translators: %s is the error code */
-				__( 'There was an error while checking your site cache settings. Error code: <code>%s</code> and the following error message:', 'performance-lab' ),
+				__( 'There was an error while checking your Cache-Control response header. Error code: <code>%s</code> and the following error message:', 'performance-lab' ),
 				esc_html( (string) $response->get_error_code() )
 			),
 			array( 'code' => array() )
@@ -59,7 +59,7 @@ function perflab_cch_check_cache_control_test(): array {
 		$result['status']      = 'recommended';
 		$result['description'] = sprintf(
 			'<p>%s</p>',
-			esc_html__( 'Cache-Control headers are not set correctly. This can affect the performance of your site.', 'performance-lab' )
+			esc_html__( 'Cache-Control headers are not set correctly. This can affect the performance of your site by preventing fast back/forward navigations (via browser bfcache).', 'performance-lab' )
 		);
 		return $result;
 	}
@@ -78,17 +78,13 @@ function perflab_cch_check_cache_control_test(): array {
 
 		$flagged_headers_string = implode( ', ', $flagged_headers );
 		if ( '' !== $flagged_headers_string ) {
-			$result['label'] = sprintf(
-				/* translators: %s: Cache-Control header value */
-				__( 'Cache-Control headers are set to %s', 'performance-lab' ),
-				$flagged_headers_string
-			);
+			$result['label']       = __( 'Cache-Control header is preventing fast back/forward navigations', 'performance-lab' );
 			$result['status']      = 'recommended';
 			$result['description'] = sprintf(
 				'<p>%s</p>',
 				sprintf(
 					/* translators: %s: Cache-Control header value */
-					esc_html__( 'Cache-Control headers are set to %s. This can affect the performance of your site.', 'performance-lab' ),
+					esc_html__( 'Cache-Control headers are set to %s. This can affect the performance of your site by preventing fast back/forward navigations (via browser bfcache).', 'performance-lab' ),
 					$flagged_headers_string
 				)
 			);

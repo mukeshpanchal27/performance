@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function perflab_cch_add_cache_control_test( array $tests ): array {
 	$tests['direct']['perflab_cch_cache_control'] = array(
-		'label' => __( 'Cache settings may impact site performance', 'performance-lab' ),
+		'label' => __( 'Cache-Control headers may prevent fast back/forward navigation', 'performance-lab' ),
 		'test'  => 'perflab_cch_check_cache_control_test',
 	);
 	return $tests;
