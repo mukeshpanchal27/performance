@@ -64,7 +64,7 @@ class Test_Cache_Control_Headers extends WP_UnitTestCase {
 	 * @param string                     $expected_message  The expected message.
 	 */
 	public function test_perflab_cch_check_bfcache_compatibility( $response, string $expected_status, string $expected_message ): void {
-		$this->mocked_responses = array( home_url() => $response );
+		$this->mocked_responses = array( home_url( '/' ) => $response );
 
 		$result = perflab_cch_check_bfcache_compatibility();
 

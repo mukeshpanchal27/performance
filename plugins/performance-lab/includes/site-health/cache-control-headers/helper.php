@@ -32,9 +32,9 @@ function perflab_cch_check_bfcache_compatibility(): array {
 	);
 
 	$response = wp_remote_get(
-		home_url(),
+		home_url( '/' ),
 		array(
-			'headers'   => array( 'Content-Type' => 'text/html' ),
+			'headers'   => array( 'Accept' => 'text/html' ),
 			'sslverify' => false,
 		)
 	);
