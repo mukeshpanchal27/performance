@@ -78,7 +78,12 @@ function od_buffer_output( $passthrough ) {
  * @access private
  */
 function od_maybe_add_template_output_buffer_filter(): void {
-	if ( ! od_can_optimize_response() || isset( $_GET['optimization_detective_disabled'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if (
+		! od_can_optimize_response() ||
+		od_is_rest_api_unavailable() ||
+		isset( $_GET['optimization_detective_disabled'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+	) {
 		return;
 	}
 	$callback = 'od_optimize_template_output_buffer';
