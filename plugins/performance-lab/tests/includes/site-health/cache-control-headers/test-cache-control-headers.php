@@ -1,6 +1,6 @@
 <?php
 /**
- * Tests for cache-control headers health check.
+ * Tests for cache-control headers for bfcache compatibility site health check.
  *
  * @package performance-lab
  * @group cache-control-headers
@@ -29,55 +29,55 @@ class Test_Cache_Control_Headers extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that the cache-control headers test is added to the site health tests.
+	 * Test that the bfcache compatibility test is added to the site health tests.
 	 *
-	 * @covers ::perflab_cch_add_cache_control_test
+	 * @covers ::perflab_cch_add_bfcache_compatibility_test
 	 */
-	public function test_perflab_cch_add_cache_control_test(): void {
+	public function test_perflab_cch_add_bfcache_compatibility_test(): void {
 		$tests = array(
 			'direct' => array(),
 		);
 
-		$tests = perflab_cch_add_cache_control_test( $tests );
+		$tests = perflab_cch_add_bfcache_compatibility_test( $tests );
 		$this->assertArrayHasKey( 'perflab_cch_cache_control', $tests['direct'] );
-		$this->assertEquals( 'Cache settings may impact site performance', $tests['direct']['perflab_cch_cache_control']['label'] );
-		$this->assertEquals( 'perflab_cch_check_cache_control_test', $tests['direct']['perflab_cch_cache_control']['test'] );
+		$this->assertEquals( 'Cache-Control headers may prevent fast back/forward navigation', $tests['direct']['perflab_cch_cache_control']['label'] );
+		$this->assertEquals( 'perflab_cch_check_bfcache_compatibility', $tests['direct']['perflab_cch_cache_control']['test'] );
 	}
 
 	/**
-	 * Test that the cache-control headers test is attached to the site status tests.
+	 * Test that the bfcache compatibility test is attached to the site status tests.
 	 *
-	 * @covers ::perflab_cch_add_cache_control_test
+	 * @covers ::perflab_cch_add_bfcache_compatibility_test
 	 */
-	public function test_perflab_cch_add_cache_control_test_is_attached_to_site_status_tests(): void {
-		$this->assertNotFalse( has_filter( 'site_status_tests', 'perflab_cch_add_cache_control_test' ) );
+	public function test_perflab_cch_add_bfcache_compatibility_test_is_attached(): void {
+		$this->assertNotFalse( has_filter( 'site_status_tests', 'perflab_cch_add_bfcache_compatibility_test' ) );
 	}
 
 	/**
-	 * Test that different conditional headers return the correct result.
+	 * Test that different Cache-Control headers return the correct bfcache compatibility result.
 	 *
-	 * @dataProvider data_test_cache_control_headers
-	 * @covers ::perflab_cch_check_cache_control_test
+	 * @dataProvider data_test_bfcache_compatibility
+	 * @covers ::perflab_cch_check_bfcache_compatibility
 	 *
 	 * @param array<int, mixed>|WP_Error $response The response headers.
 	 * @param string                     $expected_status   The expected status.
 	 * @param string                     $expected_message  The expected message.
 	 */
-	public function test_perflab_cch_check_cache_control_test( $response, string $expected_status, string $expected_message ): void {
+	public function test_perflab_cch_check_bfcache_compatibility( $response, string $expected_status, string $expected_message ): void {
 		$this->mocked_responses = array( home_url() => $response );
 
-		$result = perflab_cch_check_cache_control_test();
+		$result = perflab_cch_check_bfcache_compatibility();
 
 		$this->assertEquals( $expected_status, $result['status'] );
 		$this->assertStringContainsString( $expected_message, $result['description'] );
 	}
 
 	/**
-	 * Data provider for test_cache_control_headers.
+	 * Data provider for bfcache compatibility tests.
 	 *
 	 * @return array<string, array<int, mixed>> Test data.
 	 */
-	public function data_test_cache_control_headers(): array {
+	public function data_test_bfcache_compatibility(): array {
 		return array(
 			'headers_not_set'    => array(
 				$this->build_response( 200, array( 'cache-control' => '' ) ),
@@ -107,7 +107,7 @@ class Test_Cache_Control_Headers extends WP_UnitTestCase {
 			'error'              => array(
 				new WP_Error( 'http_request_failed', 'HTTP request failed' ),
 				'recommended',
-				'There was an error while checking your site cache settings',
+				'There was an error while checking your Cache-Control response header',
 			),
 		);
 	}

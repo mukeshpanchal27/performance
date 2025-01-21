@@ -1,6 +1,6 @@
 <?php
 /**
- * Helper functions used for Cache-Control headers site health check.
+ * Helper functions used for Cache-Control headers for bfcache compatibility site health check.
  *
  * @package performance-lab
  * @since n.e.x.t
@@ -11,14 +11,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Tests the Cache-Control headers.
+ * Tests the Cache-Control headers for bfcache compatibility.
  *
  * @since n.e.x.t
  * @access private
  *
  * @return array{label: string, status: string, badge: array{label: string, color: string}, description: string, actions: string, test: string} Result.
  */
-function perflab_cch_check_cache_control_test(): array {
+function perflab_cch_check_bfcache_compatibility(): array {
 	$result = array(
 		'label'       => __( 'The Cache-Control response header for pages ensures fast back/forward navigation.', 'performance-lab' ),
 		'status'      => 'good',
