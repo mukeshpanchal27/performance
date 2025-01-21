@@ -424,6 +424,7 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 	 * @covers ::get_breadcrumbs
 	 * @covers ::get_indexed_breadcrumbs
 	 * @covers ::get_disambiguating_attributes
+	 * @covers ::is_admin_bar
 	 *
 	 * @dataProvider data_provider_sample_documents
 	 *
@@ -441,6 +442,7 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 
 			$xpath = $p->get_xpath();
 			$this->assertArrayNotHasKey( $xpath, $actual_xpath_breadcrumbs_mapping, 'Each tag must have a unique XPath.' );
+			$this->assertSame( str_starts_with( $xpath, '/HTML/BODY/DIV[@id=\'wpadminbar\']' ), $p->is_admin_bar(), "Unexpected is_admin_bar for $xpath" );
 
 			$actual_xpath_breadcrumbs_mapping[ $xpath ] = $p->get_breadcrumbs();
 		}

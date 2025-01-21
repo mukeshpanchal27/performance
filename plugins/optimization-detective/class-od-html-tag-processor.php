@@ -656,6 +656,23 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	}
 
 	/**
+	 * Returns whether the processor is currently at or inside the admin bar.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return bool Whether at or inside the admin bar.
+	 */
+	public function is_admin_bar(): bool {
+		return (
+			isset( $this->open_stack_tags[2], $this->open_stack_attributes[2]['id'] )
+			&&
+			'DIV' === $this->open_stack_tags[2]
+			&&
+			'wpadminbar' === $this->open_stack_attributes[2]['id']
+		);
+	}
+
+	/**
 	 * Append HTML to the HEAD.
 	 *
 	 * The provided HTML must be valid! No validation is performed.
