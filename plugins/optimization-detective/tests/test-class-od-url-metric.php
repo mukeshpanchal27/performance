@@ -266,6 +266,9 @@ class Test_OD_URL_Metric extends WP_UnitTestCase {
 	/**
 	 * Tests construction.
 	 *
+	 * @covers ::__construct
+	 * @covers ::prepare_data
+	 * @covers ::get_uuid
 	 * @covers ::get_viewport
 	 * @covers ::get_viewport_width
 	 * @covers ::get_timestamp
@@ -554,6 +557,7 @@ class Test_OD_URL_Metric extends WP_UnitTestCase {
 	 * Tests construction with extended schema.
 	 *
 	 * @covers ::get_json_schema
+	 * @covers ::extend_schema_with_optional_properties
 	 *
 	 * @dataProvider data_provider_to_test_constructor_with_extended_schema
 	 *

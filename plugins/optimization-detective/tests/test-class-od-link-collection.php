@@ -329,7 +329,10 @@ class Test_OD_Link_Collection extends WP_UnitTestCase {
 	 *
 	 * @covers ::add_link
 	 * @covers ::get_html
+	 * @covers ::get_prepared_links
+	 * @covers ::merge_consecutive_links
 	 * @covers ::get_response_header
+	 * @covers ::count
 	 *
 	 * @dataProvider data_provider_to_test_add_link
 	 *
@@ -346,6 +349,9 @@ class Test_OD_Link_Collection extends WP_UnitTestCase {
 		}
 
 		$collection = new OD_Link_Collection();
+
+		$this->assertNull( $collection->get_response_header() );
+
 		foreach ( $links_args as $link_args ) {
 			$collection->add_link( ...$link_args );
 		}

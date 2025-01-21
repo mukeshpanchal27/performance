@@ -335,6 +335,8 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 	 *
 	 * @covers ::od_optimize_template_output_buffer
 	 * @covers ::od_is_response_html_content_type
+	 * @covers OD_Tag_Visitor_Context::__construct
+	 * @covers OD_Tag_Visitor_Context::__get
 	 *
 	 * @dataProvider data_provider_test_od_optimize_template_output_buffer
 	 *

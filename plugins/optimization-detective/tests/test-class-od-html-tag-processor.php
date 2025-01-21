@@ -315,11 +315,13 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test next_tag(), next_token(), and get_xpath().
+	 * Test next_tag(), next_token(), get_xpath(), expects_closer().
 	 *
 	 * @covers ::next_open_tag
 	 * @covers ::next_tag
 	 * @covers ::next_token
+	 * @covers ::expects_closer
+	 * @covers ::is_foreign_element
 	 * @covers ::get_xpath
 	 * @covers ::get_breadcrumbs
 	 *
@@ -356,6 +358,27 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 		$this->expectException( InvalidArgumentException::class );
 		$p = new OD_HTML_Tag_Processor( '<html></html>' );
 		$p->next_tag( array( 'tag_name' => 'HTML' ) );
+	}
+
+	/**
+	 * Test expects_closer().
+	 *
+	 * @covers ::expects_closer
+	 */
+	public function test_expects_closer(): void {
+		$p = new OD_HTML_Tag_Processor( '<html><body><hr></body></html>' );
+		while ( $p->next_tag() ) {
+			if ( 'BODY' === $p->get_tag() ) {
+				break;
+			}
+		}
+		$this->assertSame( 'BODY', $p->get_tag() );
+		$this->assertFalse( $p->expects_closer( 'IMG' ) );
+		$this->assertTrue( $p->expects_closer() );
+		$p->next_tag();
+		$this->assertSame( 'HR', $p->get_tag() );
+		$this->assertFalse( $p->expects_closer() );
+		$this->assertTrue( $p->expects_closer( 'DIV' ) );
 	}
 
 	/**
@@ -466,6 +489,7 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 	 * @covers ::set_bookmark
 	 * @covers ::seek
 	 * @covers ::release_bookmark
+	 * @covers ::get_current_depth
 	 */
 	public function test_bookmarking_and_seeking(): void {
 		$processor = new OD_HTML_Tag_Processor(

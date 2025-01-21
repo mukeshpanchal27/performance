@@ -12,6 +12,7 @@ class Test_OD_Element extends WP_UnitTestCase {
 	/**
 	 * Tests construction.
 	 *
+	 * @covers ::__construct
 	 * @covers ::get
 	 * @covers ::get_url_metric
 	 * @covers ::get_url_metric_group
