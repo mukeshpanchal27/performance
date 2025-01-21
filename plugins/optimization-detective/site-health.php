@@ -6,9 +6,11 @@
  * @since n.e.x.t
  */
 
+// @codeCoverageIgnoreStart
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
+// @codeCoverageIgnoreEnd
 
 /**
  * Adds the Optimization Detective REST API check to site health tests.
