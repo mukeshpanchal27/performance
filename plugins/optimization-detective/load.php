@@ -15,10 +15,11 @@
  * @package optimization-detective
  */
 
-// Exit if accessed directly.
+// @codeCoverageIgnoreStart
 if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+	exit; // Exit if accessed directly.
 }
+// @codeCoverageIgnoreEnd
 
 (
 	/**

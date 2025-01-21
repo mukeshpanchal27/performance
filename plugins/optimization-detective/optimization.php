@@ -6,9 +6,11 @@
  * @since 0.1.0
  */
 
+// @codeCoverageIgnoreStart
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
+// @codeCoverageIgnoreEnd
 
 /**
  * Starts output buffering at the end of the 'template_include' filter.

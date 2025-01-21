@@ -6,9 +6,11 @@
  * @since 0.1.0
  */
 
+// @codeCoverageIgnoreStart
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
+// @codeCoverageIgnoreEnd
 
 add_action( 'init', 'od_initialize_extensions', PHP_INT_MAX );
 add_filter( 'template_include', 'od_buffer_output', PHP_INT_MAX );
