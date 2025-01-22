@@ -6,10 +6,11 @@
  * @since 0.1.1
  */
 
-// Exit if accessed directly.
+// @codeCoverageIgnoreStart
 if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+	exit; // Exit if accessed directly.
 }
+// @codeCoverageIgnoreEnd
 
 /**
  * Extension to WP_HTML_Tag_Processor that supports injecting HTML and obtaining XPath for the current tag.

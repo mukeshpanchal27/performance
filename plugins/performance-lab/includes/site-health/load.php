@@ -6,9 +6,11 @@
  * @since 3.0.0
  */
 
+// @codeCoverageIgnoreStart
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
+// @codeCoverageIgnoreEnd
 
 // Audit Autoloaded Options site health check.
 require_once __DIR__ . '/audit-autoloaded-options/helper.php';
