@@ -196,6 +196,17 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	private $current_xpath = null;
 
 	/**
+	 * Transitional XPath for the current tag.
+	 *
+	 * This is used to store the old XPath format in a transitional period until which new URL Metrics are expected to
+	 * have been collected to purge out references to the old format.
+	 *
+	 * @since n.e.x.t
+	 * @var string|null
+	 */
+	private $transitional_current_xpath = null;
+
+	/**
 	 * Whether the previous tag does not expect a closer.
 	 *
 	 * @since 0.4.0
@@ -300,7 +311,8 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	 * @return bool Whether a token was parsed.
 	 */
 	public function next_token(): bool {
-		$this->current_xpath = null; // Clear cache.
+		$this->current_xpath              = null; // Clear cache.
+		$this->transitional_current_xpath = null; // Clear cache.
 		++$this->cursor_move_count;
 		if ( ! parent::next_token() ) {
 			$this->open_stack_tags       = array();
@@ -629,9 +641,31 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	 *
 	 * @since 0.4.0
 	 *
+	 * @param bool $transitional_format Whether to use the transitional XPath format. Default true.
 	 * @return string XPath.
 	 */
-	public function get_xpath(): string {
+	public function get_xpath( bool $transitional_format = true ): string {
+		/*
+		 * This transitional format is used by default for all extensions. The non-transitional format is used only in
+		 * od_optimize_template_output_buffer() when setting the data-od-xpath attribute. This is so that the new format
+		 * will replace the old format as new URL Metrics are collected. After a month of the new format being live, the
+		 * transitional format can be eliminated. See the corresponding logic in OD_Element for normalizing both the
+		 * old and new XPath formats to use the transitional format.
+		 */
+		if ( $transitional_format ) {
+			if ( null === $this->transitional_current_xpath ) {
+				$this->transitional_current_xpath = '';
+				foreach ( $this->get_indexed_breadcrumbs() as $i => list( $tag_name, $index, $attributes ) ) {
+					if ( $i < 2 || ( 2 === $i && '/HTML/BODY' === $this->transitional_current_xpath ) ) {
+						$this->transitional_current_xpath .= "/$tag_name";
+					} else {
+						$this->transitional_current_xpath .= sprintf( '/*[%d][self::%s]', $index + 1, $tag_name );
+					}
+				}
+			}
+			return $this->transitional_current_xpath;
+		}
+
 		if ( null === $this->current_xpath ) {
 			$this->current_xpath = '';
 			foreach ( $this->get_indexed_breadcrumbs() as $i => list( $tag_name, $index, $attributes ) ) {

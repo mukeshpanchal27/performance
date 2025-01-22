@@ -249,7 +249,9 @@ function od_optimize_template_output_buffer( string $buffer ): string {
 		$processor->release_bookmark( $current_tag_bookmark );
 
 		if ( $tracked_in_url_metrics && $needs_detection ) {
-			$processor->set_meta_attribute( 'xpath', $processor->get_xpath() );
+			// Note: This is explicitly using the non-transitional XPath format since this is what will get saved in newly-submitted URL Metrics.
+			$xpath = $processor->get_xpath( false );
+			$processor->set_meta_attribute( 'xpath', $xpath );
 		}
 	} while ( $processor->next_open_tag() );
 
