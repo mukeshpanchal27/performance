@@ -200,6 +200,7 @@ function od_get_current_url_metrics_etag( OD_Tag_Visitor_Registry $tag_visitor_r
 	}
 
 	$data = array(
+		'od_version'       => OPTIMIZATION_DETECTIVE_VERSION,
 		'tag_visitors'     => array_keys( iterator_to_array( $tag_visitor_registry ) ),
 		'queried_object'   => $queried_object_data,
 		'queried_posts'    => array_filter(
