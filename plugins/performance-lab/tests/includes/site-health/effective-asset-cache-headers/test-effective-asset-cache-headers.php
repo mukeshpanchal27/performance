@@ -214,7 +214,7 @@ class Test_Effective_Asset_Cache_Headers extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that the filter `perflab_ffh_assets_to_check` and `perflab_far_future_headers_threshold` are working as expected.
+	 * Test that the filter `perflab_effective_asset_cache_headers_assets_to_check` and `perflab_effective_asset_cache_headers_expiration_threshold` are working as expected.
 	 *
 	 * @covers ::perflab_effective_asset_cache_headers_check_assets
 	 * @covers ::perflab_effective_asset_cache_headers_check_headers
