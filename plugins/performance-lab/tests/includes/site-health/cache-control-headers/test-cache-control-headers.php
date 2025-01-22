@@ -81,8 +81,8 @@ class Test_Cache_Control_Headers extends WP_UnitTestCase {
 		return array(
 			'headers_not_set'    => array(
 				$this->build_response( 200, array( 'cache-control' => '' ) ),
-				'recommended',
-				'Cache-Control headers are not set correctly',
+				'good',
+				'If the Cache-Control response header includes directives like no-store, no-cache, or max-age=0 then it can prevent instant back/forward navigations (using the browser bfcache). Your site is configured properly.',
 			),
 			'no_store'           => array(
 				$this->build_response( 200, array( 'cache-control' => 'no-store' ) ),

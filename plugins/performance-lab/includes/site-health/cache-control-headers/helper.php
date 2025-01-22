@@ -6,9 +6,11 @@
  * @since n.e.x.t
  */
 
+// @codeCoverageIgnoreStart
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
+// @codeCoverageIgnoreEnd
 
 /**
  * Tests the Cache-Control headers for bfcache compatibility.
@@ -55,12 +57,7 @@ function perflab_cch_check_bfcache_compatibility(): array {
 
 	$cache_control_header = wp_remote_retrieve_header( $response, 'cache-control' );
 	if ( is_string( $cache_control_header ) && '' === $cache_control_header ) {
-		$result['label']       = __( 'Cache-Control headers are not set correctly', 'performance-lab' );
-		$result['status']      = 'recommended';
-		$result['description'] = sprintf(
-			'<p>%s</p>',
-			esc_html__( 'Cache-Control headers are not set correctly. This can affect the performance of your site by preventing fast back/forward navigations (via browser bfcache).', 'performance-lab' )
-		);
+		// The Cache-Control header is not set, so it does not prevent bfcache. Return the default result.
 		return $result;
 	}
 
