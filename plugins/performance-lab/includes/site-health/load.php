@@ -31,5 +31,5 @@ require_once __DIR__ . '/avif-headers/helper.php';
 require_once __DIR__ . '/avif-headers/hooks.php';
 
 // Cache-Control headers site health check.
-require_once __DIR__ . '/cache-control-headers/helper.php';
-require_once __DIR__ . '/cache-control-headers/hooks.php';
+require_once __DIR__ . '/bfcache-compatibility-headers/helper.php';
+require_once __DIR__ . '/bfcache-compatibility-headers/hooks.php';
