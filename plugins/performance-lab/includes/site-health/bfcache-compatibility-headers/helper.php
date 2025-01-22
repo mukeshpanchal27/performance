@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @return array{label: string, status: string, badge: array{label: string, color: string}, description: string, actions: string, test: string} Result.
  */
-function perflab_cch_check_bfcache_compatibility(): array {
+function perflab_bfcache_check_compatibility(): array {
 	$result = array(
 		'label'       => __( 'The Cache-Control response header for pages ensures fast back/forward navigation.', 'performance-lab' ),
 		'status'      => 'good',

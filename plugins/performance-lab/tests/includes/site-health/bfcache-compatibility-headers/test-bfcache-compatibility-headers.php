@@ -3,10 +3,10 @@
  * Tests for cache-control headers for bfcache compatibility site health check.
  *
  * @package performance-lab
- * @group cache-control-headers
+ * @group bfcache-compatibility-headers
  */
 
-class Test_Cache_Control_Headers extends WP_UnitTestCase {
+class Test_BFCache_Compatibility_Headers extends WP_UnitTestCase {
 
 	/**
 	 * Holds mocked response headers for different test scenarios.
@@ -31,42 +31,42 @@ class Test_Cache_Control_Headers extends WP_UnitTestCase {
 	/**
 	 * Test that the bfcache compatibility test is added to the site health tests.
 	 *
-	 * @covers ::perflab_cch_add_bfcache_compatibility_test
+	 * @covers ::perflab_bfcache_add_compatibility_test
 	 */
-	public function test_perflab_cch_add_bfcache_compatibility_test(): void {
+	public function test_perflab_bfcache_add_compatibility_test(): void {
 		$tests = array(
 			'direct' => array(),
 		);
 
-		$tests = perflab_cch_add_bfcache_compatibility_test( $tests );
+		$tests = perflab_bfcache_add_compatibility_test( $tests );
 		$this->assertArrayHasKey( 'perflab_cch_cache_control', $tests['direct'] );
 		$this->assertEquals( 'Cache-Control headers may prevent fast back/forward navigation', $tests['direct']['perflab_cch_cache_control']['label'] );
-		$this->assertEquals( 'perflab_cch_check_bfcache_compatibility', $tests['direct']['perflab_cch_cache_control']['test'] );
+		$this->assertEquals( 'perflab_bfcache_check_compatibility', $tests['direct']['perflab_cch_cache_control']['test'] );
 	}
 
 	/**
 	 * Test that the bfcache compatibility test is attached to the site status tests.
 	 *
-	 * @covers ::perflab_cch_add_bfcache_compatibility_test
+	 * @covers ::perflab_bfcache_add_compatibility_test
 	 */
-	public function test_perflab_cch_add_bfcache_compatibility_test_is_attached(): void {
-		$this->assertNotFalse( has_filter( 'site_status_tests', 'perflab_cch_add_bfcache_compatibility_test' ) );
+	public function test_perflab_bfcache_add_compatibility_test_is_attached(): void {
+		$this->assertNotFalse( has_filter( 'site_status_tests', 'perflab_bfcache_add_compatibility_test' ) );
 	}
 
 	/**
 	 * Test that different Cache-Control headers return the correct bfcache compatibility result.
 	 *
 	 * @dataProvider data_test_bfcache_compatibility
-	 * @covers ::perflab_cch_check_bfcache_compatibility
+	 * @covers ::perflab_bfcache_check_compatibility
 	 *
 	 * @param array<int, mixed>|WP_Error $response The response headers.
 	 * @param string                     $expected_status   The expected status.
 	 * @param string                     $expected_message  The expected message.
 	 */
-	public function test_perflab_cch_check_bfcache_compatibility( $response, string $expected_status, string $expected_message ): void {
+	public function test_perflab_bfcache_check_compatibility( $response, string $expected_status, string $expected_message ): void {
 		$this->mocked_responses = array( home_url( '/' ) => $response );
 
-		$result = perflab_cch_check_bfcache_compatibility();
+		$result = perflab_bfcache_check_compatibility();
 
 		$this->assertEquals( $expected_status, $result['status'] );
 		$this->assertStringContainsString( $expected_message, $result['description'] );
