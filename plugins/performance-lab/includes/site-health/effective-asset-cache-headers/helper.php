@@ -1,24 +1,26 @@
 <?php
 /**
- * Helper function to detect if static assets have far-future expiration headers.
+ * Helper function to detect if static assets have effective caching headers.
  *
  * @package performance-lab
  * @since n.e.x.t
  */
 
+// @codeCoverageIgnoreStart
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
+// @codeCoverageIgnoreEnd
 
 /**
- * Callback for the far-future caching test.
+ * Callback for the effective caching headers test.
  *
  * @since n.e.x.t
  * @access private
  *
  * @return array{label: string, status: string, badge: array{label: string, color: string}, description: string, actions: string, test: string} Result.
  */
-function perflab_ffh_assets_test(): array {
+function perflab_effective_asset_cache_headers_assets_test(): array {
 	$result = array(
 		'label'       => __( 'Your site serves static assets with an effective caching strategy', 'performance-lab' ),
 		'status'      => 'good',
@@ -34,7 +36,7 @@ function perflab_ffh_assets_test(): array {
 			)
 		),
 		'actions'     => '',
-		'test'        => 'is_far_future_headers_enabled',
+		'test'        => 'is_effective_asset_cache_headers_enabled',
 	);
 
 	// List of assets to check.
@@ -46,17 +48,17 @@ function perflab_ffh_assets_test(): array {
 	);
 
 	/**
-	 * Filters the list of assets to check for far-future headers.
+	 * Filters the list of assets to check for effective caching headers.
 	 *
 	 * @since n.e.x.t
 	 *
 	 * @param string[] $assets List of asset URLs to check.
 	 */
-	$assets = apply_filters( 'perflab_ffh_assets_to_check', $assets );
+	$assets = apply_filters( 'perflab_effective_asset_cache_headers_assets_to_check', $assets );
 	$assets = array_filter( (array) $assets, 'is_string' );
 
-	// Check if far-future headers are enabled for all assets.
-	$results = perflab_ffh_check_assets( $assets );
+	// Check if effective caching headers are enabled for all assets.
+	$results = perflab_effective_asset_cache_headers_check_assets( $assets );
 
 	if ( 'good' !== $results['final_status'] ) {
 		$result['status'] = $results['final_status'];
@@ -65,14 +67,14 @@ function perflab_ffh_assets_test(): array {
 		if ( count( $results['details'] ) > 0 ) {
 			$result['actions'] = sprintf(
 				'<p>%s</p>%s<p>%s</p>',
-				esc_html__( 'The following file types do not have the recommended far-future headers. Consider adding or adjusting Cache-Control or Expires headers for these asset types.', 'performance-lab' ),
-				perflab_ffh_get_extensions_table( $results['details'] ),
+				esc_html__( 'The following file types do not have the recommended effective Cache-Control or Expires headers. Consider adding or adjusting Cache-Control or Expires headers for these asset types.', 'performance-lab' ),
+				perflab_effective_asset_cache_headers_get_status_table( $results['details'] ),
 				esc_html__( 'Note: "Conditionally cached" means that the browser can re-validate the resource using ETag or Last-Modified headers. This results in fewer full downloads but still requires the browser to make requests, unlike far-future expiration headers that allow the browser to fully rely on its local cache for a longer duration.', 'performance-lab' )
 			);
 		}
 		$result['actions'] .= sprintf(
 			'<p>%s</p>',
-			esc_html__( 'Far-future Cache-Control or Expires headers can be added or adjusted with a small configuration change by your hosting provider.', 'performance-lab' )
+			esc_html__( 'Effective Cache-Control or Expires headers can be added or adjusted with a small configuration change by your hosting provider.', 'performance-lab' )
 		);
 	}
 
@@ -80,7 +82,7 @@ function perflab_ffh_assets_test(): array {
 }
 
 /**
- * Checks if far-future expiration headers are enabled for a list of assets.
+ * Checks if effective caching headers are enabled for a list of assets.
  *
  * @since n.e.x.t
  * @access private
@@ -88,7 +90,7 @@ function perflab_ffh_assets_test(): array {
  * @param  string[] $assets List of asset URLs to check.
  * @return array{final_status: string, details: array{filename: string, reason: string}[]} Final status and details.
  */
-function perflab_ffh_check_assets( array $assets ): array {
+function perflab_effective_asset_cache_headers_check_assets( array $assets ): array {
 	$final_status = 'good';
 	$fail_details = array(); // Array of arrays with 'filename' and 'reason'.
 
@@ -120,26 +122,26 @@ function perflab_ffh_check_assets( array $assets ): array {
 			continue;
 		}
 
-		$check = perflab_ffh_check_headers( $headers );
+		$check = perflab_effective_asset_cache_headers_check_headers( $headers );
 		if ( $check['passed'] ) {
-			// This asset passed far-future headers test, no action needed.
+			// This asset passed effective caching headers test, no action needed.
 			continue;
 		}
 
 		// If not passed, decide whether to try conditional request.
 		if ( $check['missing_max_age'] ) {
-			// Only if no far-future headers at all, we try conditional request.
-			$conditional_pass = perflab_ffh_try_conditional_request( $asset, $headers );
+			// Only if no effective caching headers at all, we try conditional request.
+			$conditional_pass = perflab_effective_asset_cache_headers_try_conditional_request( $asset, $headers );
 			$final_status     = 'recommended';
 			if ( ! $conditional_pass ) {
 				$fail_details[] = array(
 					'filename' => $filename,
-					'reason'   => __( 'No far-future headers and no conditional caching', 'performance-lab' ),
+					'reason'   => __( 'No effective caching headers and no conditional caching', 'performance-lab' ),
 				);
 			} else {
 				$fail_details[] = array(
 					'filename' => $filename,
-					'reason'   => __( 'No far-future headers but conditionally cached', 'performance-lab' ),
+					'reason'   => __( 'No effective caching headers but conditionally cached', 'performance-lab' ),
 				);
 			}
 		} else {
@@ -159,7 +161,7 @@ function perflab_ffh_check_assets( array $assets ): array {
 }
 
 /**
- * Checks if far-future expiration headers are enabled.
+ * Checks if effective caching headers are enabled.
  *
  * @since n.e.x.t
  * @access private
@@ -167,15 +169,15 @@ function perflab_ffh_check_assets( array $assets ): array {
  * @param WpOrg\Requests\Utility\CaseInsensitiveDictionary|array<string, string|array<string>> $headers Response headers.
  * @return array{passed: bool, reason: string, missing_max_age: bool} Detailed result of the check.
  */
-function perflab_ffh_check_headers( $headers ): array {
+function perflab_effective_asset_cache_headers_check_headers( $headers ): array {
 	/**
-	 * Filters the threshold for far-future headers.
+	 * Filters the threshold for effective caching headers.
 	 *
 	 * @since n.e.x.t
 	 *
 	 * @param int $threshold Threshold in seconds.
 	 */
-	$threshold = apply_filters( 'perflab_far_future_headers_threshold', YEAR_IN_SECONDS );
+	$threshold = apply_filters( 'perflab_effective_asset_cache_headers_expiration_threshold', YEAR_IN_SECONDS );
 
 	$cache_control = $headers['cache-control'] ?? '';
 	$expires       = $headers['expires'] ?? '';
@@ -271,7 +273,7 @@ function perflab_ffh_check_headers( $headers ): array {
  * @param WpOrg\Requests\Utility\CaseInsensitiveDictionary|array<string, string|array<string>> $headers The initial response headers.
  * @return bool True if a 304 response was received.
  */
-function perflab_ffh_try_conditional_request( string $url, $headers ): bool {
+function perflab_effective_asset_cache_headers_try_conditional_request( string $url, $headers ): bool {
 	$etag          = $headers['etag'] ?? '';
 	$last_modified = $headers['last-modified'] ?? '';
 
@@ -300,7 +302,7 @@ function perflab_ffh_try_conditional_request( string $url, $headers ): bool {
 }
 
 /**
- * Generate a table listing files that need far-future headers, including reasons.
+ * Generate a table listing files that need effective caching headers, including reasons.
  *
  * @since n.e.x.t
  * @access private
@@ -308,7 +310,7 @@ function perflab_ffh_try_conditional_request( string $url, $headers ): bool {
  * @param array<array{filename: string, reason: string}> $fail_details Array of arrays with 'filename' and 'reason'.
  * @return string HTML formatted table.
  */
-function perflab_ffh_get_extensions_table( array $fail_details ): string {
+function perflab_effective_asset_cache_headers_get_status_table( array $fail_details ): string {
 	$html_table = sprintf(
 		'<table class="widefat striped"><thead><tr><th scope="col">%s</th><th scope="col">%s</th></tr></thead><tbody>',
 		esc_html__( 'File', 'performance-lab' ),

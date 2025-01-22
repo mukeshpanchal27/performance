@@ -1,12 +1,12 @@
 <?php
 /**
- * Tests for far-future headers health check.
+ * Tests for effective caching headers health check.
  *
  * @package performance-lab
- * @group far-future-headers
+ * @group effective-asset-cache-headers
  */
 
-class Test_Far_Future_Headers extends WP_UnitTestCase {
+class Test_Effective_Asset_Cache_Headers extends WP_UnitTestCase {
 
 	/**
 	 * Holds mocked response headers for different test scenarios.
@@ -31,37 +31,37 @@ class Test_Far_Future_Headers extends WP_UnitTestCase {
 	/**
 	 * Test that the far-future headers test is added to the site health tests.
 	 *
-	 * @covers ::perflab_ffh_add_test
+	 * @covers ::perflab_effective_asset_cache_headers_add_test
 	 */
-	public function test_perflab_ffh_add_test(): void {
+	public function test_perflab_effective_asset_cache_headers_add_test(): void {
 		$tests = array(
 			'direct' => array(),
 		);
 
-		$tests = perflab_ffh_add_test( $tests );
+		$tests = perflab_effective_asset_cache_headers_add_test( $tests );
 
-		$this->assertArrayHasKey( 'far_future_headers', $tests['direct'] );
-		$this->assertEquals( 'Effective Caching Headers', $tests['direct']['far_future_headers']['label'] );
-		$this->assertEquals( 'perflab_ffh_assets_test', $tests['direct']['far_future_headers']['test'] );
+		$this->assertArrayHasKey( 'effective_asset_cache_headers', $tests['direct'] );
+		$this->assertEquals( 'Effective Caching Headers', $tests['direct']['effective_asset_cache_headers']['label'] );
+		$this->assertEquals( 'perflab_effective_asset_cache_headers_assets_test', $tests['direct']['effective_asset_cache_headers']['test'] );
 	}
 
 	/**
 	 * Test that the far-future headers test is attached to the site status tests.
 	 *
-	 * @covers ::perflab_ffh_add_test
+	 * @covers ::perflab_effective_asset_cache_headers_add_test
 	 */
-	public function test_perflab_ffh_add_test_is_attached_to_site_status_tests(): void {
-		$this->assertNotFalse( has_filter( 'site_status_tests', 'perflab_ffh_add_test' ) );
+	public function test_perflab_effective_asset_cache_headers_add_test_is_attached_to_site_status_tests(): void {
+		$this->assertNotFalse( has_filter( 'site_status_tests', 'perflab_effective_asset_cache_headers_add_test' ) );
 	}
 
 	/**
 	 * Test that when all assets have valid far-future headers, the status is "good".
 	 *
-	 * @covers ::perflab_ffh_assets_test
-	 * @covers ::perflab_ffh_check_assets
-	 * @covers ::perflab_ffh_check_headers
+	 * @covers ::perflab_effective_asset_cache_headers_assets_test
+	 * @covers ::perflab_effective_asset_cache_headers_check_assets
+	 * @covers ::perflab_effective_asset_cache_headers_check_headers
 	 */
-	public function test_all_assets_valid_far_future_headers(): void {
+	public function test_all_assets_valid_effective_cache_headers(): void {
 		// Mock responses: all assets have a max-age > 1 year (threshold).
 		$this->mocked_responses = array(
 			includes_url( 'js/wp-embed.min.js' )     => $this->build_response( 200, array( 'cache-control' => 'max-age=' . ( YEAR_IN_SECONDS + 1000 ) ) ),
@@ -70,7 +70,7 @@ class Test_Far_Future_Headers extends WP_UnitTestCase {
 			includes_url( 'images/media/video.png' ) => $this->build_response( 200, array( 'cache-control' => 'max-age=' . ( YEAR_IN_SECONDS + 2000 ) ) ),
 		);
 
-		$result = perflab_ffh_assets_test();
+		$result = perflab_effective_asset_cache_headers_assets_test();
 		$this->assertEquals( 'good', $result['status'] );
 		$this->assertEmpty( $result['actions'] );
 	}
@@ -78,11 +78,11 @@ class Test_Far_Future_Headers extends WP_UnitTestCase {
 	/**
 	 * Test that when an asset has no far-future headers but has conditional caching (ETag/Last-Modified), status is 'recommended'.
 	 *
-	 * @covers ::perflab_ffh_assets_test
-	 * @covers ::perflab_ffh_check_assets
-	 * @covers ::perflab_ffh_check_headers
-	 * @covers ::perflab_ffh_try_conditional_request
-	 * @covers ::perflab_ffh_get_extensions_table
+	 * @covers ::perflab_effective_asset_cache_headers_assets_test
+	 * @covers ::perflab_effective_asset_cache_headers_check_assets
+	 * @covers ::perflab_effective_asset_cache_headers_check_headers
+	 * @covers ::perflab_effective_asset_cache_headers_try_conditional_request
+	 * @covers ::perflab_effective_asset_cache_headers_get_status_table
 	 */
 	public function test_assets_conditionally_cached(): void {
 		// For conditional caching scenario, setting etag/last-modified headers.
@@ -100,7 +100,7 @@ class Test_Far_Future_Headers extends WP_UnitTestCase {
 			'conditional_304'                        => $this->build_response( 304 ),
 		);
 
-		$result = perflab_ffh_assets_test();
+		$result = perflab_effective_asset_cache_headers_assets_test();
 		$this->assertEquals( 'recommended', $result['status'] );
 		$this->assertNotEmpty( $result['actions'] );
 	}
@@ -109,7 +109,7 @@ class Test_Far_Future_Headers extends WP_UnitTestCase {
 	 * Test that ETag/Last-Modified is used for conditional requests.
 	 *
 	 * @dataProvider data_provider_conditional_headers
-	 * @covers ::perflab_ffh_try_conditional_request
+	 * @covers ::perflab_effective_asset_cache_headers_try_conditional_request
 	 *
 	 * @param string                        $url      The URL to test.
 	 * @param array<string, string>         $headers  The headers to send.
@@ -121,7 +121,7 @@ class Test_Far_Future_Headers extends WP_UnitTestCase {
 			$url => $response,
 		);
 
-		$result = perflab_ffh_try_conditional_request( $url, $headers );
+		$result = perflab_effective_asset_cache_headers_try_conditional_request( $url, $headers );
 
 		$this->assertEquals( $expected, $result );
 	}
@@ -169,9 +169,9 @@ class Test_Far_Future_Headers extends WP_UnitTestCase {
 	/**
 	 * Test that different status messages are returned based on the test results.
 	 *
-	 * @covers ::perflab_ffh_check_assets
-	 * @covers ::perflab_ffh_check_headers
-	 * @covers ::perflab_ffh_try_conditional_request
+	 * @covers ::perflab_effective_asset_cache_headers_check_assets
+	 * @covers ::perflab_effective_asset_cache_headers_check_headers
+	 * @covers ::perflab_effective_asset_cache_headers_try_conditional_request
 	 */
 	public function test_status_messages(): void {
 		$this->mocked_responses = array(
@@ -191,7 +191,7 @@ class Test_Far_Future_Headers extends WP_UnitTestCase {
 			includes_url( 'images/media/code.png' )  => array(),
 		);
 
-		$result = perflab_ffh_check_assets(
+		$result = perflab_effective_asset_cache_headers_check_assets(
 			array(
 				includes_url( 'js/wp-embed.min.js' ),
 				includes_url( 'css/buttons.min.css' ),
@@ -207,8 +207,8 @@ class Test_Far_Future_Headers extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'max-age below threshold (actual:', $result['details'][0]['reason'] );
 		$this->assertStringContainsString( 'expires below threshold (actual:', $result['details'][1]['reason'] );
 		$this->assertStringContainsString( 'max-age below threshold (actual:', $result['details'][2]['reason'] );
-		$this->assertEquals( 'No far-future headers but conditionally cached', $result['details'][3]['reason'] );
-		$this->assertEquals( 'No far-future headers and no conditional caching', $result['details'][4]['reason'] );
+		$this->assertEquals( 'No effective caching headers but conditionally cached', $result['details'][3]['reason'] );
+		$this->assertEquals( 'No effective caching headers and no conditional caching', $result['details'][4]['reason'] );
 		$this->assertEquals( 'Could not retrieve headers', $result['details'][5]['reason'] );
 		$this->assertEquals( 'No valid headers retrieved', $result['details'][6]['reason'] );
 	}
@@ -216,12 +216,12 @@ class Test_Far_Future_Headers extends WP_UnitTestCase {
 	/**
 	 * Test that the filter `perflab_ffh_assets_to_check` and `perflab_far_future_headers_threshold` are working as expected.
 	 *
-	 * @covers ::perflab_ffh_check_assets
-	 * @covers ::perflab_ffh_check_headers
+	 * @covers ::perflab_effective_asset_cache_headers_check_assets
+	 * @covers ::perflab_effective_asset_cache_headers_check_headers
 	 */
 	public function test_filters(): void {
 		add_filter(
-			'perflab_ffh_assets_to_check',
+			'perflab_effective_asset_cache_headers_assets_to_check',
 			static function ( $assets ) {
 				$assets[] = includes_url( 'images/blank.gif' );
 				return $assets;
@@ -229,7 +229,7 @@ class Test_Far_Future_Headers extends WP_UnitTestCase {
 		);
 
 		add_filter(
-			'perflab_far_future_headers_threshold',
+			'perflab_effective_asset_cache_headers_expiration_threshold',
 			static function () {
 				return 1000;
 			}
@@ -243,7 +243,7 @@ class Test_Far_Future_Headers extends WP_UnitTestCase {
 			includes_url( 'images/blank.gif' )       => $this->build_response( 200, array( 'cache-control' => 'max-age=' . ( 500 ) ) ),
 		);
 
-		$result = perflab_ffh_check_assets(
+		$result = perflab_effective_asset_cache_headers_check_assets(
 			array(
 				includes_url( 'js/wp-embed.min.js' ),
 				includes_url( 'css/buttons.min.css' ),
@@ -262,12 +262,12 @@ class Test_Far_Future_Headers extends WP_UnitTestCase {
 	/**
 	 * Test that when no assets are passed, the status is "good".
 	 *
-	 * @covers ::perflab_ffh_check_assets
+	 * @covers ::perflab_effective_asset_cache_headers_check_assets
 	 */
 	public function test_when_no_assets(): void {
 		$this->mocked_responses = array();
 
-		$result = perflab_ffh_check_assets( array() );
+		$result = perflab_effective_asset_cache_headers_check_assets( array() );
 
 		$this->assertEquals( 'good', $result['final_status'] );
 		$this->assertEmpty( $result['details'] );
@@ -300,7 +300,7 @@ class Test_Far_Future_Headers extends WP_UnitTestCase {
 	 *
 	 * @param int                       $status_code HTTP status code.
 	 * @param array<string, string|int> $headers     HTTP headers.
-	 * @return array{response: array{code: int, message: string}, headers: WpOrg\Requests\Utility\CaseInsensitiveDictionary}
+	 * @return array{response: array{code: int, message: string}, headers: WpOrg\Requests\Utility\CaseInsensitiveDictionary} Mock response.
 	 */
 	protected function build_response( int $status_code = 200, array $headers = array() ): array {
 		return array(
