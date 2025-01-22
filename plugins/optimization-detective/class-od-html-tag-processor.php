@@ -112,12 +112,13 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	 * level, however, does introduce the risk of duplicate XPaths being computed. For example, if a theme has a
 	 * `<div id="header" role="banner">` and a `<div id="footer" role="contentinfo">` which are both direct descendants
 	 * of `BODY`, then it is possible for an XPath like `/HTML/BODY/DIV/*[1][self::IMG]` to be duplicated if both of
-	 * these `DIV` elements has an `IMG` as the first child. This is also an issue in sites using the Image block
+	 * these `DIV` elements have an `IMG` as the first child. This is also an issue in sites using the Image block
 	 * because it outputs a `DIV.wp-lightbox-overlay.zoom` in `wp_footer`, resulting in there being a real possibility
-	 * for XPaths to not be unique in the page. Therefore, en lieu of node index being added to children of `BODY`,
-	 * a disambiguating attribute predicate is added for the element's `id`, `role`, or `class` attribute. These three
-	 * attributes are the most stable across page loads, especially at the root of the document (where there is no Post
-	 * Loop using `post_class()`).
+	 * for XPaths to not be unique in the page. This would similarly be an issue for any theme/plugin that prints a
+	 * `DIV` at the `wp_footer`, again to add a modal, for example. Therefore, en lieu of node index being added to
+	 * children of `BODY`, a disambiguating attribute predicate is added for the element's `id`, `role`, or `class`
+	 * attribute. These three attributes are the most stable across page loads, especially at the root of the document
+	 * (where there is no Post Loop using `post_class()`).
 	 *
 	 * @since 0.4.0
 	 * @see self::get_xpath()
