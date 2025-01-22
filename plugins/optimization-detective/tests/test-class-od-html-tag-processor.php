@@ -85,26 +85,32 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 									<mspace depth="40px" height="20px" width="100px" style="background: lightblue;"/>
 									<mn>2</mn>
 								</math>
+								<main /><!-- Lack of closing tag intentional to test is_foreign_element(). This causes ::warn() to be called. -->
+								<footer>Copyright 2025</footer>
 							</div>
+							<script>/*...*/</script>
 						</body>
 					</html>
 				',
-				'open_tags'         => array( 'HTML', 'HEAD', 'BODY', 'DIV', 'SVG', 'G', 'PATH', 'CIRCLE', 'G', 'RECT', 'MATH', 'MN', 'MSPACE', 'MN' ),
+				'open_tags'         => array( 'HTML', 'HEAD', 'BODY', 'DIV', 'SVG', 'G', 'PATH', 'CIRCLE', 'G', 'RECT', 'MATH', 'MN', 'MSPACE', 'MN', 'MAIN', 'FOOTER', 'SCRIPT' ),
 				'xpath_breadcrumbs' => array(
-					'/HTML'                           => array( 'HTML' ),
-					'/HTML/HEAD'                      => array( 'HTML', 'HEAD' ),
-					'/HTML/BODY'                      => array( 'HTML', 'BODY' ),
-					'/HTML/BODY/DIV'                  => array( 'HTML', 'BODY', 'DIV' ),
-					'/HTML/BODY/DIV/*[1][self::SVG]'  => array( 'HTML', 'BODY', 'DIV', 'SVG' ),
+					'/HTML'                             => array( 'HTML' ),
+					'/HTML/HEAD'                        => array( 'HTML', 'HEAD' ),
+					'/HTML/BODY'                        => array( 'HTML', 'BODY' ),
+					'/HTML/BODY/DIV'                    => array( 'HTML', 'BODY', 'DIV' ),
+					'/HTML/BODY/DIV/*[1][self::SVG]'    => array( 'HTML', 'BODY', 'DIV', 'SVG' ),
 					'/HTML/BODY/DIV/*[1][self::SVG]/*[1][self::G]' => array( 'HTML', 'BODY', 'DIV', 'SVG', 'G' ),
 					'/HTML/BODY/DIV/*[1][self::SVG]/*[1][self::G]/*[1][self::PATH]' => array( 'HTML', 'BODY', 'DIV', 'SVG', 'G', 'PATH' ),
 					'/HTML/BODY/DIV/*[1][self::SVG]/*[1][self::G]/*[2][self::CIRCLE]' => array( 'HTML', 'BODY', 'DIV', 'SVG', 'G', 'CIRCLE' ),
 					'/HTML/BODY/DIV/*[1][self::SVG]/*[1][self::G]/*[3][self::G]' => array( 'HTML', 'BODY', 'DIV', 'SVG', 'G', 'G' ),
 					'/HTML/BODY/DIV/*[1][self::SVG]/*[1][self::G]/*[4][self::RECT]' => array( 'HTML', 'BODY', 'DIV', 'SVG', 'G', 'RECT' ),
-					'/HTML/BODY/DIV/*[2][self::MATH]' => array( 'HTML', 'BODY', 'DIV', 'MATH' ),
+					'/HTML/BODY/DIV/*[2][self::MATH]'   => array( 'HTML', 'BODY', 'DIV', 'MATH' ),
 					'/HTML/BODY/DIV/*[2][self::MATH]/*[1][self::MN]' => array( 'HTML', 'BODY', 'DIV', 'MATH', 'MN' ),
 					'/HTML/BODY/DIV/*[2][self::MATH]/*[2][self::MSPACE]' => array( 'HTML', 'BODY', 'DIV', 'MATH', 'MSPACE' ),
 					'/HTML/BODY/DIV/*[2][self::MATH]/*[3][self::MN]' => array( 'HTML', 'BODY', 'DIV', 'MATH', 'MN' ),
+					'/HTML/BODY/DIV/*[3][self::MAIN]'   => array( 'HTML', 'BODY', 'DIV', 'MAIN' ),
+					'/HTML/BODY/DIV/*[3][self::MAIN]/*[1][self::FOOTER]' => array( 'HTML', 'BODY', 'DIV', 'MAIN', 'FOOTER' ), // The self-closing <main /> has no effect in HTML, so it is expected that FOOTER would be parsed as a child of MAIN.
+					'/HTML/BODY/DIV/*[4][self::SCRIPT]' => array( 'HTML', 'BODY', 'DIV', 'SCRIPT' ), // TODO: This is not correct, as the breadcrumbs should be `array( 'HTML', 'BODY', 'SCRIPT' )`. This would be handled automatically by WP_HTML_Processor. See <https://github.com/WordPress/performance/pull/1546>.
 				),
 			),
 			'closing-void-tag'   => array(
@@ -156,7 +162,7 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 								<track src="https://example.com/track">
 								<wbr>
 
-								<!-- The following are not void -->
+								<!-- The following are not void; these will result in ::warn() being called -->
 								<div>
 								<span>
 								<em>
@@ -324,6 +330,8 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 	 * @covers ::is_foreign_element
 	 * @covers ::get_xpath
 	 * @covers ::get_breadcrumbs
+	 * @covers ::get_indexed_breadcrumbs
+	 * @covers ::warn
 	 *
 	 * @dataProvider data_provider_sample_documents
 	 *
@@ -367,6 +375,7 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 	 */
 	public function test_expects_closer(): void {
 		$p = new OD_HTML_Tag_Processor( '<html><body><hr></body></html>' );
+		$this->assertFalse( $p->expects_closer() );
 		while ( $p->next_tag() ) {
 			if ( 'BODY' === $p->get_tag() ) {
 				break;
@@ -600,6 +609,9 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 
 		$processor->release_bookmark( 'FIGURE' );
 		$this->assertFalse( $processor->has_bookmark( 'FIGURE' ) );
+
+		$this->assertFalse( $processor->release_bookmark( 'optimization_detective_end_of_head' ) );
+		$this->assertFalse( $processor->release_bookmark( 'optimization_detective_end_of_body' ) );
 
 		// TODO: Try adding too many bookmarks.
 	}

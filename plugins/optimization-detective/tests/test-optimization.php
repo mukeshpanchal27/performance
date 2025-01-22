@@ -357,6 +357,16 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 						$this->assertInstanceOf( OD_HTML_Tag_Processor::class, $context->processor );
 						$this->assertInstanceOf( OD_Link_Collection::class, $context->link_collection );
 
+						$error = null;
+						$value = '';
+						try {
+							$value = $context->__get( 'invalid_param' );
+						} catch ( Error $e ) {
+							$error = $e;
+						}
+						$this->assertInstanceOf( Error::class, $error );
+						$this->assertSame( '', $value );
+
 						$this->assertFalse( $context->processor->is_tag_closer() );
 						return $context->processor->get_tag() === 'IMG';
 					}
