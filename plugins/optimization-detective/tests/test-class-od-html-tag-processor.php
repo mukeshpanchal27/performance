@@ -443,6 +443,8 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 		$this->assertTrue( $did_seek );
 		$this->assertTrue( $saw_head );
 		$this->assertTrue( $saw_body );
+		$this->assertTrue( $processor->has_bookmark( OD_HTML_Tag_Processor::END_OF_HEAD_BOOKMARK ) );
+		$this->assertTrue( $processor->has_bookmark( OD_HTML_Tag_Processor::END_OF_BODY_BOOKMARK ) );
 		$this->assertStringContainsString( $head_injected, $processor->get_updated_html(), 'Only expecting end-of-head injection once document was finalized.' );
 		$this->assertStringContainsString( $body_injected, $processor->get_updated_html(), 'Only expecting end-of-body injection once document was finalized.' );
 
@@ -463,6 +465,53 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 			</html>
 		";
 		$this->assertSame( $expected, $processor->get_updated_html() );
+	}
+
+	/**
+	 * Test get_updated_html() when running out of bookmarks.
+	 *
+	 * @covers ::get_updated_html
+	 * @covers ::warn
+	 */
+	public function test_get_updated_html_when_out_of_bookmarks(): void {
+		$this->setExpectedIncorrectUsage( 'WP_HTML_Tag_Processor::set_bookmark' );
+		$html      = '
+			<html>
+				<head>
+					<meta charset=utf-8>
+				</head>
+				<body>
+					<h1>Hello World</h1>
+				</body>
+			</html>
+		';
+		$processor = new OD_HTML_Tag_Processor( $html );
+		$this->assertTrue( $processor->next_tag() );
+		$this->assertEquals( 'HTML', $processor->get_tag() );
+		$max_bookmarks = max( WP_HTML_Processor::MAX_BOOKMARKS, WP_HTML_Tag_Processor::MAX_BOOKMARKS );
+		for ( $i = 0; $i < $max_bookmarks + 1; $i++ ) {
+			if ( ! $processor->set_bookmark( "bookmark-$i" ) ) {
+				break;
+			}
+		}
+		$processor->append_head_html( '<!-- Failed to append to HEAD -->' );
+		$processor->append_body_html( '<!-- Failed to append to BODY -->' );
+
+		$saw_head = false;
+		$saw_body = false;
+		while ( $processor->next_open_tag() ) {
+			$tag = $processor->get_tag();
+			if ( 'HEAD' === $tag ) {
+				$saw_head = true;
+			} elseif ( 'BODY' === $tag ) {
+				$saw_body = true;
+			}
+		}
+		$this->assertTrue( $saw_head );
+		$this->assertTrue( $saw_body );
+		$this->assertFalse( $processor->has_bookmark( OD_HTML_Tag_Processor::END_OF_HEAD_BOOKMARK ) );
+		$this->assertFalse( $processor->has_bookmark( OD_HTML_Tag_Processor::END_OF_BODY_BOOKMARK ) );
+		$this->assertSame( $html, $processor->get_updated_html() );
 	}
 
 	/**
