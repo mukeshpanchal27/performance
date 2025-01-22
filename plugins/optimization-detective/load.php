@@ -15,10 +15,11 @@
  * @package optimization-detective
  */
 
-// Exit if accessed directly.
+// @codeCoverageIgnoreStart
 if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+	exit; // Exit if accessed directly.
 }
+// @codeCoverageIgnoreEnd
 
 (
 	/**
@@ -127,5 +128,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		// Add hooks for the above requires.
 		require_once __DIR__ . '/hooks.php';
+
+		// Load site health checks.
+		require_once __DIR__ . '/site-health.php';
 	}
 );

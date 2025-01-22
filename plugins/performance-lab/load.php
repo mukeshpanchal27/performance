@@ -15,9 +15,11 @@
  * @package performance-lab
  */
 
+// @codeCoverageIgnoreStart
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
+// @codeCoverageIgnoreEnd
 
 define( 'PERFLAB_VERSION', '3.7.0' );
 define( 'PERFLAB_MAIN_FILE', __FILE__ );

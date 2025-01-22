@@ -6,9 +6,11 @@
  * @since 0.1.0
  */
 
+// @codeCoverageIgnoreStart
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
+// @codeCoverageIgnoreEnd
 
 /**
  * Namespace for optimization-detective.
@@ -34,6 +36,8 @@ const OD_URL_METRICS_ROUTE = '/url-metrics:store';
  *
  * @since 0.1.0
  * @access private
+ *
+ * @see od_compose_site_health_result()
  */
 function od_register_endpoint(): void {
 
