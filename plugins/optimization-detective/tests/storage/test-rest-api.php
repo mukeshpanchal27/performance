@@ -115,6 +115,9 @@ class Test_OD_Storage_REST_API extends WP_UnitTestCase {
 		$this->assertCount( 1, $url_metrics, 'Expected number of URL Metrics stored.' );
 		$this->assertSame( $valid_params['elements'], $this->get_array_json_data( $url_metrics[0]->get( 'elements' ) ) );
 		$this->assertSame( $valid_params['viewport']['width'], $url_metrics[0]->get_viewport_width() );
+		$element = $url_metrics[0]->get( 'elements' )[0];
+		$this->assertStringStartsWith( '/HTML/BODY/DIV[@id=\'page\']/', $element->jsonSerialize()['xpath'] );
+		$this->assertStringStartsWith( '/HTML/BODY/DIV/', $element->get_xpath() ); // TODO: Remove once the XPath transitional period is over.
 
 		$expected_data = $valid_params;
 		unset( $expected_data['hmac'], $expected_data['slug'], $expected_data['current_etag'], $expected_data['cache_purge_post_id'] );
@@ -678,7 +681,7 @@ class Test_OD_Storage_REST_API extends WP_UnitTestCase {
 			array(
 				'viewport_width' => 480,
 				'element'        => array(
-					'xpath' => '/HTML/BODY/DIV/*[2][self::MAIN]/*[1][self::DIV]/*[1][self::FIGURE]/*[1][self::IMG]',
+					'xpath' => '/HTML/BODY/DIV[@id=\'page\']/*[2][self::MAIN]/*[1][self::DIV]/*[1][self::FIGURE]/*[1][self::IMG]',
 				),
 			)
 		)->jsonSerialize();
