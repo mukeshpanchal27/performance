@@ -29,7 +29,7 @@ class Test_Effective_Asset_Cache_Headers extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that the far-future headers test is added to the site health tests.
+	 * Test that the effective caching headers test is added to the site health tests.
 	 *
 	 * @covers ::perflab_effective_asset_cache_headers_add_test
 	 */
@@ -46,7 +46,7 @@ class Test_Effective_Asset_Cache_Headers extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that the far-future headers test is attached to the site status tests.
+	 * Test that the effective caching headers test is attached to the site status tests.
 	 *
 	 * @covers ::perflab_effective_asset_cache_headers_add_test
 	 */
@@ -55,7 +55,7 @@ class Test_Effective_Asset_Cache_Headers extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that when all assets have valid far-future headers, the status is "good".
+	 * Test that when all assets have valid effective caching headers, the status is "good".
 	 *
 	 * @covers ::perflab_effective_asset_cache_headers_assets_test
 	 * @covers ::perflab_effective_asset_cache_headers_check_assets
@@ -76,7 +76,7 @@ class Test_Effective_Asset_Cache_Headers extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that when an asset has no far-future headers but has conditional caching (ETag/Last-Modified), status is 'recommended'.
+	 * Test that when an asset has no effective caching headers but has conditional caching (ETag/Last-Modified), status is 'recommended'.
 	 *
 	 * @covers ::perflab_effective_asset_cache_headers_assets_test
 	 * @covers ::perflab_effective_asset_cache_headers_check_assets
