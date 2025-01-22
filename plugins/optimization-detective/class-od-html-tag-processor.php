@@ -186,18 +186,20 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	private $bookmarked_open_stacks = array();
 
 	/**
-	 * XPath for the current tag.
+	 * Stored XPath for the current tag.
 	 *
-	 * This is used so that repeated calls to {@see self::get_xpath()} won't needlessly reconstruct the string. This
-	 * gets cleared whenever {@see self::open_tags()} iterates to the next tag.
+	 * This is used so that repeated calls to {@see self::get_stored_xpath()} won't needlessly reconstruct the string.
+	 * This gets cleared whenever {@see self::open_tags()} iterates to the next tag.
+	 *
+	 * @todo Remove this once the XPath transitional period is over.
 	 *
 	 * @since 0.4.0
 	 * @var string|null
 	 */
-	private $current_xpath = null;
+	private $current_stored_xpath = null;
 
 	/**
-	 * Transitional XPath for the current tag.
+	 * (Transitional) XPath for the current tag.
 	 *
 	 * This is used to store the old XPath format in a transitional period until which new URL Metrics are expected to
 	 * have been collected to purge out references to the old format.
@@ -205,7 +207,7 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	 * @since n.e.x.t
 	 * @var string|null
 	 */
-	private $transitional_current_xpath = null;
+	private $current_xpath = null;
 
 	/**
 	 * Whether the previous tag does not expect a closer.
@@ -312,8 +314,8 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	 * @return bool Whether a token was parsed.
 	 */
 	public function next_token(): bool {
-		$this->current_xpath              = null; // Clear cache.
-		$this->transitional_current_xpath = null; // Clear cache.
+		$this->current_stored_xpath = null; // Clear cache.
+		$this->current_xpath        = null; // Clear cache.
 		++$this->cursor_move_count;
 		if ( ! parent::next_token() ) {
 			$this->open_stack_tags       = array();
@@ -639,13 +641,14 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	 * index of the preceding node set. So it has to rather be written `.../*[1][self::DIV]/*[2][self::DIV]`.
 	 * Note that the first three levels lack any node index whereas the third level includes a disambiguating
 	 * attribute predicate (e.g. `/HTML/BODY/DIV[@id="page"]`) for the reasons explained in {@see self::XPATH_PATTERN}.
+	 * This predicate will be included once the transitional period is over.
 	 *
 	 * @since 0.4.0
+	 * @todo Replace the logic herein with what is in get_stored_xpath() once the transitional period is over.
 	 *
-	 * @param bool $transitional_format Whether to use the transitional XPath format. Default true.
 	 * @return string XPath.
 	 */
-	public function get_xpath( bool $transitional_format = true ): string {
+	public function get_xpath(): string {
 		/*
 		 * This transitional format is used by default for all extensions. The non-transitional format is used only in
 		 * od_optimize_template_output_buffer() when setting the data-od-xpath attribute. This is so that the new format
@@ -653,26 +656,40 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 		 * transitional format can be eliminated. See the corresponding logic in OD_Element for normalizing both the
 		 * old and new XPath formats to use the transitional format.
 		 */
-		if ( $transitional_format ) {
-			if ( null === $this->transitional_current_xpath ) {
-				$this->transitional_current_xpath = '';
-				foreach ( $this->get_indexed_breadcrumbs() as $i => list( $tag_name, $index, $attributes ) ) {
-					if ( $i < 2 || ( 2 === $i && '/HTML/BODY' === $this->transitional_current_xpath ) ) {
-						$this->transitional_current_xpath .= "/$tag_name";
-					} else {
-						$this->transitional_current_xpath .= sprintf( '/*[%d][self::%s]', $index + 1, $tag_name );
-					}
-				}
-			}
-			return $this->transitional_current_xpath;
-		}
-
 		if ( null === $this->current_xpath ) {
 			$this->current_xpath = '';
 			foreach ( $this->get_indexed_breadcrumbs() as $i => list( $tag_name, $index, $attributes ) ) {
-				if ( $i < 2 ) {
+				if ( $i < 2 || ( 2 === $i && '/HTML/BODY' === $this->current_xpath ) ) {
 					$this->current_xpath .= "/$tag_name";
-				} elseif ( 2 === $i && '/HTML/BODY' === $this->current_xpath ) {
+				} else {
+					$this->current_xpath .= sprintf( '/*[%d][self::%s]', $index + 1, $tag_name );
+				}
+			}
+		}
+		return $this->current_xpath;
+	}
+
+	/**
+	 * Gets stored XPath for the current open tag.
+	 *
+	 * This method is temporary for a transition period while new URL Metrics are collected for active installs. Once
+	 * the transition period is over, the logic in this method can be moved to {@see self::get_xpath()} and this method
+	 * can simply be an alias for that one. See related logic in {@see OD_Element::get_xpath()}. This function is only
+	 * used internally by Optimization Detective in {@see od_optimize_template_output_buffer()}.
+	 *
+	 * @since n.e.x.t
+	 * @todo Move the logic in this method to the get_xpath() method and let this be an alias for that method once the transitional period is over.
+	 * @access private
+	 *
+	 * @return string XPath.
+	 */
+	public function get_stored_xpath(): string {
+		if ( null === $this->current_stored_xpath ) {
+			$this->current_stored_xpath = '';
+			foreach ( $this->get_indexed_breadcrumbs() as $i => list( $tag_name, $index, $attributes ) ) {
+				if ( $i < 2 ) {
+					$this->current_stored_xpath .= "/$tag_name";
+				} elseif ( 2 === $i && '/HTML/BODY' === $this->current_stored_xpath ) {
 					$segment = "/$tag_name";
 					foreach ( $attributes as $attribute_name => $attribute_value ) {
 						$segment .= sprintf(
@@ -681,13 +698,13 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 							$attribute_value // Note: $attribute_value has already been validated to only contain safe characters /^[a-zA-Z0-9_.\s:-]*/ which do not need escaping.
 						);
 					}
-					$this->current_xpath .= $segment;
+					$this->current_stored_xpath .= $segment;
 				} else {
-					$this->current_xpath .= sprintf( '/*[%d][self::%s]', $index + 1, $tag_name );
+					$this->current_stored_xpath .= sprintf( '/*[%d][self::%s]', $index + 1, $tag_name );
 				}
 			}
 		}
-		return $this->current_xpath;
+		return $this->current_stored_xpath;
 	}
 
 	/**
