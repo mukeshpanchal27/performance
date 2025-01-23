@@ -8,7 +8,7 @@
 
 // If uninstall.php is not called by WordPress, bail.
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
-	exit;
+	exit; // @codeCoverageIgnore
 }
 
 require_once __DIR__ . '/storage/class-od-url-metrics-post-type.php';
