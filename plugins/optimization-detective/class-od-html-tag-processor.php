@@ -262,7 +262,12 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 		if ( null !== $query ) {
 			throw new InvalidArgumentException( esc_html__( 'Processor subclass does not support queries.', 'optimization-detective' ) );
 		}
-		return parent::next_tag( array( 'tag_closers' => 'visit' ) );
+
+		// Elements in the Admin Bar are not relevant for optimization, so this loop ensures that no tags in the Admin Bar are visited.
+		do {
+			$matched = parent::next_tag( array( 'tag_closers' => 'visit' ) );
+		} while ( $matched && $this->is_admin_bar() );
+		return $matched;
 	}
 
 	/**
@@ -705,6 +710,23 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 			}
 		}
 		return $this->current_stored_xpath;
+	}
+
+	/**
+	 * Returns whether the processor is currently at or inside the admin bar.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return bool Whether at or inside the admin bar.
+	 */
+	private function is_admin_bar(): bool {
+		return (
+			isset( $this->open_stack_tags[2], $this->open_stack_attributes[2]['id'] )
+			&&
+			'DIV' === $this->open_stack_tags[2]
+			&&
+			'wpadminbar' === $this->open_stack_attributes[2]['id']
+		);
 	}
 
 	/**
