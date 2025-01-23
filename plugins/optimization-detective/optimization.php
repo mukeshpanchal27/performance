@@ -108,7 +108,7 @@ function od_maybe_add_template_output_buffer_filter(): void {
 					foreach ( $reasons as $reason ) {
 						wp_print_inline_script_tag(
 							sprintf(
-								'console.log( %s );',
+								'console.info( %s );',
 								(string) wp_json_encode( '[Optimization Detective] ' . $reason )
 							),
 							array( 'type' => 'module' )
