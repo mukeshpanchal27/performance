@@ -22,13 +22,16 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function perflab_bfcache_compatibility_headers_check(): array {
 	$result = array(
-		'label'       => __( 'The Cache-Control response header for pages ensures fast back/forward navigation.', 'performance-lab' ),
+		'label'       => __( 'The Cache-Control page header is compatible with fast back/forward navigations', 'performance-lab' ),
 		'status'      => 'good',
 		'badge'       => array(
 			'label' => __( 'Performance', 'performance-lab' ),
 			'color' => 'blue',
 		),
-		'description' => '<p>' . esc_html__( 'If the Cache-Control response header includes directives like no-store, no-cache, or max-age=0 then it can prevent instant back/forward navigations (using the browser bfcache). Your site is configured properly.', 'performance-lab' ) . '</p>',
+		'description' => '<p>' . wp_kses(
+			__( 'If the <code>Cache-Control</code> page response header includes directives like <code>no-store</code>, <code>no-cache</code>, or <code>max-age=0</code> then it can prevent instant back/forward navigations (using the browser bfcache). Your site is configured properly.', 'performance-lab' ),
+			array( 'code' => array() )
+		) . '</p>',
 		'actions'     => '',
 		'test'        => 'perflab_cch_cache_control_header_check',
 	);
@@ -42,12 +45,12 @@ function perflab_bfcache_compatibility_headers_check(): array {
 	);
 
 	if ( is_wp_error( $response ) ) {
-		$result['label']       = __( 'Error checking cache settings', 'performance-lab' );
+		$result['label']       = __( 'Unable to check whether the Cache-Control page header is compatible with fast back/forward navigations', 'performance-lab' );
 		$result['status']      = 'recommended';
 		$result['description'] = '<p>' . wp_kses(
 			sprintf(
 				/* translators: 1: the error code, 2: the error message */
-				__( 'The request to check the Cache-Control response header responded with error code <code>%1$s</code> and the following error message: %2$s.', 'performance-lab' ),
+				__( 'The request to check the <code>Cache-Control</code> response header for the home page resulted in an error with code <code>%1$s</code> and the following message: %2$s.', 'performance-lab' ),
 				esc_html( (string) $response->get_error_code() ),
 				esc_html( rtrim( $response->get_error_message(), '.' ) )
 			),
@@ -74,17 +77,33 @@ function perflab_bfcache_compatibility_headers_check(): array {
 			}
 		}
 
-		$flagged_headers_string = implode( ', ', $flagged_headers );
-		if ( '' !== $flagged_headers_string ) {
-			$result['label']       = __( 'Cache-Control header is preventing fast back/forward navigations', 'performance-lab' );
+		if ( count( $flagged_headers ) > 0 ) {
+			$result['label']       = __( 'The Cache-Control page header is preventing fast back/forward navigations', 'performance-lab' );
 			$result['status']      = 'recommended';
 			$result['description'] = sprintf(
-				'<p>%s</p>',
-				sprintf(
-					/* translators: %s: Cache-Control header value */
-					esc_html__( 'Cache-Control headers are set to %s. This can affect the performance of your site by preventing fast back/forward navigations (via browser bfcache).', 'performance-lab' ),
-					$flagged_headers_string
-				)
+				'<p>%s %s</p>',
+				wp_kses(
+					sprintf(
+						/* translators: %s: problematic directive(s) */
+						_n(
+							'The <code>Cache-Control</code> response header for the home page includes the following directive: %s.',
+							'The <code>Cache-Control</code> response header for the home page includes the following directives: %s.',
+							count( $flagged_headers ),
+							'performance-lab'
+						),
+						implode(
+							', ',
+							array_map(
+								static function ( $header ) {
+									return "<code>$header</code>";
+								},
+								$flagged_headers
+							)
+						)
+					),
+					array( 'code' => array() )
+				),
+				esc_html__( 'This can affect the performance of your site by preventing fast back/forward navigations (via browser bfcache).', 'performance-lab' )
 			);
 			break;
 		}

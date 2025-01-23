@@ -82,32 +82,32 @@ class Test_BFCache_Compatibility_Headers extends WP_UnitTestCase {
 			'headers_not_set'    => array(
 				$this->build_response( 200, array( 'cache-control' => '' ) ),
 				'good',
-				'If the Cache-Control response header includes directives like no-store, no-cache, or max-age=0 then it can prevent instant back/forward navigations (using the browser bfcache). Your site is configured properly.',
+				'If the <code>Cache-Control</code> page response header includes directives like',
 			),
 			'no_store'           => array(
 				$this->build_response( 200, array( 'cache-control' => 'no-store' ) ),
 				'recommended',
-				'Cache-Control headers are set to no-store',
+				'The <code>Cache-Control</code> response header for the home page includes the following directive: <code>no-store</code>',
 			),
 			'no_cache'           => array(
 				$this->build_response( 200, array( 'cache-control' => 'no-cache' ) ),
 				'recommended',
-				'Cache-Control headers are set to no-cache',
+				'The <code>Cache-Control</code> response header for the home page includes the following directive: <code>no-cache</code>',
 			),
 			'max_age_0'          => array(
 				$this->build_response( 200, array( 'cache-control' => 'max-age=0' ) ),
 				'recommended',
-				'Cache-Control headers are set to max-age=0',
+				'The <code>Cache-Control</code> response header for the home page includes the following directive: <code>max-age=0</code>',
 			),
 			'max_age_0_no_store' => array(
 				$this->build_response( 200, array( 'cache-control' => 'max-age=0, no-store' ) ),
 				'recommended',
-				'Cache-Control headers are set to no-store, max-age=0',
+				'The <code>Cache-Control</code> response header for the home page includes the following directives: <code>no-store</code>, <code>max-age=0</code>',
 			),
 			'error'              => array(
 				new WP_Error( 'http_request_failed', 'HTTP request failed' ),
 				'recommended',
-				'The request to check the Cache-Control response header responded with error code',
+				'The request to check the <code>Cache-Control</code> response header for the home page resulted in an error with code',
 			),
 		);
 	}
