@@ -233,11 +233,6 @@ function od_optimize_template_output_buffer( string $buffer ): string {
 			continue;
 		}
 
-		// Elements in the Admin Bar are not relevant for optimization, so skip passing them to tag visitors.
-		if ( $processor->is_admin_bar() ) {
-			continue;
-		}
-
 		$tracked_in_url_metrics = false;
 		$processor->set_bookmark( $current_tag_bookmark ); // TODO: Should we break if this returns false?
 
