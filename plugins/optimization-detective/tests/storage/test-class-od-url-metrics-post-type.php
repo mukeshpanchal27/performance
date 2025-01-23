@@ -95,7 +95,16 @@ class Test_OD_Storage_Post_Type extends WP_UnitTestCase {
 					'height' => 480,
 				),
 				'timestamp' => microtime( true ),
-				'elements'  => array(),
+				'elements'  => array(
+					array(
+						'xpath'              => '/HTML/BODY/DIV[@id=\'page\']/*[1][self::IMG]',
+						'isLCP'              => false,
+						'isLCPCandidate'     => true,
+						'intersectionRatio'  => 0.123,
+						'intersectionRect'   => $this->get_sample_dom_rect(),
+						'boundingClientRect' => $this->get_sample_dom_rect(),
+					),
+				),
 			),
 		);
 
