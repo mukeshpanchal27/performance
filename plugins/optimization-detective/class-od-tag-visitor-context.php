@@ -16,7 +16,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Context for tag visitors invoked for each tag while walking over a document.
  *
  * @since 0.4.0
- * @access private
  *
  * @property-read OD_URL_Metric_Group_Collection $url_metrics_group_collection Deprecated property accessed via magic getter. Use the url_metric_group_collection property instead.
  */
@@ -25,6 +24,7 @@ final class OD_Tag_Visitor_Context {
 	/**
 	 * HTML tag processor.
 	 *
+	 * @since 0.4.0
 	 * @var OD_HTML_Tag_Processor
 	 * @readonly
 	 */
@@ -33,6 +33,7 @@ final class OD_Tag_Visitor_Context {
 	/**
 	 * URL Metric group collection.
 	 *
+	 * @since 0.4.0
 	 * @var OD_URL_Metric_Group_Collection
 	 * @readonly
 	 */
@@ -41,6 +42,7 @@ final class OD_Tag_Visitor_Context {
 	/**
 	 * Link collection.
 	 *
+	 * @since 0.4.0
 	 * @var OD_Link_Collection
 	 * @readonly
 	 */
@@ -48,6 +50,8 @@ final class OD_Tag_Visitor_Context {
 
 	/**
 	 * Constructor.
+	 *
+	 * @since 0.4.0
 	 *
 	 * @param OD_HTML_Tag_Processor          $processor                   HTML tag processor.
 	 * @param OD_URL_Metric_Group_Collection $url_metric_group_collection URL Metric group collection.
