@@ -31,3 +31,7 @@ require_once __DIR__ . '/avif-support/hooks.php';
 // AVIF headers site health check.
 require_once __DIR__ . '/avif-headers/helper.php';
 require_once __DIR__ . '/avif-headers/hooks.php';
+
+// Effective Asset Cache Headers site health check.
+require_once __DIR__ . '/effective-asset-cache-headers/helper.php';
+require_once __DIR__ . '/effective-asset-cache-headers/hooks.php';
