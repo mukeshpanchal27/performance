@@ -46,12 +46,13 @@ function perflab_bfcache_compatibility_headers_check(): array {
 		$result['status']      = 'recommended';
 		$result['description'] = '<p>' . wp_kses(
 			sprintf(
-				/* translators: %s is the error code */
-				__( 'The request to check the Cache-Control response header responded with error code <code>%s</code> and the following error message:', 'performance-lab' ),
-				esc_html( (string) $response->get_error_code() )
+				/* translators: 1: the error code, 2: the error message */
+				__( 'The request to check the Cache-Control response header responded with error code <code>%1$s</code> and the following error message: %2$s.', 'performance-lab' ),
+				esc_html( (string) $response->get_error_code() ),
+				esc_html( rtrim( $response->get_error_message(), '.' ) )
 			),
 			array( 'code' => array() )
-		) . '</p><blockquote>' . esc_html( $response->get_error_message() ) . '</blockquote>';
+		) . '</p>';
 		return $result;
 	}
 
