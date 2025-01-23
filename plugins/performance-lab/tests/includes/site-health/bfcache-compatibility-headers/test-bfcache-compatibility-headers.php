@@ -39,9 +39,9 @@ class Test_BFCache_Compatibility_Headers extends WP_UnitTestCase {
 		);
 
 		$tests = perflab_bfcache_add_compatibility_test( $tests );
-		$this->assertArrayHasKey( 'perflab_cch_cache_control', $tests['direct'] );
-		$this->assertEquals( 'Cache-Control headers may prevent fast back/forward navigation', $tests['direct']['perflab_cch_cache_control']['label'] );
-		$this->assertEquals( 'perflab_bfcache_check_compatibility', $tests['direct']['perflab_cch_cache_control']['test'] );
+		$this->assertArrayHasKey( 'perflab_bfcache_compatibility_headers', $tests['direct'] );
+		$this->assertEquals( 'Cache-Control headers may prevent fast back/forward navigation', $tests['direct']['perflab_bfcache_compatibility_headers']['label'] );
+		$this->assertEquals( 'perflab_bfcache_check_compatibility', $tests['direct']['perflab_bfcache_compatibility_headers']['test'] );
 	}
 
 	/**
@@ -107,7 +107,7 @@ class Test_BFCache_Compatibility_Headers extends WP_UnitTestCase {
 			'error'              => array(
 				new WP_Error( 'http_request_failed', 'HTTP request failed' ),
 				'recommended',
-				'There was an error while checking your Cache-Control response header',
+				'The request to check the Cache-Control response header responded with error code',
 			),
 		);
 	}

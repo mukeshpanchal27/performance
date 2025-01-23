@@ -47,7 +47,7 @@ function perflab_bfcache_check_compatibility(): array {
 		$result['description'] = '<p>' . wp_kses(
 			sprintf(
 				/* translators: %s is the error code */
-				__( 'There was an error while checking your Cache-Control response header. Error code: <code>%s</code> and the following error message:', 'performance-lab' ),
+				__( 'The request to check the Cache-Control response header responded with error code <code>%s</code> and the following error message:', 'performance-lab' ),
 				esc_html( (string) $response->get_error_code() )
 			),
 			array( 'code' => array() )

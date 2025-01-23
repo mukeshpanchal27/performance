@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return array{direct: array<string, array{label: string, test: string}>} Amended tests.
  */
 function perflab_bfcache_add_compatibility_test( array $tests ): array {
-	$tests['direct']['perflab_cch_cache_control'] = array(
+	$tests['direct']['perflab_bfcache_compatibility_headers'] = array(
 		'label' => __( 'Cache-Control headers may prevent fast back/forward navigation', 'performance-lab' ),
 		'test'  => 'perflab_bfcache_check_compatibility',
 	);
