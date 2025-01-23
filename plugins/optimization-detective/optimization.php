@@ -82,9 +82,8 @@ function od_buffer_output( $passthrough ) {
 function od_maybe_add_template_output_buffer_filter(): void {
 	if (
 		! od_can_optimize_response() ||
-		od_is_rest_api_unavailable() ||
+		( od_is_rest_api_unavailable() && ( wp_get_environment_type() !== 'local' || class_exists( 'Test_OD_Optimization' ) ) ) ||
 		isset( $_GET['optimization_detective_disabled'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-
 	) {
 		return;
 	}
