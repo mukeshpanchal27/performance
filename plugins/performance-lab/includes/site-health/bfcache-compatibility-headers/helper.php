@@ -59,25 +59,22 @@ function perflab_bfcache_compatibility_headers_check(): array {
 		return $result;
 	}
 
-	$cache_control_header = wp_remote_retrieve_header( $response, 'cache-control' );
-	if ( is_string( $cache_control_header ) && '' === $cache_control_header ) {
+	$cache_control_headers = wp_remote_retrieve_header( $response, 'cache-control' );
+	if ( '' === $cache_control_headers ) {
 		// The Cache-Control header is not set, so it does not prevent bfcache. Return the default result.
 		return $result;
 	}
 
-	$cache_control_header = (array) $cache_control_header;
-	foreach ( $cache_control_header as $header ) {
-		$header           = strtolower( $header );
-		$headers_to_check = array( 'no-store', 'no-cache', 'max-age=0' );
-		$flagged_headers  = array();
-
-		foreach ( $headers_to_check as $header_to_check ) {
-			if ( is_int( strpos( $header, $header_to_check ) ) ) {
-				$flagged_headers[] = $header_to_check;
+	foreach ( (array) $cache_control_headers as $cache_control_header ) {
+		$cache_control_header = strtolower( $cache_control_header );
+		$found_directives     = array();
+		foreach ( array( 'no-store', 'no-cache', 'max-age=0' ) as $directive ) {
+			if ( str_contains( $cache_control_header, $directive ) ) {
+				$found_directives[] = $directive;
 			}
 		}
 
-		if ( count( $flagged_headers ) > 0 ) {
+		if ( count( $found_directives ) > 0 ) {
 			$result['label']       = __( 'The Cache-Control page header is preventing fast back/forward navigations', 'performance-lab' );
 			$result['status']      = 'recommended';
 			$result['description'] = sprintf(
@@ -88,7 +85,7 @@ function perflab_bfcache_compatibility_headers_check(): array {
 						_n(
 							'The <code>Cache-Control</code> response header for the home page includes the following directive: %s.',
 							'The <code>Cache-Control</code> response header for the home page includes the following directives: %s.',
-							count( $flagged_headers ),
+							count( $found_directives ),
 							'performance-lab'
 						),
 						implode(
@@ -97,7 +94,7 @@ function perflab_bfcache_compatibility_headers_check(): array {
 								static function ( $header ) {
 									return "<code>$header</code>";
 								},
-								$flagged_headers
+								$found_directives
 							)
 						)
 					),
