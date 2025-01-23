@@ -87,27 +87,27 @@ class Test_BFCache_Compatibility_Headers extends WP_UnitTestCase {
 			'no_store'           => array(
 				$this->build_response( 200, array( 'cache-control' => 'no-store' ) ),
 				'recommended',
-				'The <code>Cache-Control</code> response header for the home page includes the following directive: <code>no-store</code>',
+				'<p>The <code>Cache-Control</code> response header for an unauthenticated request to the home page includes the following directive: <code>no-store</code>',
 			),
 			'no_cache'           => array(
 				$this->build_response( 200, array( 'cache-control' => 'no-cache' ) ),
 				'recommended',
-				'The <code>Cache-Control</code> response header for the home page includes the following directive: <code>no-cache</code>',
+				'<p>The <code>Cache-Control</code> response header for an unauthenticated request to the home page includes the following directive: <code>no-cache</code>',
 			),
 			'max_age_0'          => array(
 				$this->build_response( 200, array( 'cache-control' => 'max-age=0' ) ),
 				'recommended',
-				'The <code>Cache-Control</code> response header for the home page includes the following directive: <code>max-age=0</code>',
+				'<p>The <code>Cache-Control</code> response header for an unauthenticated request to the home page includes the following directive: <code>max-age=0</code>',
 			),
 			'max_age_0_no_store' => array(
 				$this->build_response( 200, array( 'cache-control' => 'max-age=0, no-store' ) ),
 				'recommended',
-				'The <code>Cache-Control</code> response header for the home page includes the following directives: <code>no-store</code>, <code>max-age=0</code>',
+				'<p>The <code>Cache-Control</code> response header for an unauthenticated request to the home page includes the following directives: <code>no-store</code>, <code>max-age=0</code>',
 			),
 			'error'              => array(
 				new WP_Error( 'http_request_failed', 'HTTP request failed' ),
 				'recommended',
-				'The request to check the <code>Cache-Control</code> response header for the home page resulted in an error with code',
+				'The unauthenticated request to check the <code>Cache-Control</code> response header for the home page resulted in an error with code',
 			),
 		);
 	}

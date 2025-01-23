@@ -29,7 +29,7 @@ function perflab_bfcache_compatibility_headers_check(): array {
 			'color' => 'blue',
 		),
 		'description' => '<p>' . wp_kses(
-			__( 'If the <code>Cache-Control</code> page response header includes directives like <code>no-store</code>, <code>no-cache</code>, or <code>max-age=0</code> then it can prevent instant back/forward navigations (using the browser bfcache). Your site is configured properly.', 'performance-lab' ),
+			__( 'If the <code>Cache-Control</code> page response header includes directives like <code>no-store</code>, <code>no-cache</code>, or <code>max-age=0</code> then it can prevent instant back/forward navigations (using the browser bfcache). These are not present for unauthenticated requests on your site, so it is configured properly. Note that WordPress adds these directives for logged-in page responses.', 'performance-lab' ),
 			array( 'code' => array() )
 		) . '</p>',
 		'actions'     => '',
@@ -50,7 +50,7 @@ function perflab_bfcache_compatibility_headers_check(): array {
 		$result['description'] = '<p>' . wp_kses(
 			sprintf(
 				/* translators: 1: the error code, 2: the error message */
-				__( 'The request to check the <code>Cache-Control</code> response header for the home page resulted in an error with code <code>%1$s</code> and the following message: %2$s.', 'performance-lab' ),
+				__( 'The unauthenticated request to check the <code>Cache-Control</code> response header for the home page resulted in an error with code <code>%1$s</code> and the following message: %2$s.', 'performance-lab' ),
 				esc_html( (string) $response->get_error_code() ),
 				esc_html( rtrim( $response->get_error_message(), '.' ) )
 			),
@@ -83,8 +83,8 @@ function perflab_bfcache_compatibility_headers_check(): array {
 					sprintf(
 						/* translators: %s: problematic directive(s) */
 						_n(
-							'The <code>Cache-Control</code> response header for the home page includes the following directive: %s.',
-							'The <code>Cache-Control</code> response header for the home page includes the following directives: %s.',
+							'The <code>Cache-Control</code> response header for an unauthenticated request to the home page includes the following directive: %s.',
+							'The <code>Cache-Control</code> response header for an unauthenticated request to the home page includes the following directives: %s.',
 							count( $found_directives ),
 							'performance-lab'
 						),
