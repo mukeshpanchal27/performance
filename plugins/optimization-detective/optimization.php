@@ -220,7 +220,8 @@ function od_optimize_template_output_buffer( string $buffer ): string {
 		od_get_url_metric_freshness_ttl()
 	);
 	$link_collection      = new OD_Link_Collection();
-	$tag_visitor_context  = new OD_Tag_Visitor_Context( $processor, $group_collection, $link_collection );
+	$visited_tag_state    = new OD_Visited_Tag_State();
+	$tag_visitor_context  = new OD_Tag_Visitor_Context( $processor, $group_collection, $link_collection, $visited_tag_state );
 	$current_tag_bookmark = 'optimization_detective_current_tag';
 	$visitors             = iterator_to_array( $tag_visitor_registry );
 
@@ -237,8 +238,11 @@ function od_optimize_template_output_buffer( string $buffer ): string {
 		$processor->set_bookmark( $current_tag_bookmark ); // TODO: Should we break if this returns false?
 
 		foreach ( $visitors as $visitor ) {
-			$cursor_move_count      = $processor->get_cursor_move_count();
-			$tracked_in_url_metrics = $visitor( $tag_visitor_context ) || $tracked_in_url_metrics;
+			$cursor_move_count    = $processor->get_cursor_move_count();
+			$visitor_return_value = $visitor( $tag_visitor_context );
+			if ( true === $visitor_return_value ) {
+				$tracked_in_url_metrics = true;
+			}
 
 			// If the visitor traversed HTML tags, we need to go back to this tag so that in the next iteration any
 			// relevant tag visitors may apply, in addition to properly setting the data-od-xpath on this tag below.
@@ -248,11 +252,17 @@ function od_optimize_template_output_buffer( string $buffer ): string {
 		}
 		$processor->release_bookmark( $current_tag_bookmark );
 
+		if ( $visited_tag_state->is_tag_tracked() ) {
+			$tracked_in_url_metrics = true;
+		}
+
 		if ( $tracked_in_url_metrics && $needs_detection ) {
 			// TODO: Replace get_stored_xpath with get_xpath once the transitional period is over.
 			$xpath = $processor->get_stored_xpath();
 			$processor->set_meta_attribute( 'xpath', $xpath );
 		}
+
+		$visited_tag_state->reset();
 	} while ( $processor->next_open_tag() );
 
 	// Send any preload links in a Link response header and in a LINK tag injected at the end of the HEAD.

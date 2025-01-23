@@ -49,6 +49,14 @@ final class OD_Tag_Visitor_Context {
 	public $link_collection;
 
 	/**
+	 * Visited tag state.
+	 *
+	 * @since n.e.x.t
+	 * @var OD_Visited_Tag_State
+	 */
+	private $visited_tag_state;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 0.4.0
@@ -56,11 +64,24 @@ final class OD_Tag_Visitor_Context {
 	 * @param OD_HTML_Tag_Processor          $processor                   HTML tag processor.
 	 * @param OD_URL_Metric_Group_Collection $url_metric_group_collection URL Metric group collection.
 	 * @param OD_Link_Collection             $link_collection             Link collection.
+	 * @param OD_Visited_Tag_State           $visited_tag_state           Visited tag state.
 	 */
-	public function __construct( OD_HTML_Tag_Processor $processor, OD_URL_Metric_Group_Collection $url_metric_group_collection, OD_Link_Collection $link_collection ) {
+	public function __construct( OD_HTML_Tag_Processor $processor, OD_URL_Metric_Group_Collection $url_metric_group_collection, OD_Link_Collection $link_collection, OD_Visited_Tag_State $visited_tag_state ) {
 		$this->processor                   = $processor;
 		$this->url_metric_group_collection = $url_metric_group_collection;
 		$this->link_collection             = $link_collection;
+		$this->visited_tag_state           = $visited_tag_state;
+	}
+
+	/**
+	 * Marks the tag for being tracked in URL Metrics.
+	 *
+	 * Calling this method from a tag visitor has the same effect as a tag visitor returning `true`.
+	 *
+	 * @since n.e.x.t
+	 */
+	public function track_tag(): void {
+		$this->visited_tag_state->track_tag();
 	}
 
 	/**
