@@ -85,11 +85,14 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 									<mspace depth="40px" height="20px" width="100px" style="background: lightblue;"/>
 									<mn>2</mn>
 								</math>
+								<main /><!-- Lack of closing tag intentional to test is_foreign_element(). This causes ::warn() to be called. -->
+								<footer>Copyright 2025</footer>
 							</div>
+							<script>/*...*/</script>
 						</body>
 					</html>
 				',
-				'open_tags'         => array( 'HTML', 'HEAD', 'BODY', 'DIV', 'SVG', 'G', 'PATH', 'CIRCLE', 'G', 'RECT', 'MATH', 'MN', 'MSPACE', 'MN' ),
+				'open_tags'         => array( 'HTML', 'HEAD', 'BODY', 'DIV', 'SVG', 'G', 'PATH', 'CIRCLE', 'G', 'RECT', 'MATH', 'MN', 'MSPACE', 'MN', 'MAIN', 'FOOTER', 'SCRIPT' ),
 				'xpath_breadcrumbs' => array(
 					'/HTML'                        => array( 'HTML' ),
 					'/HTML/HEAD'                   => array( 'HTML', 'HEAD' ),
@@ -105,6 +108,9 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 					'/HTML/BODY/DIV[@id=\'page\']/*[2][self::MATH]/*[1][self::MN]' => array( 'HTML', 'BODY', 'DIV', 'MATH', 'MN' ),
 					'/HTML/BODY/DIV[@id=\'page\']/*[2][self::MATH]/*[2][self::MSPACE]' => array( 'HTML', 'BODY', 'DIV', 'MATH', 'MSPACE' ),
 					'/HTML/BODY/DIV[@id=\'page\']/*[2][self::MATH]/*[3][self::MN]' => array( 'HTML', 'BODY', 'DIV', 'MATH', 'MN' ),
+					'/HTML/BODY/DIV[@id=\'page\']/*[3][self::MAIN]' => array( 'HTML', 'BODY', 'DIV', 'MAIN' ),
+					'/HTML/BODY/DIV[@id=\'page\']/*[3][self::MAIN]/*[1][self::FOOTER]' => array( 'HTML', 'BODY', 'DIV', 'MAIN', 'FOOTER' ), // The self-closing <main /> has no effect in HTML, so it is expected that FOOTER would be parsed as a child of MAIN.
+					'/HTML/BODY/DIV[@id=\'page\']/*[4][self::SCRIPT]' => array( 'HTML', 'BODY', 'DIV', 'SCRIPT' ), // TODO: This is not correct, as the breadcrumbs should be `array( 'HTML', 'BODY', 'SCRIPT' )`. This would be handled automatically by WP_HTML_Processor. See <https://github.com/WordPress/performance/pull/1546>.
 				),
 			),
 			'closing-void-tag'                       => array(
@@ -156,7 +162,7 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 								<track src="https://example.com/track">
 								<wbr>
 
-								<!-- The following are not void -->
+								<!-- The following are not void; these will result in ::warn() being called -->
 								<div>
 								<span>
 								<em>
@@ -411,16 +417,19 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test next_tag(), next_token(), and get_xpath().
+	 * Test next_tag(), next_token(), get_xpath(), expects_closer().
 	 *
 	 * @covers ::next_open_tag
 	 * @covers ::next_tag
 	 * @covers ::next_token
+	 * @covers ::expects_closer
+	 * @covers ::is_foreign_element
 	 * @covers ::get_xpath
 	 * @covers ::get_breadcrumbs
 	 * @covers ::get_indexed_breadcrumbs
 	 * @covers ::get_disambiguating_attributes
 	 * @covers ::is_admin_bar
+	 * @covers ::warn
 	 *
 	 * @dataProvider data_provider_sample_documents
 	 *
@@ -465,6 +474,28 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 		$this->expectException( InvalidArgumentException::class );
 		$p = new OD_HTML_Tag_Processor( '<html></html>' );
 		$p->next_tag( array( 'tag_name' => 'HTML' ) );
+	}
+
+	/**
+	 * Test expects_closer().
+	 *
+	 * @covers ::expects_closer
+	 */
+	public function test_expects_closer(): void {
+		$p = new OD_HTML_Tag_Processor( '<html><body><hr></body></html>' );
+		$this->assertFalse( $p->expects_closer() );
+		while ( $p->next_tag() ) {
+			if ( 'BODY' === $p->get_tag() ) {
+				break;
+			}
+		}
+		$this->assertSame( 'BODY', $p->get_tag() );
+		$this->assertFalse( $p->expects_closer( 'IMG' ) );
+		$this->assertTrue( $p->expects_closer() );
+		$p->next_tag();
+		$this->assertSame( 'HR', $p->get_tag() );
+		$this->assertFalse( $p->expects_closer() );
+		$this->assertTrue( $p->expects_closer( 'DIV' ) );
 	}
 
 	/**
@@ -520,6 +551,8 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 		$this->assertTrue( $did_seek );
 		$this->assertTrue( $saw_head );
 		$this->assertTrue( $saw_body );
+		$this->assertTrue( $processor->has_bookmark( OD_HTML_Tag_Processor::END_OF_HEAD_BOOKMARK ) );
+		$this->assertTrue( $processor->has_bookmark( OD_HTML_Tag_Processor::END_OF_BODY_BOOKMARK ) );
 		$this->assertStringContainsString( $head_injected, $processor->get_updated_html(), 'Only expecting end-of-head injection once document was finalized.' );
 		$this->assertStringContainsString( $body_injected, $processor->get_updated_html(), 'Only expecting end-of-body injection once document was finalized.' );
 
@@ -540,6 +573,53 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 			</html>
 		";
 		$this->assertSame( $expected, $processor->get_updated_html() );
+	}
+
+	/**
+	 * Test get_updated_html() when running out of bookmarks.
+	 *
+	 * @covers ::get_updated_html
+	 * @covers ::warn
+	 */
+	public function test_get_updated_html_when_out_of_bookmarks(): void {
+		$this->setExpectedIncorrectUsage( 'WP_HTML_Tag_Processor::set_bookmark' );
+		$html      = '
+			<html>
+				<head>
+					<meta charset=utf-8>
+				</head>
+				<body>
+					<h1>Hello World</h1>
+				</body>
+			</html>
+		';
+		$processor = new OD_HTML_Tag_Processor( $html );
+		$this->assertTrue( $processor->next_tag() );
+		$this->assertEquals( 'HTML', $processor->get_tag() );
+		$max_bookmarks = max( WP_HTML_Processor::MAX_BOOKMARKS, WP_HTML_Tag_Processor::MAX_BOOKMARKS );
+		for ( $i = 0; $i < $max_bookmarks + 1; $i++ ) {
+			if ( ! $processor->set_bookmark( "bookmark-$i" ) ) {
+				break;
+			}
+		}
+		$processor->append_head_html( '<!-- Failed to append to HEAD -->' );
+		$processor->append_body_html( '<!-- Failed to append to BODY -->' );
+
+		$saw_head = false;
+		$saw_body = false;
+		while ( $processor->next_open_tag() ) {
+			$tag = $processor->get_tag();
+			if ( 'HEAD' === $tag ) {
+				$saw_head = true;
+			} elseif ( 'BODY' === $tag ) {
+				$saw_body = true;
+			}
+		}
+		$this->assertTrue( $saw_head );
+		$this->assertTrue( $saw_body );
+		$this->assertFalse( $processor->has_bookmark( OD_HTML_Tag_Processor::END_OF_HEAD_BOOKMARK ) );
+		$this->assertFalse( $processor->has_bookmark( OD_HTML_Tag_Processor::END_OF_BODY_BOOKMARK ) );
+		$this->assertSame( $html, $processor->get_updated_html() );
 	}
 
 	/**
@@ -575,6 +655,7 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 	 * @covers ::set_bookmark
 	 * @covers ::seek
 	 * @covers ::release_bookmark
+	 * @covers ::get_current_depth
 	 */
 	public function test_bookmarking_and_seeking(): void {
 		$processor = new OD_HTML_Tag_Processor(
@@ -685,6 +766,9 @@ class Test_OD_HTML_Tag_Processor extends WP_UnitTestCase {
 
 		$processor->release_bookmark( 'FIGURE' );
 		$this->assertFalse( $processor->has_bookmark( 'FIGURE' ) );
+
+		$this->assertFalse( $processor->release_bookmark( 'optimization_detective_end_of_head' ) );
+		$this->assertFalse( $processor->release_bookmark( 'optimization_detective_end_of_body' ) );
 
 		// TODO: Try adding too many bookmarks.
 	}

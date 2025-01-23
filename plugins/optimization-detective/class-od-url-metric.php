@@ -45,6 +45,19 @@ if ( ! defined( 'ABSPATH' ) ) {
  *                                viewport: ViewportRect,
  *                                elements: ElementData[]
  *                            }
+ * @phpstan-type JSONSchema   array{
+ *                                type: string|string[],
+ *                                items?: mixed,
+ *                                properties?: array<string, mixed>,
+ *                                patternProperties?: array<string, mixed>,
+ *                                required?: bool,
+ *                                minimum?: int,
+ *                                maximum?: int,
+ *                                pattern?: non-empty-string,
+ *                                additionalProperties?: bool,
+ *                                format?: non-empty-string,
+ *                                readonly?: bool,
+ *                            }
  *
  * @since 0.1.0
  * @access private
@@ -161,7 +174,7 @@ class OD_URL_Metric implements JsonSerializable {
 	 *
 	 * @todo Cache the return value?
 	 *
-	 * @return array<string, mixed> Schema.
+	 * @return JSONSchema Schema.
 	 */
 	public static function get_json_schema(): array {
 		/*

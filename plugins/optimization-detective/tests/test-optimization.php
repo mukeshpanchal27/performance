@@ -335,6 +335,8 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 	 *
 	 * @covers ::od_optimize_template_output_buffer
 	 * @covers ::od_is_response_html_content_type
+	 * @covers OD_Tag_Visitor_Context::__construct
+	 * @covers OD_Tag_Visitor_Context::__get
 	 *
 	 * @dataProvider data_provider_test_od_optimize_template_output_buffer
 	 *
@@ -354,6 +356,16 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 						$this->assertInstanceOf( OD_URL_Metric_Group_Collection::class, $context->url_metrics_group_collection );
 						$this->assertInstanceOf( OD_HTML_Tag_Processor::class, $context->processor );
 						$this->assertInstanceOf( OD_Link_Collection::class, $context->link_collection );
+
+						$error = null;
+						$value = '';
+						try {
+							$value = $context->__get( 'invalid_param' );
+						} catch ( Error $e ) {
+							$error = $e;
+						}
+						$this->assertInstanceOf( Error::class, $error );
+						$this->assertSame( '', $value );
 
 						$this->assertFalse( $context->processor->is_tag_closer() );
 						return $context->processor->get_tag() === 'IMG';
