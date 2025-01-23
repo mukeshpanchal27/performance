@@ -105,20 +105,13 @@ function od_maybe_add_template_output_buffer_filter(): void {
 			add_action(
 				'wp_print_footer_scripts',
 				static function () use ( $reasons ): void {
-					foreach ( $reasons as $reason ) {
-						wp_print_inline_script_tag(
-							sprintf(
-								'console.info( %s );',
-								(string) wp_json_encode( '[Optimization Detective] ' . $reason )
-							),
-							array( 'type' => 'module' )
-						);
-					}
+					od_print_disabled_reasons( $reasons );
 				}
 			);
 		}
 		return;
 	}
+
 	$callback = 'od_optimize_template_output_buffer';
 	if (
 		function_exists( 'perflab_wrap_server_timing' )
@@ -130,6 +123,28 @@ function od_maybe_add_template_output_buffer_filter(): void {
 		$callback = perflab_wrap_server_timing( $callback, 'optimization-detective', 'exist' );
 	}
 	add_filter( 'od_template_output_buffer', $callback );
+}
+
+/**
+ * Prints the reasons why Optimization Detective is not optimizing the current page.
+ *
+ * This is only used when WP_DEBUG is enabled.
+ *
+ * @since n.e.x.t
+ * @access private
+ *
+ * @param string[] $reasons Reason messages.
+ */
+function od_print_disabled_reasons( array $reasons ): void {
+	foreach ( $reasons as $reason ) {
+		wp_print_inline_script_tag(
+			sprintf(
+				'console.info( %s );',
+				(string) wp_json_encode( '[Optimization Detective] ' . $reason )
+			),
+			array( 'type' => 'module' )
+		);
+	}
 }
 
 /**
