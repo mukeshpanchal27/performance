@@ -80,11 +80,43 @@ function od_buffer_output( $passthrough ) {
  * @access private
  */
 function od_maybe_add_template_output_buffer_filter(): void {
-	if (
-		! od_can_optimize_response() ||
-		( od_is_rest_api_unavailable() && ( wp_get_environment_type() !== 'local' || class_exists( 'Test_OD_Optimization' ) ) ) ||
-		isset( $_GET['optimization_detective_disabled'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-	) {
+	$conditions = array(
+		array(
+			'test'   => od_can_optimize_response(),
+			'reason' => __( 'Page is not optimized because od_can_optimize_response() returned false. This can be overridden with the od_can_optimize_response filter.', 'optimization-detective' ),
+		),
+		array(
+			'test'   => ! ( od_is_rest_api_unavailable() && ( wp_get_environment_type() !== 'local' || class_exists( 'Test_OD_Optimization' ) ) ),
+			'reason' => __( 'Page is not optimized because the REST API for storing URL Metrics is not available.', 'optimization-detective' ),
+		),
+		array(
+			'test'   => ! isset( $_GET['optimization_detective_disabled'] ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			'reason' => __( 'Page is not optimized because the URL has the optimization_detective_disabled query parameter.', 'optimization-detective' ),
+		),
+	);
+	$reasons    = array();
+	foreach ( $conditions as $condition ) {
+		if ( ! $condition['test'] ) {
+			$reasons[] = $condition['reason'];
+		}
+	}
+	if ( count( $reasons ) > 0 ) {
+		if ( WP_DEBUG ) {
+			add_action(
+				'wp_print_footer_scripts',
+				static function () use ( $reasons ): void {
+					foreach ( $reasons as $reason ) {
+						wp_print_inline_script_tag(
+							sprintf(
+								'console.log( %s );',
+								(string) wp_json_encode( '[Optimization Detective] ' . $reason )
+							),
+							array( 'type' => 'module' )
+						);
+					}
+				}
+			);
+		}
 		return;
 	}
 	$callback = 'od_optimize_template_output_buffer';
