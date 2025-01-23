@@ -266,6 +266,9 @@ class Test_OD_URL_Metric extends WP_UnitTestCase {
 	/**
 	 * Tests construction.
 	 *
+	 * @covers ::__construct
+	 * @covers ::prepare_data
+	 * @covers ::get_uuid
 	 * @covers ::get_viewport
 	 * @covers ::get_viewport_width
 	 * @covers ::get_timestamp
@@ -363,6 +366,13 @@ class Test_OD_URL_Metric extends WP_UnitTestCase {
 			'intersectionRatio'  => 1.0,
 			'intersectionRect'   => $this->get_sample_dom_rect(),
 			'boundingClientRect' => $this->get_sample_dom_rect(),
+		);
+
+		$data = array(
+			'url'       => home_url( '/' ),
+			'viewport'  => $viewport,
+			'timestamp' => microtime( true ),
+			'elements'  => array( $valid_element ),
 		);
 
 		return array(
@@ -547,6 +557,112 @@ class Test_OD_URL_Metric extends WP_UnitTestCase {
 				'assert' => static function (): void {},
 				'error'  => 'OD_URL_Metric[elements][0][isColorful] is not of type boolean.',
 			),
+
+			'added_immutable_element_property'           => array(
+				'set_up' => static function (): void {
+					add_filter(
+						'od_url_metric_schema_element_item_additional_properties',
+						static function ( array $properties ): array {
+							$properties['isLCP'] = array(
+								'type' => 'string',
+							);
+							return $properties;
+						}
+					);
+				},
+				'data'   => $data,
+				'assert' => static function (): void {},
+				'error'  => '',
+				'wrong'  => 'Filter: &#039;od_url_metric_schema_element_item_additional_properties&#039;',
+			),
+
+			'added_element_property_without_type'        => array(
+				'set_up' => static function (): void {
+					add_filter(
+						'od_url_metric_schema_element_item_additional_properties',
+						static function ( array $properties ): array {
+							$properties['foo'] = array(
+								'minimum' => 1,
+							);
+							return $properties;
+						}
+					);
+				},
+				'data'   => $data,
+				'assert' => function (): void {
+					$this->assertArrayHasKey( 'isLCP', OD_URL_Metric::get_json_schema()['properties']['elements']['items']['properties'] );
+					$this->assertArrayNotHasKey( 'foo', OD_URL_Metric::get_json_schema()['properties']['elements']['items']['properties'] );
+				},
+				'error'  => '',
+				'wrong'  => 'Filter: &#039;od_url_metric_schema_element_item_additional_properties&#039;',
+			),
+
+			'added_element_property_with_invalid_type'   => array(
+				'set_up' => static function (): void {
+					add_filter(
+						'od_url_metric_schema_element_item_additional_properties',
+						static function ( array $properties ): array {
+							$properties['foo'] = array(
+								'type' => null,
+							);
+							return $properties;
+						}
+					);
+				},
+				'data'   => $data,
+				'assert' => function (): void {
+					$this->assertArrayHasKey( 'isLCP', OD_URL_Metric::get_json_schema()['properties']['elements']['items']['properties'] );
+					$this->assertArrayNotHasKey( 'foo', OD_URL_Metric::get_json_schema()['properties']['elements']['items']['properties'] );
+				},
+				'error'  => '',
+				'wrong'  => 'Filter: &#039;od_url_metric_schema_element_item_additional_properties&#039;',
+			),
+
+			'added_element_property_with_required'       => array(
+				'set_up' => static function (): void {
+					add_filter(
+						'od_url_metric_schema_element_item_additional_properties',
+						static function ( array $properties ): array {
+							$properties['foo'] = array(
+								'type'     => 'string',
+								'required' => true,
+							);
+							return $properties;
+						}
+					);
+				},
+				'data'   => $data,
+				'assert' => function (): void {
+					$this->assertArrayHasKey( 'isLCP', OD_URL_Metric::get_json_schema()['properties']['elements']['items']['properties'] );
+					$this->assertArrayHasKey( 'foo', OD_URL_Metric::get_json_schema()['properties']['elements']['items']['properties'] );
+					$this->assertFalse( OD_URL_Metric::get_json_schema()['properties']['elements']['items']['properties']['foo']['required'] );
+				},
+				'error'  => '',
+				'wrong'  => 'Filter: &#039;od_url_metric_schema_element_item_additional_properties&#039;',
+			),
+
+			'added_element_property_invalid_default'     => array(
+				'set_up' => static function (): void {
+					add_filter(
+						'od_url_metric_schema_element_item_additional_properties',
+						static function ( array $properties ): array {
+							$properties['foo'] = array(
+								'type'    => 'string',
+								'default' => 'bard',
+							);
+							return $properties;
+						}
+					);
+				},
+				'data'   => $data,
+				'assert' => function (): void {
+					$this->assertArrayHasKey( 'isLCP', OD_URL_Metric::get_json_schema()['properties']['elements']['items']['properties'] );
+					$this->assertArrayHasKey( 'foo', OD_URL_Metric::get_json_schema()['properties']['elements']['items']['properties'] );
+					$this->assertArrayNotHasKey( 'default', OD_URL_Metric::get_json_schema()['properties']['elements']['items']['properties']['foo'] );
+				},
+				'error'  => '',
+				'wrong'  => 'Filter: &#039;od_url_metric_schema_element_item_additional_properties&#039;',
+			),
 		);
 	}
 
@@ -554,6 +670,7 @@ class Test_OD_URL_Metric extends WP_UnitTestCase {
 	 * Tests construction with extended schema.
 	 *
 	 * @covers ::get_json_schema
+	 * @covers ::extend_schema_with_optional_properties
 	 *
 	 * @dataProvider data_provider_to_test_constructor_with_extended_schema
 	 *
@@ -561,11 +678,15 @@ class Test_OD_URL_Metric extends WP_UnitTestCase {
 	 * @param array<string, mixed> $data   Data.
 	 * @param Closure              $assert Assert.
 	 * @param string               $error  Error.
+	 * @param string               $wrong  Expected doing it wrong.
 	 */
-	public function test_constructor_with_extended_schema( Closure $set_up, array $data, Closure $assert, string $error = '' ): void {
+	public function test_constructor_with_extended_schema( Closure $set_up, array $data, Closure $assert, string $error = '', string $wrong = '' ): void {
 		if ( '' !== $error ) {
 			$this->expectException( OD_Data_Validation_Exception::class );
 			$this->expectExceptionMessage( $error );
+		}
+		if ( '' !== $wrong ) {
+			$this->setExpectedIncorrectUsage( $wrong );
 		}
 		$url_metric_sans_extended_schema = new OD_URL_Metric( $data );
 		$set_up();
