@@ -21,11 +21,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param array{direct: array<string, array{label: string, test: string}>} $tests Site Health Tests.
  * @return array{direct: array<string, array{label: string, test: string}>} Amended tests.
  */
-function perflab_bfcache_add_compatibility_test( array $tests ): array {
+function perflab_bfcache_compatibility_headers_add_test( array $tests ): array {
 	$tests['direct']['perflab_bfcache_compatibility_headers'] = array(
 		'label' => __( 'Cache-Control headers may prevent fast back/forward navigation', 'performance-lab' ),
-		'test'  => 'perflab_bfcache_check_compatibility',
+		'test'  => 'perflab_bfcache_compatibility_headers_check',
 	);
 	return $tests;
 }
-add_filter( 'site_status_tests', 'perflab_bfcache_add_compatibility_test' );
+add_filter( 'site_status_tests', 'perflab_bfcache_compatibility_headers_add_test' );
