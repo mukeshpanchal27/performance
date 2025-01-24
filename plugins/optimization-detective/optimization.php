@@ -80,14 +80,38 @@ function od_buffer_output( $passthrough ) {
  * @access private
  */
 function od_maybe_add_template_output_buffer_filter(): void {
-	if (
-		! od_can_optimize_response() ||
-		od_is_rest_api_unavailable() ||
-		isset( $_GET['optimization_detective_disabled'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-
-	) {
+	$conditions = array(
+		array(
+			'test'   => od_can_optimize_response(),
+			'reason' => __( 'Page is not optimized because od_can_optimize_response() returned false. This can be overridden with the od_can_optimize_response filter.', 'optimization-detective' ),
+		),
+		array(
+			'test'   => ! od_is_rest_api_unavailable() || ( wp_get_environment_type() === 'local' && ! function_exists( 'tests_add_filter' ) ),
+			'reason' => __( 'Page is not optimized because the REST API for storing URL Metrics is not available.', 'optimization-detective' ),
+		),
+		array(
+			'test'   => ! isset( $_GET['optimization_detective_disabled'] ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			'reason' => __( 'Page is not optimized because the URL has the optimization_detective_disabled query parameter.', 'optimization-detective' ),
+		),
+	);
+	$reasons    = array();
+	foreach ( $conditions as $condition ) {
+		if ( ! $condition['test'] ) {
+			$reasons[] = $condition['reason'];
+		}
+	}
+	if ( count( $reasons ) > 0 ) {
+		if ( WP_DEBUG ) {
+			add_action(
+				'wp_print_footer_scripts',
+				static function () use ( $reasons ): void {
+					od_print_disabled_reasons( $reasons );
+				}
+			);
+		}
 		return;
 	}
+
 	$callback = 'od_optimize_template_output_buffer';
 	if (
 		function_exists( 'perflab_wrap_server_timing' )
@@ -99,6 +123,28 @@ function od_maybe_add_template_output_buffer_filter(): void {
 		$callback = perflab_wrap_server_timing( $callback, 'optimization-detective', 'exist' );
 	}
 	add_filter( 'od_template_output_buffer', $callback );
+}
+
+/**
+ * Prints the reasons why Optimization Detective is not optimizing the current page.
+ *
+ * This is only used when WP_DEBUG is enabled.
+ *
+ * @since n.e.x.t
+ * @access private
+ *
+ * @param string[] $reasons Reason messages.
+ */
+function od_print_disabled_reasons( array $reasons ): void {
+	foreach ( $reasons as $reason ) {
+		wp_print_inline_script_tag(
+			sprintf(
+				'console.info( %s );',
+				(string) wp_json_encode( '[Optimization Detective] ' . $reason )
+			),
+			array( 'type' => 'module' )
+		);
+	}
 }
 
 /**

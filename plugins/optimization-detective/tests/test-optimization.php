@@ -216,6 +216,25 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test od_print_disabled_reasons().
+	 *
+	 * @covers ::od_print_disabled_reasons
+	 */
+	public function test_od_print_disabled_reasons(): void {
+		$this->assertSame( '', get_echo( 'od_print_disabled_reasons', array( array() ) ) );
+		$foo_message = get_echo( 'od_print_disabled_reasons', array( array( 'Foo' ) ) );
+		$this->assertStringContainsString( '<script', $foo_message );
+		$this->assertStringContainsString( 'console.info(', $foo_message );
+		$this->assertStringContainsString( '[Optimization Detective] Foo', $foo_message );
+
+		$foo_and_bar_messages = get_echo( 'od_print_disabled_reasons', array( array( 'Foo', 'Bar' ) ) );
+		$this->assertStringContainsString( '<script', $foo_and_bar_messages );
+		$this->assertStringContainsString( 'console.info(', $foo_and_bar_messages );
+		$this->assertStringContainsString( '[Optimization Detective] Foo', $foo_and_bar_messages );
+		$this->assertStringContainsString( '[Optimization Detective] Bar', $foo_and_bar_messages );
+	}
+
+	/**
 	 * Data provider.
 	 *
 	 * @return array<string, mixed> Data.
