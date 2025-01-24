@@ -15,10 +15,11 @@
  * @package optimization-detective
  */
 
-// Exit if accessed directly.
+// @codeCoverageIgnoreStart
 if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+	exit; // Exit if accessed directly.
 }
+// @codeCoverageIgnoreEnd
 
 (
 	/**
@@ -122,10 +123,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 		// Optimization logic.
 		require_once __DIR__ . '/class-od-link-collection.php';
 		require_once __DIR__ . '/class-od-tag-visitor-registry.php';
+		require_once __DIR__ . '/class-od-visited-tag-state.php';
 		require_once __DIR__ . '/class-od-tag-visitor-context.php';
 		require_once __DIR__ . '/optimization.php';
 
 		// Add hooks for the above requires.
 		require_once __DIR__ . '/hooks.php';
+
+		// Load site health checks.
+		require_once __DIR__ . '/site-health.php';
 	}
 );

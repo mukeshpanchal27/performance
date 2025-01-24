@@ -15,10 +15,11 @@
  * @package webp-uploads
  */
 
-// Exit if accessed directly.
+// @codeCoverageIgnoreStart
 if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+	exit; // Exit if accessed directly.
 }
+// @codeCoverageIgnoreEnd
 
 // Define required constants.
 if ( defined( 'WEBP_UPLOADS_VERSION' ) ) {

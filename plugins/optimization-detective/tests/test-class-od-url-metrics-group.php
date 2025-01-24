@@ -415,6 +415,7 @@ class Test_OD_URL_Metric_Group extends WP_UnitTestCase {
 		$lcp_element_xpaths_by_minimum_viewport_widths = array();
 		foreach ( $group_collection as $group ) {
 			$lcp_element = $group->get_lcp_element();
+			$this->assertSame( $lcp_element, $group->get_lcp_element() ); // Check cached result.
 			$width_range = sprintf( '%d:', $group->get_minimum_viewport_width() );
 			if ( $group->get_maximum_viewport_width() !== PHP_INT_MAX ) {
 				$width_range .= $group->get_maximum_viewport_width();

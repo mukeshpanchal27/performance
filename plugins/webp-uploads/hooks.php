@@ -7,9 +7,11 @@
  * @since 1.0.0
  */
 
+// @codeCoverageIgnoreStart
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
+// @codeCoverageIgnoreEnd
 
 /**
  * Hook called by `wp_generate_attachment_metadata` to create the `sources` property for every image
