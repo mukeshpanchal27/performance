@@ -50,7 +50,7 @@ async function checkPluginDirectory( pluginDirectory ) {
 	);
 	if ( ! latestChangelogMatches ) {
 		throw new Error(
-			'Unable to latest version entry in readme changelog.'
+			'Unable to locate latest version entry in readme changelog.'
 		);
 	}
 	const latestChangelogVersion = latestChangelogMatches[ 1 ];
