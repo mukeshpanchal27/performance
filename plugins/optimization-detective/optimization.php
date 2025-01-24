@@ -86,7 +86,7 @@ function od_maybe_add_template_output_buffer_filter(): void {
 			'reason' => __( 'Page is not optimized because od_can_optimize_response() returned false. This can be overridden with the od_can_optimize_response filter.', 'optimization-detective' ),
 		),
 		array(
-			'test'   => ! od_is_rest_api_unavailable() || ( wp_get_environment_type() === 'local' && ! class_exists( 'Test_OD_Optimization' ) ),
+			'test'   => ! od_is_rest_api_unavailable() || ( wp_get_environment_type() === 'local' && ! function_exists( 'tests_add_filter' ) ),
 			'reason' => __( 'Page is not optimized because the REST API for storing URL Metrics is not available.', 'optimization-detective' ),
 		),
 		array(
