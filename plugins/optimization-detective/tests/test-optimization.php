@@ -337,6 +337,11 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 	 * @covers ::od_is_response_html_content_type
 	 * @covers OD_Tag_Visitor_Context::__construct
 	 * @covers OD_Tag_Visitor_Context::__get
+	 * @covers OD_Tag_Visitor_Context::track_tag
+	 * @covers OD_Visited_Tag_State::__construct
+	 * @covers OD_Visited_Tag_State::track_tag
+	 * @covers OD_Visited_Tag_State::is_tag_tracked
+	 * @covers OD_Visited_Tag_State::reset
 	 *
 	 * @dataProvider data_provider_test_od_optimize_template_output_buffer
 	 *
@@ -379,9 +384,11 @@ class Test_OD_Optimization extends WP_UnitTestCase {
 			function ( OD_Tag_Visitor_Registry $tag_visitor_registry ): void {
 				$tag_visitor_registry->register(
 					'video',
-					function ( OD_Tag_Visitor_Context $context ): bool {
+					function ( OD_Tag_Visitor_Context $context ): void {
 						$this->assertFalse( $context->processor->is_tag_closer() );
-						return $context->processor->get_tag() === 'VIDEO';
+						if ( $context->processor->get_tag() === 'VIDEO' ) {
+							$context->track_tag();
+						}
 					}
 				);
 			}
