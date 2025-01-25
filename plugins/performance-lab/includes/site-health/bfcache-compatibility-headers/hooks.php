@@ -3,7 +3,7 @@
  * Hook callbacks used for cache-control headers.
  *
  * @package performance-lab
- * @since n.e.x.t
+ * @since 3.8.0
  */
 
 // @codeCoverageIgnoreStart
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Add the bfcache compatibility check to site health tests.
  *
- * @since n.e.x.t
+ * @since 3.8.0
  * @access private
  *
  * @param array{direct: array<string, array{label: string, test: string}>} $tests Site Health Tests.

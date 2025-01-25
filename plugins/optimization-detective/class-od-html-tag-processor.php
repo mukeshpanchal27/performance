@@ -159,7 +159,7 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	 * Note that currently only the third item will currently be populated (index 2), as this corresponds to tags which
 	 * are children of the `BODY` tag. This is used in {@see self::get_xpath()}.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0-beta1
 	 * @var array<array<string, string>>
 	 */
 	private $open_stack_attributes = array();
@@ -204,7 +204,7 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	 * This is used to store the old XPath format in a transitional period until which new URL Metrics are expected to
 	 * have been collected to purge out references to the old format.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0-beta1
 	 * @var string|null
 	 */
 	private $current_xpath = null;
@@ -582,7 +582,7 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	 * Themes utilize the 'wp-site-blocks' class name in the root `DIV`. Only one attribute is currently returned,
 	 * although potentially more could be returned if additional disambiguation is needed in the future.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0-beta1
 	 *
 	 * @return array<string, string> Disambiguating attributes.
 	 */
@@ -682,7 +682,7 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	 * can simply be an alias for that one. See related logic in {@see OD_Element::get_xpath()}. This function is only
 	 * used internally by Optimization Detective in {@see od_optimize_template_output_buffer()}.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0-beta1
 	 * @todo Move the logic in this method to the get_xpath() method and let this be an alias for that method once the transitional period is over.
 	 * @access private
 	 *
@@ -715,7 +715,7 @@ final class OD_HTML_Tag_Processor extends WP_HTML_Tag_Processor {
 	/**
 	 * Returns whether the processor is currently at or inside the admin bar.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0-beta1
 	 *
 	 * @return bool Whether at or inside the admin bar.
 	 */
