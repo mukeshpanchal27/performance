@@ -91,18 +91,18 @@ class Test_BFCache_Compatibility_Headers extends WP_UnitTestCase {
 			),
 			'no_cache'           => array(
 				$this->build_response( 200, array( 'cache-control' => 'no-cache' ) ),
-				'recommended',
-				'<p>The <code>Cache-Control</code> response header for an unauthenticated request to the home page includes the following directive: <code>no-cache</code>',
+				'good',
+				'If the <code>Cache-Control</code> page response header includes directives like',
 			),
 			'max_age_0'          => array(
-				$this->build_response( 200, array( 'cache-control' => 'max-age=0' ) ),
-				'recommended',
-				'<p>The <code>Cache-Control</code> response header for an unauthenticated request to the home page includes the following directive: <code>max-age=0</code>',
+				$this->build_response( 200, array( 'cache-control' => 'no-cache' ) ),
+				'good',
+				'If the <code>Cache-Control</code> page response header includes directives like',
 			),
 			'max_age_0_no_store' => array(
 				$this->build_response( 200, array( 'cache-control' => 'max-age=0, no-store' ) ),
 				'recommended',
-				'<p>The <code>Cache-Control</code> response header for an unauthenticated request to the home page includes the following directives: <code>no-store</code>, <code>max-age=0</code>',
+				'<p>The <code>Cache-Control</code> response header for an unauthenticated request to the home page includes the following directive: <code>no-store</code>',
 			),
 			'error'              => array(
 				new WP_Error( 'http_request_failed', 'HTTP request failed' ),

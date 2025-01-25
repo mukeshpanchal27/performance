@@ -68,7 +68,7 @@ function perflab_bfcache_compatibility_headers_check(): array {
 	foreach ( (array) $cache_control_headers as $cache_control_header ) {
 		$cache_control_header = strtolower( $cache_control_header );
 		$found_directives     = array();
-		foreach ( array( 'no-store', 'no-cache', 'max-age=0' ) as $directive ) {
+		foreach ( array( 'no-store' ) as $directive ) {
 			if ( str_contains( $cache_control_header, $directive ) ) {
 				$found_directives[] = $directive;
 			}
