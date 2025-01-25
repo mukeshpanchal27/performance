@@ -69,6 +69,10 @@ The [plugin source code](https://github.com/WordPress/performance/tree/trunk/plu
 
 = 0.4.1 =
 
+**Bug Fixes**
+
+* Remove requirement for both mobile and desktop URL metrics to be collected for `preconnect` links to be added. ([1764](https://github.com/WordPress/performance/pull/1764))
+
 = 0.4.0 =
 
 **Enhancements**

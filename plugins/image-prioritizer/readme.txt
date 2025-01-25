@@ -72,6 +72,10 @@ The [plugin source code](https://github.com/WordPress/performance/tree/trunk/plu
 
 = 0.3.1 =
 
+**Bug Fixes**
+
+* Remove erroneous check for resource initiator type when considering whether to submit LCP background image. ([1760](https://github.com/WordPress/performance/pull/1760))
+
 = 0.3.0 =
 
 **Enhancements**

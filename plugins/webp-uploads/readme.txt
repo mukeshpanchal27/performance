@@ -62,6 +62,10 @@ By default, the Modern Image Formats plugin will only generate WebP versions of 
 
 = 2.5.0 =
 
+**Enhancements**
+
+* Switch to `wp_content_img_tag` filter for improved image handling. ([1772](https://github.com/WordPress/performance/pull/1772))
+
 = 2.4.0 =
 
 **Enhancements**

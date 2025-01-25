@@ -121,6 +121,10 @@ Contributions are always welcome! Learn more about how to get involved in the [C
 
 = 1.4.0 =
 
+**Enhancements**
+
+* Implement speculative loading considerations for safer behavior. ([1784](https://github.com/WordPress/performance/pull/1784))
+
 = 1.3.1 =
 
 **Bug Fixes**

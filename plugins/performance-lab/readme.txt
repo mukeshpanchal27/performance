@@ -73,6 +73,12 @@ Contributions are always welcome! Learn more about how to get involved in the [C
 
 = 3.8.0 =
 
+**Enhancements**
+
+* Add Site Health check for `Cache-Control: no-store` page response header which disables bfcache. ([1807](https://github.com/WordPress/performance/pull/1807))
+* Add Site Health test to verify that static assets are served with far-future expires. ([1727](https://github.com/WordPress/performance/pull/1727))
+* Enqueue scripts using `plugins_url()` instead of `plugin_dir_url()`. ([1761](https://github.com/WordPress/performance/pull/1761))
+
 = 3.7.0 =
 
 **Enhancements**
