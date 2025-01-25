@@ -9,26 +9,6 @@
 class Test_BFCache_Compatibility_Headers extends WP_UnitTestCase {
 
 	/**
-	 * Holds mocked response headers for different test scenarios.
-	 *
-	 * @var array<string, array<string, mixed>>
-	 */
-	protected $mocked_responses = array();
-
-	/**
-	 * Setup each test.
-	 */
-	public function setUp(): void {
-		parent::setUp();
-
-		// Clear any filters or mocks.
-		remove_all_filters( 'pre_http_request' );
-
-		// Add the filter to mock HTTP requests.
-		add_filter( 'pre_http_request', array( $this, 'mock_http_requests' ), 10, 3 );
-	}
-
-	/**
 	 * Test that the bfcache compatibility test is added to the site health tests.
 	 *
 	 * @covers ::perflab_bfcache_compatibility_headers_add_test
@@ -64,7 +44,7 @@ class Test_BFCache_Compatibility_Headers extends WP_UnitTestCase {
 	 * @param string                     $expected_message  The expected message.
 	 */
 	public function test_perflab_bfcache_compatibility_headers_check( $response, string $expected_status, string $expected_message ): void {
-		$this->mocked_responses = array( home_url( '/' ) => $response );
+		$this->mock_http_request( $response, home_url( '/' ) );
 
 		$result = perflab_bfcache_compatibility_headers_check();
 
@@ -113,20 +93,23 @@ class Test_BFCache_Compatibility_Headers extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Mock HTTP requests for assets to simulate different responses.
+	 * Mock HTTP response for a given URL.
 	 *
-	 * @param bool                 $response A preemptive return value of an HTTP request. Default false.
-	 * @param array<string, mixed> $args     Request arguments.
-	 * @param string               $url      The request URL.
-	 * @return array<string, mixed>|WP_Error Mocked response.
+	 * @param array<string, mixed>|WP_Error $mocked_response The mocked response.
+	 * @param non-empty-string              $url             The request URL.
 	 */
-	public function mock_http_requests( bool $response, array $args, string $url ) {
-		if ( isset( $this->mocked_responses[ $url ] ) ) {
-			return $this->mocked_responses[ $url ];
-		}
-
-		// If no specific mock set, default to a generic success with no caching.
-		return $this->build_response( 200 );
+	public function mock_http_request( $mocked_response, string $url ): void {
+		add_filter(
+			'pre_http_request',
+			static function ( $pre, $args, $request_url ) use ( $url, $mocked_response ) {
+				if ( $url === $request_url ) {
+					return $mocked_response;
+				}
+				return $pre;
+			},
+			10,
+			3
+		);
 	}
 
 	/**
