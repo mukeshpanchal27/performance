@@ -71,9 +71,11 @@ function perflab_bfcache_compatibility_headers_check(): array {
 			$result['status']      = 'recommended';
 			$result['description'] = sprintf(
 				'<p>%s</p>',
-				wp_kses(
-					__( "The <code>Cache-Control</code> response header for an unauthenticated request to the home page includes the <code>no-store</code> directive. This can affect the performance of your site by preventing fast back/forward navigations (via the browser's bfcache).", 'performance-lab' ),
-					array( 'code' => array() )
+				sprintf(
+					/* translators: 1: Cache-Control, 2: no-store */
+					esc_html__( 'The %1$s response header for an unauthenticated request to the home page includes the %2$s directive. This can affect the performance of your site by preventing fast back/forward navigations (via the browser\'s bfcache).', 'performance-lab' ),
+					'<code>Cache-Control</code>',
+					'<code>no-store</code>'
 				)
 			);
 			break;
