@@ -29,7 +29,7 @@ function perflab_bfcache_compatibility_headers_check(): array {
 			'color' => 'blue',
 		),
 		'description' => '<p>' . wp_kses(
-			__( 'If the <code>Cache-Control</code> page response header includes directives like <code>no-store</code>, <code>no-cache</code>, or <code>max-age=0</code> then it can prevent instant back/forward navigations (using the browser bfcache). These are not present for unauthenticated requests on your site, so it is configured properly. Note that WordPress adds these directives for logged-in page responses.', 'performance-lab' ),
+			__( "If the <code>Cache-Control</code> page response header includes the <code>no-store</code> directive then it can prevent instant back/forward navigations (using the browser's bfcache). This is not present for unauthenticated requests on your site, so it is configured properly. Note that there are other ways that bfcache can be disabled (e.g. you have JavaScript which uses a <code>unload</code> event listener). Also note that WordPress adds this directive for logged-in page responses for privacy/security reasons.", 'performance-lab' ),
 			array( 'code' => array() )
 		) . '</p>',
 		'actions'     => '',
@@ -66,41 +66,17 @@ function perflab_bfcache_compatibility_headers_check(): array {
 	}
 
 	foreach ( (array) $cache_control_headers as $cache_control_header ) {
-		$cache_control_header = strtolower( $cache_control_header );
-		$found_directives     = array();
-		foreach ( array( 'no-store', 'no-cache', 'max-age=0' ) as $directive ) {
-			if ( str_contains( $cache_control_header, $directive ) ) {
-				$found_directives[] = $directive;
-			}
-		}
-
-		if ( count( $found_directives ) > 0 ) {
+		if ( str_contains( strtolower( $cache_control_header ), 'no-store' ) ) {
 			$result['label']       = __( 'The Cache-Control page header is preventing fast back/forward navigations', 'performance-lab' );
 			$result['status']      = 'recommended';
 			$result['description'] = sprintf(
-				'<p>%s %s</p>',
-				wp_kses(
-					sprintf(
-						/* translators: %s: problematic directive(s) */
-						_n(
-							'The <code>Cache-Control</code> response header for an unauthenticated request to the home page includes the following directive: %s.',
-							'The <code>Cache-Control</code> response header for an unauthenticated request to the home page includes the following directives: %s.',
-							count( $found_directives ),
-							'performance-lab'
-						),
-						implode(
-							', ',
-							array_map(
-								static function ( $header ) {
-									return "<code>$header</code>";
-								},
-								$found_directives
-							)
-						)
-					),
-					array( 'code' => array() )
-				),
-				esc_html__( 'This can affect the performance of your site by preventing fast back/forward navigations (via browser bfcache).', 'performance-lab' )
+				'<p>%s</p>',
+				sprintf(
+					/* translators: 1: Cache-Control, 2: no-store */
+					esc_html__( 'The %1$s response header for an unauthenticated request to the home page includes the %2$s directive. This can affect the performance of your site by preventing fast back/forward navigations (via the browser\'s bfcache).', 'performance-lab' ),
+					'<code>Cache-Control</code>',
+					'<code>no-store</code>'
+				)
 			);
 			break;
 		}

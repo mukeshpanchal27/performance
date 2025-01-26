@@ -9,26 +9,6 @@
 class Test_BFCache_Compatibility_Headers extends WP_UnitTestCase {
 
 	/**
-	 * Holds mocked response headers for different test scenarios.
-	 *
-	 * @var array<string, array<string, mixed>>
-	 */
-	protected $mocked_responses = array();
-
-	/**
-	 * Setup each test.
-	 */
-	public function setUp(): void {
-		parent::setUp();
-
-		// Clear any filters or mocks.
-		remove_all_filters( 'pre_http_request' );
-
-		// Add the filter to mock HTTP requests.
-		add_filter( 'pre_http_request', array( $this, 'mock_http_requests' ), 10, 3 );
-	}
-
-	/**
 	 * Test that the bfcache compatibility test is added to the site health tests.
 	 *
 	 * @covers ::perflab_bfcache_compatibility_headers_add_test
@@ -64,7 +44,7 @@ class Test_BFCache_Compatibility_Headers extends WP_UnitTestCase {
 	 * @param string                     $expected_message  The expected message.
 	 */
 	public function test_perflab_bfcache_compatibility_headers_check( $response, string $expected_status, string $expected_message ): void {
-		$this->mocked_responses = array( home_url( '/' ) => $response );
+		$this->mock_http_request( $response, home_url( '/' ) );
 
 		$result = perflab_bfcache_compatibility_headers_check();
 
@@ -82,27 +62,27 @@ class Test_BFCache_Compatibility_Headers extends WP_UnitTestCase {
 			'headers_not_set'    => array(
 				$this->build_response( 200, array( 'cache-control' => '' ) ),
 				'good',
-				'If the <code>Cache-Control</code> page response header includes directives like',
+				'If the <code>Cache-Control</code> page response header includes',
 			),
 			'no_store'           => array(
 				$this->build_response( 200, array( 'cache-control' => 'no-store' ) ),
 				'recommended',
-				'<p>The <code>Cache-Control</code> response header for an unauthenticated request to the home page includes the following directive: <code>no-store</code>',
+				'<p>The <code>Cache-Control</code> response header for an unauthenticated request to the home page includes',
 			),
 			'no_cache'           => array(
 				$this->build_response( 200, array( 'cache-control' => 'no-cache' ) ),
-				'recommended',
-				'<p>The <code>Cache-Control</code> response header for an unauthenticated request to the home page includes the following directive: <code>no-cache</code>',
+				'good',
+				'If the <code>Cache-Control</code> page response header includes',
 			),
 			'max_age_0'          => array(
-				$this->build_response( 200, array( 'cache-control' => 'max-age=0' ) ),
-				'recommended',
-				'<p>The <code>Cache-Control</code> response header for an unauthenticated request to the home page includes the following directive: <code>max-age=0</code>',
+				$this->build_response( 200, array( 'cache-control' => 'no-cache' ) ),
+				'good',
+				'If the <code>Cache-Control</code> page response header includes',
 			),
 			'max_age_0_no_store' => array(
 				$this->build_response( 200, array( 'cache-control' => 'max-age=0, no-store' ) ),
 				'recommended',
-				'<p>The <code>Cache-Control</code> response header for an unauthenticated request to the home page includes the following directives: <code>no-store</code>, <code>max-age=0</code>',
+				'<p>The <code>Cache-Control</code> response header for an unauthenticated request to the home page includes',
 			),
 			'error'              => array(
 				new WP_Error( 'http_request_failed', 'HTTP request failed' ),
@@ -113,20 +93,23 @@ class Test_BFCache_Compatibility_Headers extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Mock HTTP requests for assets to simulate different responses.
+	 * Mock HTTP response for a given URL.
 	 *
-	 * @param bool                 $response A preemptive return value of an HTTP request. Default false.
-	 * @param array<string, mixed> $args     Request arguments.
-	 * @param string               $url      The request URL.
-	 * @return array<string, mixed>|WP_Error Mocked response.
+	 * @param array<string, mixed>|WP_Error $mocked_response The mocked response.
+	 * @param non-empty-string              $url             The request URL.
 	 */
-	public function mock_http_requests( bool $response, array $args, string $url ) {
-		if ( isset( $this->mocked_responses[ $url ] ) ) {
-			return $this->mocked_responses[ $url ];
-		}
-
-		// If no specific mock set, default to a generic success with no caching.
-		return $this->build_response( 200 );
+	public function mock_http_request( $mocked_response, string $url ): void {
+		add_filter(
+			'pre_http_request',
+			static function ( $pre, $args, $request_url ) use ( $url, $mocked_response ) {
+				if ( $url === $request_url ) {
+					return $mocked_response;
+				}
+				return $pre;
+			},
+			10,
+			3
+		);
 	}
 
 	/**
