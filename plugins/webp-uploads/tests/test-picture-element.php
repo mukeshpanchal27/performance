@@ -46,7 +46,7 @@ class Test_WebP_Uploads_Picture_Element extends TestCase {
 		// Fallback to JPEG IMG.
 		update_option( 'perflab_generate_webp_and_jpeg', '1' );
 
-		self::$image_id = $factory->attachment->create_upload_object( __DIR__ . '/data/images/leaves.jpg' );
+		self::$image_id = $factory->attachment->create_upload_object( TESTS_PLUGIN_DIR . '/data/images/leaves.jpg' );
 	}
 
 	public static function wpTearDownAfterClass(): void {

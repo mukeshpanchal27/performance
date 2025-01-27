@@ -23,7 +23,7 @@ class Tests_Improve_Calculate_Sizes extends WP_UnitTestCase {
 
 		switch_theme( 'twentytwentyfour' );
 
-		self::$image_id = self::factory()->attachment->create_upload_object( __DIR__ . '/data/images/leaves.jpg' );
+		self::$image_id = self::factory()->attachment->create_upload_object( TESTS_PLUGIN_DIR . '/data/images/leaves.jpg' );
 	}
 
 	public function set_up(): void {

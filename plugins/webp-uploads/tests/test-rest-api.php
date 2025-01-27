@@ -27,7 +27,7 @@ class Test_WebP_Uploads_REST_API extends WP_UnitTestCase {
 			}
 		);
 
-		$file_location = __DIR__ . '/data/images/leaves.jpg';
+		$file_location = TESTS_PLUGIN_DIR . '/data/images/leaves.jpg';
 		$attachment_id = self::factory()->attachment->create_upload_object( $file_location );
 		$metadata      = wp_get_attachment_metadata( $attachment_id );
 
@@ -72,7 +72,7 @@ class Test_WebP_Uploads_REST_API extends WP_UnitTestCase {
 	 * Checks whether the media details information is added to the REST response object.
 	 */
 	public function test_it_should_check_media_details_in_rest_response(): void {
-		$file_location = __DIR__ . '/data/images/leaves.jpg';
+		$file_location = TESTS_PLUGIN_DIR . '/data/images/leaves.jpg';
 		$attachment_id = self::factory()->attachment->create_upload_object( $file_location );
 
 		$request = new WP_REST_Request();

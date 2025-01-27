@@ -19,7 +19,7 @@ class Test_AutoSizes extends WP_UnitTestCase {
 	 * Setup shared fixtures.
 	 */
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ): void {
-		self::$image_id = $factory->attachment->create_upload_object( __DIR__ . '/data/images/leaves.jpg' );
+		self::$image_id = $factory->attachment->create_upload_object( TESTS_PLUGIN_DIR . '/data/images/leaves.jpg' );
 	}
 
 	/**
