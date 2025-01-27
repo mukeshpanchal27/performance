@@ -36,7 +36,6 @@ function perflab_aea_audit_enqueued_scripts(): void {
 			// Add any extra data (inlined) that was passed with the script.
 			$inline_size = 0;
 			if (
-				property_exists( $script, 'extra' ) &&
 				isset( $script->extra['after'] ) &&
 				is_array( $script->extra['after'] )
 			) {
@@ -83,7 +82,6 @@ function perflab_aea_audit_enqueued_styles(): void {
 
 			// Check if we already have the style's path ( part of a refactor for block styles from 5.9 ).
 			if (
-				property_exists( $style, 'extra' ) &&
 				isset( $style->extra['path'] ) &&
 				is_string( $style->extra['path'] ) &&
 				'' !== $style->extra['path']
@@ -99,7 +97,6 @@ function perflab_aea_audit_enqueued_styles(): void {
 			// Add any extra data (inlined) that was passed with the style.
 			$inline_size = 0;
 			if (
-				property_exists( $style, 'extra' ) &&
 				isset( $style->extra['after'] ) &&
 				is_array( $style->extra['after'] )
 			) {
