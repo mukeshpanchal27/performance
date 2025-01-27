@@ -218,7 +218,11 @@ function webp_uploads_create_sources_property( array $metadata, int $attachment_
 		}
 
 		if (
-			( ! isset( $properties['sources'][ $current_mime ] ) || ! is_array( $properties['sources'][ $current_mime ] ) || 0 === count( $properties['sources'][ $current_mime ] ) ) &&
+			(
+				! isset( $properties['sources'][ $current_mime ] ) ||
+				! is_array( $properties['sources'][ $current_mime ] ) ||
+				0 === count( $properties['sources'][ $current_mime ] )
+			) &&
 			isset( $properties['file'] )
 		) {
 			$properties['sources'][ $current_mime ] = array(
@@ -394,7 +398,11 @@ function webp_uploads_remove_sources_files( int $attachment_id ): void {
 	$sizes = ! isset( $metadata['sizes'] ) || ! is_array( $metadata['sizes'] ) ? array() : $metadata['sizes'];
 
 	$upload_path = wp_get_upload_dir();
-	if ( ! isset( $upload_path['basedir'] ) || ! is_string( $upload_path['basedir'] ) || '' === $upload_path['basedir'] ) {
+	if (
+		! isset( $upload_path['basedir'] ) ||
+		! is_string( $upload_path['basedir'] ) ||
+		'' === $upload_path['basedir']
+	) {
 		return;
 	}
 
