@@ -185,7 +185,7 @@ function webp_uploads_generate_additional_image_source( int $attachment_id, stri
 		return $image;
 	}
 
-	if ( ! isset( $image['file'] ) || '' === $image['file'] ) {
+	if ( ! isset( $image['file'] ) || ! is_string( $image['file'] ) || '' === $image['file'] ) {
 		return new WP_Error( 'image_file_not_present', __( 'The file key is not present on the image data', 'webp-uploads' ) );
 	}
 
