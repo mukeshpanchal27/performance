@@ -5,18 +5,18 @@
  * @package performance-lab
  */
 
-define( 'TESTS_PLUGIN_DIR', dirname( __DIR__, 2 ) );
+define( 'REPO_ROOT_DIR', dirname( __DIR__, 2 ) );
 
 // Determine correct location for plugins directory to use.
 if ( false !== getenv( 'WP_PLUGIN_DIR' ) ) {
 	define( 'WP_PLUGIN_DIR', getenv( 'WP_PLUGIN_DIR' ) );
 } else {
-	define( 'WP_PLUGIN_DIR', dirname( TESTS_PLUGIN_DIR ) );
+	define( 'WP_PLUGIN_DIR', dirname( REPO_ROOT_DIR ) );
 }
 
 // Load Composer dependencies if applicable.
-if ( file_exists( TESTS_PLUGIN_DIR . '/vendor/autoload.php' ) ) {
-	require_once TESTS_PLUGIN_DIR . '/vendor/autoload.php';
+if ( file_exists( REPO_ROOT_DIR . '/vendor/autoload.php' ) ) {
+	require_once REPO_ROOT_DIR . '/vendor/autoload.php';
 }
 
 // Detect where to load the WordPress tests environment from.
@@ -26,8 +26,8 @@ if ( false !== getenv( 'WP_TESTS_DIR' ) ) {
 	$_test_root = getenv( 'WP_DEVELOP_DIR' ) . '/tests/phpunit';
 } elseif ( false !== getenv( 'WP_PHPUNIT__DIR' ) ) {
 	$_test_root = getenv( 'WP_PHPUNIT__DIR' );
-} elseif ( file_exists( TESTS_PLUGIN_DIR . '/../../../../tests/phpunit/includes/functions.php' ) ) {
-	$_test_root = TESTS_PLUGIN_DIR . '/../../../../tests/phpunit';
+} elseif ( file_exists( REPO_ROOT_DIR . '/../../../../tests/phpunit/includes/functions.php' ) ) {
+	$_test_root = REPO_ROOT_DIR . '/../../../../tests/phpunit';
 } else { // Fallback.
 	$_test_root = '/tmp/wordpress-tests-lib';
 }
@@ -47,7 +47,7 @@ foreach ( $_SERVER['argv'] as $index => $arg ) {
 	if (
 		'--testsuite' === $arg &&
 		isset( $_SERVER['argv'][ $index + 1 ] ) &&
-		file_exists( TESTS_PLUGIN_DIR . '/plugins/' . $_SERVER['argv'][ $index + 1 ] )
+		file_exists( REPO_ROOT_DIR . '/plugins/' . $_SERVER['argv'][ $index + 1 ] )
 	) {
 		$plugin_name = $_SERVER['argv'][ $index + 1 ];
 	}
@@ -64,7 +64,7 @@ if ( '' === $plugin_name ) {
  * @param string $plugin_name Plugin slug to load.
  */
 $load_plugin = static function ( string $plugin_name ) use ( &$load_plugin ): void {
-	$plugin_test_path = TESTS_PLUGIN_DIR . '/plugins/' . $plugin_name;
+	$plugin_test_path = REPO_ROOT_DIR . '/plugins/' . $plugin_name;
 	if ( file_exists( $plugin_test_path . '/' . $plugin_name . '.php' ) ) {
 		$plugin_file = $plugin_test_path . '/' . $plugin_name . '.php';
 	} elseif ( file_exists( $plugin_test_path . '/load.php' ) ) {
@@ -102,9 +102,9 @@ if ( 'performance-lab' === $plugin_name ) {
 	tests_add_filter(
 		'plugins_loaded',
 		static function () use ( $plugin_name ): void {
-			require_once TESTS_PLUGIN_DIR . '/plugins/' . $plugin_name . '/includes/admin/load.php';
-			require_once TESTS_PLUGIN_DIR . '/plugins/' . $plugin_name . '/includes/admin/server-timing.php';
-			require_once TESTS_PLUGIN_DIR . '/plugins/' . $plugin_name . '/includes/admin/plugins.php';
+			require_once REPO_ROOT_DIR . '/plugins/' . $plugin_name . '/includes/admin/load.php';
+			require_once REPO_ROOT_DIR . '/plugins/' . $plugin_name . '/includes/admin/server-timing.php';
+			require_once REPO_ROOT_DIR . '/plugins/' . $plugin_name . '/includes/admin/plugins.php';
 		},
 		1
 	);
