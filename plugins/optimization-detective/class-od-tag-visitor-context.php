@@ -51,7 +51,7 @@ final class OD_Tag_Visitor_Context {
 	/**
 	 * Visited tag state.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var OD_Visited_Tag_State
 	 */
 	private $visited_tag_state;
@@ -78,7 +78,7 @@ final class OD_Tag_Visitor_Context {
 	 *
 	 * Calling this method from a tag visitor has the same effect as a tag visitor returning `true`.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	public function track_tag(): void {
 		$this->visited_tag_state->track_tag();

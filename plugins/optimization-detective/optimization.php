@@ -130,7 +130,7 @@ function od_maybe_add_template_output_buffer_filter(): void {
  *
  * This is only used when WP_DEBUG is enabled.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  * @access private
  *
  * @param string[] $reasons Reason messages.
