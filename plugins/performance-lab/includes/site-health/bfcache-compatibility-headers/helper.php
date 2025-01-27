@@ -3,7 +3,7 @@
  * Helper functions used for Cache-Control headers for bfcache compatibility site health check.
  *
  * @package performance-lab
- * @since n.e.x.t
+ * @since 3.8.0
  */
 
 // @codeCoverageIgnoreStart
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Tests the Cache-Control headers for bfcache compatibility.
  *
- * @since n.e.x.t
+ * @since 3.8.0
  * @access private
  *
  * @return array{label: string, status: string, badge: array{label: string, color: string}, description: string, actions: string, test: string} Result.
