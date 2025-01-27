@@ -194,7 +194,7 @@ function webp_uploads_create_sources_property( array $metadata, int $attachment_
 		if (
 			! is_array( $properties ) ||
 			! isset( $sizes_with_mime_type_support[ $size_name ] ) ||
-			false === (bool) $sizes_with_mime_type_support[ $size_name ]
+			false === $sizes_with_mime_type_support[ $size_name ]
 		) {
 			continue;
 		}
