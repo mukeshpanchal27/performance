@@ -79,8 +79,7 @@ function webp_uploads_create_sources_property( array $metadata, int $attachment_
 
 	if (
 		! isset( $metadata['sources'][ $mime_type ] ) ||
-		! is_array( $metadata['sources'][ $mime_type ] ) ||
-		0 === count( $metadata['sources'][ $mime_type ] )
+		! is_array( $metadata['sources'][ $mime_type ] )
 	) {
 		$metadata['sources'][ $mime_type ] = array(
 			'file'     => wp_basename( $file ),
@@ -105,8 +104,7 @@ function webp_uploads_create_sources_property( array $metadata, int $attachment_
 		// If this property exists no need to create the image again.
 		if (
 			isset( $metadata['sources'][ $targeted_mime ] ) &&
-			is_array( $metadata['sources'][ $targeted_mime ] ) &&
-			0 !== count( $metadata['sources'][ $targeted_mime ] )
+			is_array( $metadata['sources'][ $targeted_mime ] )
 		) {
 			continue;
 		}
@@ -220,8 +218,7 @@ function webp_uploads_create_sources_property( array $metadata, int $attachment_
 		if (
 			(
 				! isset( $properties['sources'][ $current_mime ] ) ||
-				! is_array( $properties['sources'][ $current_mime ] ) ||
-				0 === count( $properties['sources'][ $current_mime ] )
+				! is_array( $properties['sources'][ $current_mime ] )
 			) &&
 			isset( $properties['file'] )
 		) {
@@ -242,8 +239,7 @@ function webp_uploads_create_sources_property( array $metadata, int $attachment_
 			// If this property exists no need to create the image again.
 			if (
 				isset( $properties['sources'][ $mime ] ) &&
-				is_array( $properties['sources'][ $mime ] ) &&
-				0 !== count( $properties['sources'][ $mime ] )
+				is_array( $properties['sources'][ $mime ] )
 			) {
 				continue;
 			}
