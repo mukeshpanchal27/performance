@@ -505,7 +505,6 @@ function webp_uploads_remove_sources_files( int $attachment_id ): void {
 			}
 
 			if (
-				! is_array( $backup_properties ) ||
 				! isset( $backup_properties['file'] ) ||
 				! is_string( $backup_properties['file'] ) ||
 				'' === $backup_properties['file']
@@ -535,7 +534,6 @@ function webp_uploads_remove_sources_files( int $attachment_id ): void {
 
 		foreach ( $backup_mimes as $backup_mime_properties ) {
 			if (
-				! is_array( $backup_mime_properties ) ||
 				! isset( $backup_mime_properties['file'] ) ||
 				! is_string( $backup_mime_properties['file'] ) ||
 				'' === $backup_mime_properties['file']
