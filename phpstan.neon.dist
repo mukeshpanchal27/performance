@@ -5,7 +5,6 @@ parameters:
 	treatPhpDocTypesAsCertain: false
 	paths:
 		- plugins
-		- tests
 		- performance.php
 		- plugins/performance-lab/load.php
 	bootstrapFiles:
