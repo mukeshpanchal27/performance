@@ -209,12 +209,7 @@ function webp_uploads_create_sources_property( array $metadata, int $attachment_
 			$properties['sources'] = array();
 		}
 
-		if (
-			(
-				! isset( $properties['sources'][ $current_mime ]['file'] )
-			) &&
-			isset( $properties['file'] )
-		) {
+		if ( ! isset( $properties['sources'][ $current_mime ]['file'] ) && isset( $properties['file'] ) ) {
 			$properties['sources'][ $current_mime ] = array(
 				'file'     => $properties['file'],
 				'filesize' => 0,
