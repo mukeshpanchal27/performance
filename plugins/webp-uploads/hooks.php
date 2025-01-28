@@ -425,7 +425,6 @@ function webp_uploads_remove_sources_files( int $attachment_id ): void {
 			}
 
 			if (
-				! is_array( $properties ) ||
 				! isset( $properties['file'] ) ||
 				! is_string( $properties['file'] ) ||
 				'' === $properties['file']
@@ -462,7 +461,6 @@ function webp_uploads_remove_sources_files( int $attachment_id ): void {
 		}
 
 		if (
-			! is_array( $properties ) ||
 			! isset( $properties['file'] ) ||
 			! is_string( $properties['file'] ) ||
 			'' === $properties['file']
