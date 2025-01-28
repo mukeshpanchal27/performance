@@ -24,7 +24,7 @@ class OD_Uninstall_Tests extends WP_UnitTestCase {
 	 * Load uninstall.php.
 	 */
 	private function require_uninstall(): void {
-		require TESTS_REPO_ROOT_DIR . '/plugins/optimization-detective/uninstall.php';
+		require TESTS_PLUGIN_DIR . '/uninstall.php';
 	}
 
 	/**

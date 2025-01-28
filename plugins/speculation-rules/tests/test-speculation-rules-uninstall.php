@@ -24,7 +24,7 @@ class Test_Speculation_Rules_Uninstall extends WP_UnitTestCase {
 	 * Load uninstall.php.
 	 */
 	private function require_uninstall(): void {
-		require TESTS_REPO_ROOT_DIR . '/plugins/speculation-rules/uninstall.php';
+		require TESTS_PLUGIN_DIR . '/uninstall.php';
 	}
 
 	/**
