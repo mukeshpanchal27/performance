@@ -77,10 +77,7 @@ function webp_uploads_create_sources_property( array $metadata, int $attachment_
 		$metadata['sources'] = array();
 	}
 
-	if (
-		! isset( $metadata['sources'][ $mime_type ] ) ||
-		! is_array( $metadata['sources'][ $mime_type ] )
-	) {
+	if ( ! isset( $metadata['sources'][ $mime_type ]['file'] ) ) {
 		$metadata['sources'][ $mime_type ] = array(
 			'file'     => wp_basename( $file ),
 			'filesize' => wp_filesize( $file ),
@@ -102,10 +99,7 @@ function webp_uploads_create_sources_property( array $metadata, int $attachment_
 	// Create the sources for the full sized image.
 	foreach ( $valid_mime_transforms[ $mime_type ] as $targeted_mime ) {
 		// If this property exists no need to create the image again.
-		if (
-			isset( $metadata['sources'][ $targeted_mime ] ) &&
-			is_array( $metadata['sources'][ $targeted_mime ] )
-		) {
+		if ( isset( $metadata['sources'][ $targeted_mime ]['file'] ) ) {
 			continue;
 		}
 
@@ -217,8 +211,7 @@ function webp_uploads_create_sources_property( array $metadata, int $attachment_
 
 		if (
 			(
-				! isset( $properties['sources'][ $current_mime ] ) ||
-				! is_array( $properties['sources'][ $current_mime ] )
+				! isset( $properties['sources'][ $current_mime ]['file'] )
 			) &&
 			isset( $properties['file'] )
 		) {
@@ -237,10 +230,7 @@ function webp_uploads_create_sources_property( array $metadata, int $attachment_
 
 		foreach ( $valid_mime_transforms[ $mime_type ] as $mime ) {
 			// If this property exists no need to create the image again.
-			if (
-				isset( $properties['sources'][ $mime ] ) &&
-				is_array( $properties['sources'][ $mime ] )
-			) {
+			if ( isset( $properties['sources'][ $mime ]['file'] ) ) {
 				continue;
 			}
 
