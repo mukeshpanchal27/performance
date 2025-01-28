@@ -469,7 +469,7 @@ class Test_OD_Storage_Data extends WP_UnitTestCase {
 			'block_theme'                 => array(
 				'set_up' => function (): Closure {
 					self::factory()->post->create();
-					register_theme_directory( TESTS_PLUGIN_DIR . '/data/themes' );
+					register_theme_directory( __DIR__ . '/../data/themes' );
 					update_option( 'template', 'block-theme' );
 					update_option( 'stylesheet', 'block-theme' );
 					$this->go_to( '/' );

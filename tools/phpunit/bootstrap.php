@@ -58,7 +58,7 @@ if ( '' === $plugin_name ) {
 	$plugin_name = 'performance-lab';
 }
 
-define( 'TESTS_PLUGIN_DIR', REPO_ROOT_DIR . "/plugins/$plugin_name/tests" );
+define( 'TESTS_PLUGIN_DIR', REPO_ROOT_DIR . "/plugins/$plugin_name" );
 
 /**
  * Load plugin bootstrap and any dependencies.

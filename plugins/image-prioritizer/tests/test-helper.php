@@ -504,7 +504,7 @@ class Test_Image_Prioritizer_Helper extends WP_UnitTestCase {
 
 			'good_url_allowed_cdn_origin' => array(
 				'set_up'       => function (): string {
-					$attachment_id = self::factory()->attachment->create_upload_object( TESTS_PLUGIN_DIR . '/data/images/car.jpeg' );
+					$attachment_id = self::factory()->attachment->create_upload_object( TESTS_PLUGIN_DIR . '/tests/data/images/car.jpeg' );
 					$this->assertIsInt( $attachment_id );
 
 					add_filter(
