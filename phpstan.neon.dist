@@ -65,11 +65,3 @@ parameters:
 		-
 			identifier: staticMethod.dynamicCall
 			path: */tests/*
-		-
-			# TODO: Remove this to fix https://github.com/WordPress/performance/issues/1219
-			identifier: empty.notAllowed
-			paths:
-				- */tests/*
-				- plugins/dominant-color-images
-				- plugins/performance-lab
-				- plugins/webp-uploads
