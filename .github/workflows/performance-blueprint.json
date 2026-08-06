@@ -1,0 +1,56 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "plugins": [
+    "woocommerce",
+    "email-log",
+    "https://github.com/woocommerce/wc-smooth-generator/releases/latest/download/wc-smooth-generator.zip"
+  ],
+  "extraLibraries": [
+    "wp-cli"
+  ],
+  "steps": [
+    {
+      "step": "defineWpConfigConsts",
+      "consts": {
+        "WP_DEBUG": true,
+        "WP_CACHE": true
+      }
+    },
+    {
+      "step": "installTheme",
+      "themeData": {
+        "resource": "wordpress.org/themes",
+        "slug": "storefront"
+      },
+      "ifAlreadyInstalled": "skip",
+      "options": {
+        "activate": true,
+        "importStarterContent": false
+      }
+    },
+    {
+      "step": "runPHP",
+      "code": "<?php\nrequire '/wordpress/wp-load.php';\n\n// Create the 'Vendor' term under 'wcpv_product_vendors' taxonomy\n$term = wp_insert_term('Vendor', 'wcpv_product_vendors');\n\n// Check if the term was created successfully\nif (is_wp_error($term)) {\n    echo 'Error creating term: ' . $term->get_error_message();\n} else {\n    $term_id = $term['term_id'];\n    // Set the term meta for 'vendor_data'\n    update_term_meta($term_id, 'vendor_data', json_encode(['email' => 'sample@example.com']));\n    echo 'Term created and meta data set successfully.';\n}\n"
+    },
+    {
+      "step": "wp-cli",
+      "command": "wp wc generate products 50"
+    },
+    {
+      "step": "wp-cli",
+      "command": "wp wc generate orders 20"
+    },
+    {
+      "step": "wp-cli",
+      "command": "wp wc generate customers 10"
+    },
+    {
+      "step": "wp-cli",
+      "command": "wp wc generate terms product_cat 100"
+    },
+    {
+      "step": "login",
+      "username": "admin"
+    }
+  ]
+}
